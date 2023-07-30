@@ -1,5 +1,5 @@
 <p align="center">
-  ![Pilliz logo](docs/assets/Pilliz-logo.png)
+  <img alt="Pilliz logo" src="docs/assets/Pilliz-logo.png" width="500"/>
 </p>
 
 <p align="center">REST API of the Pilliz App made with <a href="http://nestjs.com" target="_blank">NestJS</a>.</p>
