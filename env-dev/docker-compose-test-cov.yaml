@@ -1,0 +1,8 @@
+services:
+  pilliz-backend-test:
+    build:
+      target: test-cov
+    image: pilliz-backend-test-cov
+    container_name: env-dev_pilliz-backend-test-cov
+    volumes:
+      - ../coverage:/app/coverage

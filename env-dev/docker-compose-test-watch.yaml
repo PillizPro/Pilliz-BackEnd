@@ -1,0 +1,8 @@
+services:
+  pilliz-backend-test:
+    build:
+      target: test-watch
+    image: pilliz-backend-test-watch
+    container_name: env-dev_pilliz-backend-test-watch
+    volumes:
+      - ../.git:/app/.git/

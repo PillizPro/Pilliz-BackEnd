@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  pilliz-backend-dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      target: dev
+    image: pilliz-backend-dev
+    container_name: env-dev_pilliz-backend-dev
+    ports:
+      - '8080:3000'
+    volumes:
+      - ../src:/app/src
+      - ../test:/app/test
+    depends_on:
+      - pilliz-db
+    tty: true
+
+  pilliz-backend-lint:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      target: lint
+    image: pilliz-backend-lint
+    container_name: env-dev_pilliz-backend-lint
+    volumes:
+      - ../src:/app/src
+      - ../test:/app/test
+    tty: true
+
+  pilliz-backend-test:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      target: test
+    image: pilliz-backend-test
+    container_name: env-dev_pilliz-backend-test
+    depends_on:
+      - pilliz-db
+    tty: true
+
+  pilliz-db:
+    image: postgres
+    container_name: env-dev_pilliz-db
+    restart: always
+    ports:
+      - '5432:5432'
+    env_file:
+      - ./.env.dev
+    volumes:
+      - pilliz-db-data:/var/lib/postgresql/data
+
+  dbadmin:
+    image: dpage/pgadmin4
+    container_name: env-dev_dbadmin
+    restart: always
+    ports:
+      - '8081:80'
+    env_file:
+      - ./.dbadmin.cred
+    volumes:
+      - dbadmin-data:/var/lib/pgadmin
+volumes:
+  pilliz-db-data:
+    name: pilliz-db-data
+  dbadmin-data:
+    name: dbadmin-data
