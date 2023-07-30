@@ -19,7 +19,7 @@ See **[Setup.md](docs/Setup.md)**
 The **scripts** are made to make easier the writing of long commands.
 <br/>
 <br/>
-You can execute all the scripts below with: **pnpm \***script**\*** or **pnpm run \***script**\***.
+You can execute all the scripts below with: **pnpm** ***script*** or **pnpm run** ***script***.
 <br/>
 <br/>
 E.g.:
