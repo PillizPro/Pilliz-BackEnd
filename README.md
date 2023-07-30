@@ -1,5 +1,5 @@
 <p align="center">
-  ![Pilliz logo](docs/assets/Pilliz-logo)
+  ![Pilliz logo](docs/assets/Pilliz-logo.png)
 </p>
 
 <p align="center">REST API of the Pilliz App made with <a href="http://nestjs.com" target="_blank">NestJS</a>.</p>
@@ -19,7 +19,7 @@ See **[Setup.md](docs/Setup.md)**
 The **scripts** are made to make easier the writing of long commands.
 <br/>
 <br/>
-You can execute all the scripts below with: **pnpm** ***script*** or **pnpm run** ***script***.
+You can execute all the scripts below with: **pnpm** **_script_** or **pnpm run** **_script_**.
 <br/>
 <br/>
 E.g.:
