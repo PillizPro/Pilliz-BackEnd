@@ -12,7 +12,7 @@ export class UserEntity implements Users {
   @ApiHideProperty()
   @Exclude()
   password: string
-  @ApiProperty({ enum: UserRoles, enumName: 'UsersRoles' })
+  @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
   role: UserRoles
   createdAt: Date
   updatedAt: Date
