@@ -1,8 +1,8 @@
 <p align="center">
-  ![Pilliz logo](docs/assets/Pilliz-logo.png)
+  <img alt="Pilliz logo" src="docs/assets/Pilliz-logo.png" width="500"/>
 </p>
 
-<p align="center">REST API of the Pilliz App made with <a href="http://nestjs.com" target="_blank">NestJS</a>.</p>
+<p align="center">REST API of the Pilliz App made with <a href="http://nestjs.com" target="_blank"><b>NestJS</b></a>.</p>
 <p align="center">
   <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img alt="Nest Version" src="https://img.shields.io/npm/v/%40nestjs%2Fcore?label=nest"></a>
   <a href="https://pnpm.io/" target="_blank"><img alt="npm" src="https://img.shields.io/npm/v/pnpm?label=pnpm"></a>
