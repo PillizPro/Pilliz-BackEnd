@@ -21,9 +21,6 @@ COPY . .
 RUN pnpm prisma:generate
 CMD [ "pnpm", "start:dev" ]
 
-FROM dev AS lint
-CMD [ "pnpm", "lint" ]
-
 FROM dev as test
 ENV NODE_ENV=test
 CMD [ "pnpm", "test" ]

@@ -16,18 +16,6 @@ services:
       - pilliz-db
     tty: true
 
-  pilliz-backend-lint:
-    build:
-      context: ..
-      dockerfile: Dockerfile.dev
-      target: lint
-    image: pilliz-backend-lint
-    container_name: env-dev_pilliz-backend-lint
-    volumes:
-      - ../src:/app/src
-      - ../test:/app/test
-    tty: true
-
   pilliz-backend-test:
     build:
       context: ..

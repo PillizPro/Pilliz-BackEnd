@@ -46,12 +46,12 @@ An autocomplete is available when starting the command with **pnpm run** if you 
 |       SCRIPTS       |                                                                DESCRIPTION                                                                |
 | :-----------------: | :---------------------------------------------------------------------------------------------------------------------------------------: |
 |     `docker:db`     |       Start the Database Service (**PostgreSQL**) <br/> and <br/> Start the Database Admin Service (**pgAdmin 4**) on port **8081**       |
-|  `docker:db:reset`  |                                            Delete the Database Service and its persistent data                                            |
+|  `docker:db:reset`  |                                   Delete the Database Service (**PostgreSQL**) and its persistent data                                    |
 |    `docker:dev`     | Start the Development Server on port **8080** <br/> and <br/> Start Database related Services (if not already started) (see: `docker:db`) |
 |    `docker:test`    |                                                             Launch Unit Tests                                                             |
 |  `docker:test:cov`  |                                                   Launch Unit Tests and Create Coverage                                                   |
 | `docker:test:watch` |                                     Launch Unit Tests watching for modification in the Git Work Tree                                      |
-|    `docker:lint`    |                                                      Launch Linting for the project                                                       |
+|    `docker:lint`    |                                Lint and Format files of the project (`docker:dev` is **required** before)                                 |
 |   `docker:clean`    |                                               Delete all Services and their persistent data                                               |
 | `docker:clean:img`  |                                    Like `docker:clean` but also delete Docker images of those Services                                    |
 
@@ -75,10 +75,12 @@ E.g:
 
 ### Prisma
 
-⚠️ _<a href="#setup">**dotenv-cli**</a> is mandatory to execute migrate or pull scripts._
+⚠️ _**[dotenv-cli](docs/Setup.md)** is mandatory to execute studio, migrate or pull prisma scripts as well as a working database._
 
 |        SCRIPTS         |                                                    DESCRIPTION                                                    | DEVELOPMENT | PRODUCTION |
 | :--------------------: | :---------------------------------------------------------------------------------------------------------------: | :---------: | :--------: |
+|  `prisma:studio:dev`   |                        Access a simplest representation of the Development Database's data                        |     ✔️      |            |
+|  `prisma:studio:prod`  |                        Access a simplest representation of the Production Database's data                         |             |     ✔️     |
 |  `prisma:migrate:dev`  |   Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Development Database    |     ✔️      |            |
 | `prisma:migrate:reset` |                           Delete all data present in tables of the Development Database                           |     ✔️      |            |
 | `prisma:migrate:prod`  |    Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Production Database    |             |     ✔️     |
@@ -87,6 +89,14 @@ E.g:
 |   `prisma:generate`    | Synchronize your Prisma Client with the migrations that have been made to manipulate the correct data when coding |     ✔️      |     ✔️     |
 
 See https://www.prisma.io/docs/reference/api-reference/command-reference for complete explanation about Prisma CLI.
+
+## Database visualization
+
+Like mentioned above in the different scripts regarding the database, you can access a visualization of the database via 2 ways:
+
+- **pgAdmin 4** which provides a more complex and well-stocked interface to use for more complex operations and queries (see <a href="#urls">**URLs**</a>)
+
+- **prisma:studio:dev** and **prisma:studio:prod** scripts which provides a more refine interface to use to don't worry too much about queries and make handling data easier
 
 ## URLs
 
@@ -110,7 +120,7 @@ Pilliz API **OpenAPI** documentation is available here: _http://localhost:8080/a
 
 ### Files Syntax:
 
-When creating a new file make sure to create it with the following syntax to allow **OpenAPI** to automatically document the code:
+When creating a new file make sure to name it with the following syntax to allow **OpenAPI** to automatically document the code:
 
 #### DTO Files:
 
