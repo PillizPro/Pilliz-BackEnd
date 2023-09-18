@@ -11,6 +11,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerDto: CreateUserDto) {
+    console.log('bidddte')
     return await this.authService.register(registerDto)
   }
 

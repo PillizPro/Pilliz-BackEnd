@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import CONFIG_SCHEMA_VALIDATAION from './config.schema'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
+import { MailModule } from './mail/mail.module';
 
 const ENV = process.env.NODE_ENV
 
@@ -28,6 +29,7 @@ const ENV = process.env.NODE_ENV
     PrismaModule,
     AuthModule,
     UserModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
