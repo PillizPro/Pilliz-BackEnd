@@ -22,6 +22,6 @@ export class AuthService {
     if (user.role === 'admin') {
       return { status: 'success', isAdmin: true };
     }
-    return { status: 'success', isAdmin: false };
+    return { status: 'success', isAdmin: false, username: user.name, email: user.email };
   }
 }

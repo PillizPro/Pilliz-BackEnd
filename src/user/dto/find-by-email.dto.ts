@@ -3,4 +3,4 @@ import { CreateUserDto } from './create-user.dto'
 
 export class FindByEmailDto extends PickType(CreateUserDto, [
   'email',
-] as const) {}
+] as const) { }
