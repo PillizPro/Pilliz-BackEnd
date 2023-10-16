@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger'
-import { Users, UserRoles } from '@prisma/client'
+import { Users, UserRoles, BanningStatus } from '@prisma/client'
 import { Exclude } from 'class-transformer'
 
 export class UserEntity implements Users {
@@ -13,7 +13,9 @@ export class UserEntity implements Users {
   @Exclude()
   password: string
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
+  @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
   role: UserRoles
+  banned: BanningStatus
   createdAt: Date
   updatedAt: Date
 }

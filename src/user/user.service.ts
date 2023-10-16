@@ -3,7 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { FindByEmailDto } from './dto/find-by-email.dto'
 import { DeleteUserDto } from './dto/delete-user.dto'
+import { BanningDto } from 'src/admin/dto/banning.dto'
 import { UserEntity } from './entities/user.entity'
+import { BanningStatus } from '@prisma/client'
 
 @Injectable()
 export class UserService {
@@ -35,6 +37,30 @@ export class UserService {
       return { message: 'User successfully deleted.' }
     } catch (error) {
       throw new Error('An error occurred while deleting the user.')
+    }
+  }
+
+  async banUserByID(banningDto: BanningDto) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: banningDto.id },
+        data: { banned: BanningStatus.banned },
+      });
+      return { message: 'User successfully banned.' };
+    } catch (error) {
+      throw new Error('An error occurred while banning the user.');
+    }
+  }
+
+  async unbanUserByID(banningDto: BanningDto) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: banningDto.id },
+        data: { banned: BanningStatus.notBanned },
+      });
+      return { message: 'User successfully unbanned.' };
+    } catch (error) {
+      throw new Error('An error occurred while unbanning the user.');
     }
   }
 }
