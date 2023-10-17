@@ -16,6 +16,28 @@ model Users {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   banned    BanningStatus @default(notBanned)
+  posts     Post[]        // Relation vers tous les posts créés par l'utilisateur
+  likes     Like[]        // Relation vers tous les likes faits par l'utilisateur
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      Users    @relation(fields: [userId], references: [id])
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  likesCount Int      @default(0)
+  comments  Int      @default(0)
+  likedBy   Like[]   // Relation vers tous les likes reçus par le post
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      Users    @relation(fields: [userId], references: [id])
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 enum UserRoles {

@@ -7,6 +7,8 @@ import { AdminModule } from './admin/admin.module'
 import CONFIG_SCHEMA_VALIDATAION from './config.schema'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
+import { PostModule } from './post/post.module'
+import { LikeModule } from './like/like.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -30,6 +32,8 @@ const ENV = process.env.NODE_ENV
     AuthModule,
     AdminModule,
     UserModule,
+    PostModule,
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

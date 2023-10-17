@@ -43,7 +43,7 @@ export class AuthService {
     if (user.role === 'admin') {
       return { status: 'success', isAdmin: true };
     }
-    return { status: 'success', isAdmin: false, username: user.name, email: user.email };
+    return { status: 'success', isAdmin: false, username: user.name, email: user.email, id: user.id };
   }
 
   private async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
