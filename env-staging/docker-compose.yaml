@@ -14,14 +14,12 @@ services:
     tty: true
 
   pilliz-backend-staging:
-    build:
-      context: ..
-      dockerfile: Dockerfile.prod
-      target: staging
-    image: pilliz-backend-staging
+    image: ghcr.io/pillizpro/pilliz-backend/staging:latest
     container_name: env-staging_pilliz-backend-staging
     ports:
       - '8081:3000'
+    env_file:
+      - ./.env.staging
     depends_on:
       - pilliz-db-staging
     tty: true
