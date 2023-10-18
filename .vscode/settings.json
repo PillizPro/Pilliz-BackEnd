@@ -11,5 +11,6 @@
     "source.fixAll.eslint": true
   },
   "editor.formatOnSave": true,
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "files.eol": "\n"
 }

@@ -39,6 +39,7 @@ Dockerfile.dev
 Dockerfile.dev.dockerignore
 Dockerfile.prod
 env-dev
+env-staging/*.yaml
 env-prod/*.yaml
 
 # Miscellaneous

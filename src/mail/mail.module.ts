@@ -10,11 +10,12 @@ import { join } from 'path'
     // import users
     MailerModule.forRoot({
       transport: {
-        host: 'sandbox.smtp.mailtrap.io',
-        port: 2525,
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
-          user: '7c50c100b59bab',
-          pass: '506088bab9112d',
+          user: 'baptiste.alik@gmail.com',
+          pass: 'bztkpnohpubpoxsa',
         },
       },
       defaults: {
