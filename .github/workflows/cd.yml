@@ -1,0 +1,17 @@
+# name: Continous Deployment
+
+# on:
+#   workflow_dispatch:
+#   # schedule:
+#   #  - cron: '0 8 * * 1'
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: ssh-agent
+#         uses: webfactory/ssh-agent@master
+#         with:
+#           ssh-private-key: ${{ secrets.SSH_KEY }}
+#       - name: Deploy
+#         run: |

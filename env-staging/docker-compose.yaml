@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  pilliz-backend-staging:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      target: staging
+    image: pilliz-backend-staging
+    container_name: env-staging_pilliz-backend-staging
+    ports:
+      - '8082:3000'
+    volumes:
+      - ../src:/app/src
+    tty: true
+
+  pilliz-db-staging:
+    image: postgres
+    container_name: env-staging_pilliz-db
+    restart: always
+    ports:
+      - '5431:5432'
+    env_file:
+      - ./.env.staging
+    volumes:
+      - pilliz-db-staging-data:/var/lib/postgresql/data
+volumes:
+  pilliz-db-staging-data:
+    name: pilliz-db-staging-data
