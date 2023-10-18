@@ -1,0 +1,17 @@
+name: Continous Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - "CodeQL"
+    types:
+      - "completed"
+    branches:
+      - "staging"
+
+jobs:
+  deploy_staging:
+    uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@main
+    secrets: inherit
+    with:
+      environment: staging
