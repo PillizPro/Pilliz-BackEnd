@@ -9,6 +9,10 @@ on:
     branches:
       - "staging"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   deploy_staging:
     uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@main
