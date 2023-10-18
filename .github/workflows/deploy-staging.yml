@@ -20,3 +20,11 @@ jobs:
     secrets: inherit
     with:
       environment: staging
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: github ref
+        run: echo ${{ github.ref }}
+
+      - name: github ref name
+        run: echo ${{ github.ref_name }}
