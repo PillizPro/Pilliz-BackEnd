@@ -37,7 +37,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,format=long,prefix={{branch}}-
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', inputs.environment) }}
+            type=raw,value=latest
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -46,5 +46,5 @@ jobs:
           file: "Dockerfile.prod"
           target: ${{ inputs.environment }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
