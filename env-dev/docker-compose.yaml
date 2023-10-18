@@ -13,7 +13,7 @@ services:
       - ../src:/app/src
       - ../test:/app/test
     depends_on:
-      - pilliz-db
+      - pilliz-db-dev
     tty: true
 
   pilliz-backend-test:
@@ -24,10 +24,10 @@ services:
     image: pilliz-backend-test
     container_name: env-dev_pilliz-backend-test
     depends_on:
-      - pilliz-db
+      - pilliz-db-dev
     tty: true
 
-  pilliz-db:
+  pilliz-db-dev:
     image: postgres
     container_name: env-dev_pilliz-db
     restart: always
@@ -36,7 +36,7 @@ services:
     env_file:
       - ./.env.dev
     volumes:
-      - pilliz-db-data:/var/lib/postgresql/data
+      - pilliz-db-dev-data:/var/lib/postgresql/data
 
   dbadmin:
     image: dpage/pgadmin4
@@ -49,7 +49,7 @@ services:
     volumes:
       - dbadmin-data:/var/lib/pgadmin
 volumes:
-  pilliz-db-data:
-    name: pilliz-db-data
+  pilliz-db-dev-data:
+    name: pilliz-db-dev-data
   dbadmin-data:
     name: dbadmin-data

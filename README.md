@@ -67,6 +67,12 @@ E.g:
 - a new dependency is added to the package.json
 - etc...
 
+### Staging
+
+|     SCRIPTS      |                DESCRIPTION                |
+| :--------------: | :---------------------------------------: |
+| `docker:staging` | Start the Staging Server on port **8082** |
+
 ### Production
 
 |    SCRIPTS    |                 DESCRIPTION                  |
@@ -77,16 +83,19 @@ E.g:
 
 ⚠️ _**[dotenv-cli](docs/Setup.md)** is mandatory to execute studio, migrate or pull prisma scripts as well as a working database._
 
-|        SCRIPTS         |                                                    DESCRIPTION                                                    | DEVELOPMENT | PRODUCTION |
-| :--------------------: | :---------------------------------------------------------------------------------------------------------------: | :---------: | :--------: |
-|  `prisma:studio:dev`   |                        Access a simplest representation of the Development Database's data                        |     ✔️      |            |
-|  `prisma:studio:prod`  |                        Access a simplest representation of the Production Database's data                         |             |     ✔️     |
-|  `prisma:migrate:dev`  |   Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Development Database    |     ✔️      |            |
-| `prisma:migrate:reset` |                           Delete all data present in tables of the Development Database                           |     ✔️      |            |
-| `prisma:migrate:prod`  |    Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Production Database    |             |     ✔️     |
-|   `prisma:pull:dev`    |       Pull the schema from the Development Database, updating the **[Prisma schema](prisma/schema.prisma)**       |     ✔️      |            |
-|   `prisma:pull:prod`   |       Pull the schema from the Production Database, updating the **[Prisma schema](prisma/schema.prisma)**        |             |     ✔️     |
-|   `prisma:generate`    | Synchronize your Prisma Client with the migrations that have been made to manipulate the correct data when coding |     ✔️      |     ✔️     |
+|         SCRIPTS          |                                                    DESCRIPTION                                                    | DEVELOPMENT | STAGING | PRODUCTION |
+| :----------------------: | :---------------------------------------------------------------------------------------------------------------: | :---------: | :-----: | :--------: |
+|   `prisma:studio:dev`    |                        Access a simplest representation of the Development Database's data                        |     ✔️      |         |            |
+| `prisma:studio:staging`  |                          Access a simplest representation of the Staging Database's data                          |             |   ✔️    |            |
+|   `prisma:studio:prod`   |                        Access a simplest representation of the Production Database's data                         |             |         |     ✔️     |
+|   `prisma:migrate:dev`   |   Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Development Database    |     ✔️      |         |            |
+|  `prisma:migrate:reset`  |                           Delete all data present in tables of the Development Database                           |     ✔️      |         |            |
+| `prisma:migrate:staging` |     Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Staging Database      |             |   ✔️    |            |
+|  `prisma:migrate:prod`   |    Create migrations from the **[Prisma schema](prisma/schema.prisma)**, apply them to the Production Database    |             |         |     ✔️     |
+|    `prisma:pull:dev`     |       Pull the schema from the Development Database, updating the **[Prisma schema](prisma/schema.prisma)**       |     ✔️      |         |            |
+|  `prisma:pull:staging`   |         Pull the schema from the Staging Database, updating the **[Prisma schema](prisma/schema.prisma)**         |             |   ✔️    |            |
+|    `prisma:pull:prod`    |       Pull the schema from the Production Database, updating the **[Prisma schema](prisma/schema.prisma)**        |             |         |     ✔️     |
+|    `prisma:generate`     | Synchronize your Prisma Client with the migrations that have been made to manipulate the correct data when coding |     ✔️      |   ✔️    |     ✔️     |
 
 See https://www.prisma.io/docs/reference/api-reference/command-reference for complete explanation about Prisma CLI.
 
