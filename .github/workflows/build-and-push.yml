@@ -48,9 +48,3 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-
-      - name: github ref
-        run: echo ${{ github.ref }}
-
-      - name: github ref name
-        run: echo ${{ github.ref_name }}
