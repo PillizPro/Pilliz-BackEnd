@@ -33,7 +33,7 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.environment }}
           tags: |
             type=ref,event=branch
             type=sha,format=long,prefix={{branch}}-
