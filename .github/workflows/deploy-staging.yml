@@ -7,7 +7,8 @@ on:
     types:
       - "completed"
     branches:
-      - "staging"
+      - "NL-docker-image-staging"
+      # - "staging"
 
 permissions:
   contents: read
