@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   deploy_staging:
-    uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@main
+    uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@staging
     secrets: inherit
     with:
       environment: staging
