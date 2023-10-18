@@ -25,7 +25,6 @@ on:
       - prod
       - dependabot-updates
   workflow_dispatch:
-  workflow_call:
 
 jobs:
   analyze:
