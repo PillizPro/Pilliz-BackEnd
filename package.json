@@ -20,8 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:clean": "docker image prune -f && docker compose -f env-dev/docker-compose.yaml down -v",
     "docker:clean:img": "docker image prune -f && docker compose -f env-dev/docker-compose.yaml down -v --rmi all",
-    "docker:db": "docker compose -f env-dev/docker-compose.yaml up --build -d pilliz-db dbadmin",
-    "docker:db:reset": "docker compose -f env-dev/docker-compose.yaml rm -s -v -f pilliz-db && docker volume rm pilliz-db-data",
+    "docker:db": "docker compose -f env-dev/docker-compose.yaml up --build -d pilliz-db-dev dbadmin",
+    "docker:db:reset": "docker compose -f env-dev/docker-compose.yaml rm -s -v -f pilliz-db-dev && docker volume rm pilliz-db-dev-data",
     "docker:dev": "docker image prune -f && pnpm docker:db && docker compose -f env-dev/docker-compose.yaml up --build pilliz-backend-dev",
     "docker:lint": "docker compose -f env-dev/docker-compose.yaml exec pilliz-backend-dev pnpm lint",
     "docker:test": "docker image prune -f && docker compose -f env-dev/docker-compose.yaml up --build pilliz-backend-test",
@@ -31,10 +31,17 @@
     "prisma:migrate:dev": "dotenv -e env-dev/.env.dev -- npx prisma migrate dev",
     "prisma:migrate:reset": "dotenv -e env-dev/.env.dev -- npx prisma migrate reset",
     "prisma:pull:dev": "dotenv -e env-dev/.env.dev -- npx prisma db pull",
+
+    "docker:staging": "docker image prune -f && docker compose -f env-staging/docker-compose.yaml up --build pilliz-backend-staging-dev",
+    "prisma:studio:staging": "dotenv -e env-staging/.env.staging -- npx prisma studio",
+    "prisma:migrate:staging": "dotenv -e env-staging/.env.staging -- npx prisma migrate deploy",
+    "prisma:pull:staging": "dotenv -e env-staging/.env.staging -- npx prisma db pull",
+
     "docker:prod": "docker image prune -f && docker compose -f env-prod/docker-compose.yaml up --build -d",
     "prisma:studio:prod": "dotenv -e env-prod/.env.prod -- npx prisma studio",
     "prisma:migrate:prod": "dotenv -e env-prod/.env.prod -- npx prisma migrate deploy",
     "prisma:pull:prod": "dotenv -e env-prod/.env.prod -- npx prisma db pull",
+
     "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
