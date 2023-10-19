@@ -35,8 +35,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.environment }}
           tags: |
-            type=raw,value=${{ github.event.workflow_run.head_branch }}
-            type=raw,value=${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
+            type=ref,event=branch
+            type=sha,format=long,prefix={{branch}}-
             type=raw,value=latest
 
       - name: Build and Push Docker Image
@@ -48,14 +48,3 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-      # - name: github ref
-      #   run: echo ${{ github.ref }}
-
-      # - name: github ref name
-      #   run: echo ${{ github.ref_name }}
-
-      # - name: Dump GitHub context
-      #   env:
-      #     GITHUB_CONTEXT: ${{ toJson(github) }}
-      #   run: |
-      #     echo "$GITHUB_CONTEXT"
