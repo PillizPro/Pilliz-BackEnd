@@ -115,7 +115,7 @@ Like mentioned above in the different scripts regarding the database, you can ac
   - Pilliz API url: _http://localhost:8080/api/<a href="#versioning">**{version_number}**</a>_
   - pgAdmin 4 url: _http://localhost:8081_
 - **Staging:**
-  - Pilliz API url: _http://localhost:8082/api/<a href="#versioning">**{version_number}**</a>_
+  - Pilliz API url: _http://localhost:8082/api/<a href="#versioning">**{version_number}**</a>_ (to use when developing with staging database)
 - **Production:**
   - Pilliz API url: **_none_**
 
@@ -129,7 +129,7 @@ Pilliz API support versioning and is currently supporting:
 
 Pilliz API **OpenAPI** documentation is available here:
   - _http://localhost:8080/api/doc_ (for development server)
-  - _http://localhost:8082/api/doc_ (for staging server)
+  - _http://localhost:8082/api/doc_ (for staging server) (to use when developing with staging database)
 
 ### Files Syntax:
 
