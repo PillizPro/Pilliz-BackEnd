@@ -49,6 +49,7 @@ jobs:
   deploy-env-on-server:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    needs: build-and-push-docker-image
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
