@@ -73,12 +73,6 @@ E.g:
 | :--------------: | :---------------------------------------: |
 | `docker:staging` | Start the Staging Server on port **8082** |
 
-### Production
-
-|    SCRIPTS    |                 DESCRIPTION                  |
-| :-----------: | :------------------------------------------: |
-| `docker:prod` | Start the Production Server on port **8080** |
-
 ### Prisma
 
 ⚠️ _**[dotenv-cli](docs/Setup.md)** is mandatory to execute studio, migrate or pull prisma scripts as well as a working database._
@@ -128,8 +122,9 @@ Pilliz API support versioning and is currently supporting:
 ## OpenAPI
 
 Pilliz API **OpenAPI** documentation is available here:
-  - _http://localhost:8080/api/doc_ (for development server)
-  - _http://localhost:8082/api/doc_ (for staging server) (to use when developing with staging database)
+
+- _http://localhost:8080/api/doc_ (for development server)
+- _http://localhost:8082/api/doc_ (for staging server) (to use when developing with staging database)
 
 ### Files Syntax:
 
