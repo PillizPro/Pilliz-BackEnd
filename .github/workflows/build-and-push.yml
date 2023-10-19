@@ -75,4 +75,3 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           port: ${{ secrets.SSH_PORT }}
           script: ${{ secrets.SSH_SCRIPT_TO_EXECUTE }}
-
