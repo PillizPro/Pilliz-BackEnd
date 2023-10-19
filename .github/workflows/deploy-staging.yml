@@ -7,8 +7,7 @@ on:
     types:
       - "completed"
     branches:
-      - "NL-docker-image-staging"
-      # - "staging"
+      - "staging"
 
 permissions:
   contents: read
@@ -16,15 +15,7 @@ permissions:
 
 jobs:
   deploy_staging:
-    uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@NL-docker-image-staging
+    uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@main
     secrets: inherit
     with:
       environment: staging
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: github ref
-        run: echo ${{ github.ref }}
-
-      - name: github ref name
-        run: echo ${{ github.ref_name }}
