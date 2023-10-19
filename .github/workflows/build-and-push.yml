@@ -22,35 +22,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: metadata
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.environment }}
-          tags: |
-            type=ref,event=branch
-            type=sha,format=long,prefix={{branch}}-
-            type=raw,value=latest
+      # - name: Extract metadata (tags, labels) for Docker
+      #   id: metadata
+      #   uses: docker/metadata-action@v5
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.environment }}
+      #     tags: |
+      #       type=ref,event=branch
+      #       type=sha,format=long,prefix={{branch}}-
+      #       type=raw,value=latest
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: "Dockerfile.prod"
-          target: ${{ inputs.environment }}
-          push: true
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-
+      # - name: Build and Push Docker Image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: "Dockerfile.prod"
+      #     target: ${{ inputs.environment }}
+      #     push: true
+      #     tags: ${{ steps.metadata.outputs.tags }}
+      #     labels: ${{ steps.metadata.outputs.labels }}
       - name: github ref
         run: echo ${{ github.ref }}
 
       - name: github ref name
         run: echo ${{ github.ref_name }}
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
