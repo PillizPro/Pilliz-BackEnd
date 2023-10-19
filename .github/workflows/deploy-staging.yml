@@ -9,6 +9,7 @@ on:
     branches:
       - "NL-docker-image-staging"
       # - "staging"
+  workflow_dispatch:
 
 permissions:
   contents: read
