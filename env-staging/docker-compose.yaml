@@ -20,6 +20,7 @@ services:
       - '8081:3000'
     env_file:
       - ./.env.staging
+      - ./.env.staging.internal
     depends_on:
       - pilliz-db-staging
     tty: true
