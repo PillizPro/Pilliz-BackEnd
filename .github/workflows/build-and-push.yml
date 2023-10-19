@@ -66,3 +66,13 @@ jobs:
           target: ${{ secrets.SCP_TARGET_DIR }}
           strip_components: 1
 
+      - name: Execute Docker Container on Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          port: ${{ secrets.SSH_PORT }}
+          script: ${{ secrets.SSH_SCRIPT_TO_EXECUTE }}
+
