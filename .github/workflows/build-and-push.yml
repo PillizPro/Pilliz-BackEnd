@@ -6,9 +6,6 @@ on:
       environment:
         required: true
         type: string
-      with_deploy:
-        required: false
-        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -19,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
@@ -48,3 +45,23 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+
+  deploy-env-on-server:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Docker Env
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          port: ${{ secrets.SSH_PORT }}
+          source: ${{ secrets.SCP_SOURCE_FILE }}
+          target: ${{ secrets.SCP_TARGET_DIR }}
+          strip_components: 1
+
