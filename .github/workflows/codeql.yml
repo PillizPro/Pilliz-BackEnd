@@ -59,8 +59,11 @@ jobs:
       - name: github ref name
         run: echo ${{ github.ref_name }}
 
-      - name: github event
-        run: echo ${{ github.event }}
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
       # Initializes the CodeQL tools for scanning.
       # - name: Initialize CodeQL
       #   uses: github/codeql-action/init@v2
