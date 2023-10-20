@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  pilliz-backend-staging-dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+      target: staging
+    image: pilliz-backend-staging-dev
+    container_name: env-staging_pilliz-backend-staging-dev
+    ports:
+      - '8082:3000'
+    volumes:
+      - ../src:/app/src
+    tty: true
+
+  pilliz-backend-staging:
+    image: ghcr.io/pillizpro/pilliz-backend/staging:latest
+    container_name: env-staging_pilliz-backend-staging
+    ports:
+      - '8081:3000'
+    env_file:
+      - ./.env.staging
+      - ./.env.staging.internal
+    depends_on:
+      - pilliz-db-staging
+    tty: true
+
+  pilliz-db-staging:
+    image: postgres
+    container_name: env-staging_pilliz-db
+    restart: always
+    ports:
+      - '5431:5432'
+    env_file:
+      - ./.env.staging
+    volumes:
+      - pilliz-db-staging-data:/var/lib/postgresql/data
+volumes:
+  pilliz-db-staging-data:
+    name: pilliz-db-staging-data
