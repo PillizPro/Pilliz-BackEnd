@@ -42,4 +42,5 @@ prisma/migrations
 # ENV
 env-dev/.dbadmin.cred
 env-dev/.env.dev
+env-staging/.env.staging
 env-prod/.env.prod
