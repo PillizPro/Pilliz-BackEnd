@@ -1,0 +1,26 @@
+name: "CI"
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches:
+      - main
+      - staging
+      - prod
+  workflow_dispatch:
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Pilliz Backend Docker Container
+        run: docker compose -f env-dev/docker-compose.yaml up --build -d pilliz-backend-dev
+
+      - name: Lint all files
+        run: pnpm docker:lint
