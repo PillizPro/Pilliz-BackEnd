@@ -1,10 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { UserService } from 'src/user/user.service'
-import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception'
-const bcrypt = require('bcrypt');
-const salt = bcrypt.genSaltSync(10);
+import bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
@@ -12,12 +10,12 @@ export class AuthService {
   constructor(private readonly userService: UserService) { }
 
   async register(registerDto: CreateUserDto) {
-    const hashedPassword = await this.hashPassword(registerDto.password);
+    const hashedPassword = await this._hashPassword(registerDto.password);
     const userDtoWithHashedPassword = { ...registerDto, password: hashedPassword };
     return await this.userService.createUser(userDtoWithHashedPassword);
   }
 
-  private async hashPassword(password: string): Promise<string> {
+  private async _hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     const hash = await bcrypt.hash(password, saltRounds);
     return hash;
@@ -30,9 +28,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
-    const passwordMatch = await this.verifyPassword(loginDto.password, user.password);
+    const isPasswordMatch = await this._verifyPassword(loginDto.password, user.password);
 
-    if (!passwordMatch) {
+    if (!isPasswordMatch) {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
@@ -46,7 +44,7 @@ export class AuthService {
     return { status: 'success', isAdmin: false, username: user.name, email: user.email };
   }
 
-  private async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  private async _verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
     return await bcrypt.compare(plainPassword, hashedPassword);
   }
 }
