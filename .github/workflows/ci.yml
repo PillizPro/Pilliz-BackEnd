@@ -2,8 +2,10 @@ name: "CI"
 
 on:
   push:
-    branches:
-      - "**"
+    branches-ignore:
+      - main
+      - staging
+      - prod
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
@@ -22,7 +24,6 @@ jobs:
     strategy:
       matrix:
         node-version: ['16.18.0', '18.x']
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -60,9 +61,7 @@ jobs:
             [1]: https://github.com/peter-evans/create-pull-request
           labels: |
             cicd_action
-          assignees: noaleclaire
-          reviewers: noaleclaire
+            auto_merge
 
   # build:
   #   needs: linter
-
