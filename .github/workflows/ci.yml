@@ -15,12 +15,27 @@ on:
 jobs:
   linter:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['16.18.0', '18.x']
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create Pilliz Backend Docker Container
-        run: docker compose -f env-dev/docker-compose.yaml up --build -d pilliz-backend-dev
+      - name: Setup pnpm latest version
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
-      - name: Lint all files
-        run: pnpm docker:lint
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint files
+        run: pnpm lint
