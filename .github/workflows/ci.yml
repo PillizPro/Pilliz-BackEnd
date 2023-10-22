@@ -64,10 +64,13 @@ jobs:
             auto_merge
 
       - if: ${{ steps.cpr.outputs.pull-request-number }}
-        name: Result Create Pull Request
+        name: Merge Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Pull Request ${{ steps.cpr.outputs.pull-request-number }} ${{ steps.cpr.outputs.pull-request-operation }}"
           echo "Pull Request URL: ${{ steps.cpr.outputs.pull-request-url }}"
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }}
 
   # build:
   #   needs: linter
