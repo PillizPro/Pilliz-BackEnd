@@ -62,3 +62,6 @@ jobs:
             cicd_action
           assignees: noaleclaire
           reviewers: noaleclaire
+
+  # build:
+  #   needs: linter
