@@ -41,5 +41,5 @@ jobs:
         run: pnpm lint
 
       - name: Push lint files to repository
-        if: ${{ matrix.node-version }} == 18.x
+        if: ${{ matrix.node-version }} == '18.x'
         run: echo ${{ matrix.node-version }}
