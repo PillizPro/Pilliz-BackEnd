@@ -24,6 +24,14 @@ jobs:
           run: |
             sudo apt-get update -y && sudo apt-get upgrade -y
 
+        - name: Extract metadata (tags, labels) for Docker
+          id: metadata
+          uses: docker/metadata-action@v5
+          with:
+            images: gha/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/build
+            tags: |
+              type=raw,value=latest
+
         - name: Build
           uses: docker/build-push-action@v5
           with:
@@ -31,7 +39,8 @@ jobs:
             file: "Dockerfile.prod"
             target: "prod"
             load: true
-            tags: gha/${{ github.repository }}/build:latest
+            tags: ${{ steps.metadata.outputs.tags }}
+            labels: ${{ steps.metadata.outputs.labels }}
 
         - name: Run
           run: |
