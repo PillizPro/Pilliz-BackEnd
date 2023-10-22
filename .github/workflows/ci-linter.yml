@@ -2,8 +2,9 @@ name: CI Linter
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - staging
+      - prod
   workflow_dispatch:
 
 permissions:

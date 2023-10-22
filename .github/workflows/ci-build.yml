@@ -13,6 +13,9 @@ on:
       - prod
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
     build:
       runs-on: ubuntu-latest
@@ -28,7 +31,7 @@ jobs:
           id: metadata
           uses: docker/metadata-action@v5
           with:
-            images: gha/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/build
+            images: gha/${{ env.IMAGE_NAME }}/build
             tags: |
               type=raw,value=latest
 
