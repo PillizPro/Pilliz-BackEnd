@@ -31,7 +31,7 @@ jobs:
             file: "Dockerfile.prod"
             target: "prod"
             load: true
-            tags: GHA/${{ github.repository }}/build:latest
+            tags: gha/${{ github.repository }}/build:latest
 
         - name: Run
           run: |
