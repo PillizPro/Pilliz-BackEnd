@@ -1,0 +1,41 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - prod
+  pull_request:
+    branches:
+      - main
+      - staging
+      - prod
+  workflow_dispatch:
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Install dependencies
+          run: |
+            sudo apt-get update -y && sudo apt-get upgrade -y
+
+        - name: Build
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: "Dockerfile.prod"
+            target: "prod"
+            load: true
+            tags: GHA/${{ github.repository }}/build:latest
+
+        - name: Run
+          run: |
+            echo "Run Docker Backend Container"
+            docker run -p localhost:3000:3000 -d
+            sleep 10
+            curl http://localhost:3000

@@ -1,4 +1,4 @@
-name: "CI"
+name: CI Linter
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
       - staging
       - prod
   pull_request:
-    # The branches below must be a subset of the branches above
     branches:
       - main
       - staging
@@ -70,6 +69,3 @@ jobs:
           echo "Pull Request ${{ steps.cpr.outputs.pull-request-number }} ${{ steps.cpr.outputs.pull-request-operation }}"
           echo "Pull Request URL: ${{ steps.cpr.outputs.pull-request-url }}"
           gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --merge --body "[+] Lint files" --delete-branch
-
-  # build:
-  #   needs: linter
