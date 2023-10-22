@@ -48,6 +48,6 @@ jobs:
         - name: Run
           run: |
             echo "Run Docker Backend Container"
-            docker run -p localhost:3000:3000 -d gha/${{ env.IMAGE_NAME }}/build:latest
+            docker run -p 127.0.0.1:3000:3000 -d ${{ steps.metadata.outputs.tags }}
             sleep 10
-            curl http://localhost:3000
+            curl 127.0.0.1:3000
