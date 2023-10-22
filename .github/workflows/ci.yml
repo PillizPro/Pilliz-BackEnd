@@ -63,5 +63,11 @@ jobs:
             cicd_action
             auto_merge
 
+      - if: ${{ steps.cpr.outputs.pull-request-number }}
+        name: Result Create Pull Request
+        run: |
+          echo "Pull Request ${{ steps.cpr.outputs.pull-request-number }} ${{ steps.cpr.outputs.pull-request-operation }}"
+          echo "Pull Request URL: ${{ steps.cpr.outputs.pull-request-url }}"
+
   # build:
   #   needs: linter
