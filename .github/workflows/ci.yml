@@ -34,11 +34,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
-      # - name: Install dependencies
-      #   run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-      # - name: Lint files
-      #   run: pnpm lint
+      - name: Lint files
+        run: pnpm lint
 
       - name: Push lint files to repository
+        if: ${{ matrix.node-version }} == 18.x
         run: echo ${{ matrix.node-version }}
