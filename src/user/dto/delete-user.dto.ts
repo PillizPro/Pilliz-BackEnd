@@ -1,6 +1,6 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator'
 
 export class DeleteUserDto {
   @IsNotEmpty()
-  readonly id: string;
+  readonly id: string
 }

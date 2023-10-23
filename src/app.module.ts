@@ -19,7 +19,9 @@ const ENV = process.env.NODE_ENV
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
           ? 'env-staging/.env.staging'
-          : 'env-dev/.env.dev',
+          : ENV === 'development'
+          ? 'env-dev/.env.dev'
+          : '',
       // eslint-disable-next-line @typescript-eslint/naming-convention
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
