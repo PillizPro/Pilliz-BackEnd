@@ -11,7 +11,7 @@ export class AdminController {
 
   @Post('delete')
   async deleteUser(@Body() deleteDto: DeleteDto) {
-    return await this.adminService.deleteUser(deleteDto)
+    return await this.adminService.deleteUser(deleteDto);
   }
 
   @Post('ban')
