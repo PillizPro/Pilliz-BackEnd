@@ -32,3 +32,4 @@ jobs:
             [1]: https://github.com/peter-evans/create-pull-request
           labels: |
             cicd_action
+            update_branch
