@@ -9,7 +9,7 @@ import { BanningStatus } from '@prisma/client'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.prismaService.users.create({
@@ -45,10 +45,10 @@ export class UserService {
       await this.prismaService.users.update({
         where: { id: banningDto.id },
         data: { banned: BanningStatus.banned },
-      });
-      return { message: 'User successfully banned.' };
+      })
+      return { message: 'User successfully banned.' }
     } catch (error) {
-      throw new Error('An error occurred while banning the user.');
+      throw new Error('An error occurred while banning the user.')
     }
   }
 
@@ -57,10 +57,10 @@ export class UserService {
       await this.prismaService.users.update({
         where: { id: banningDto.id },
         data: { banned: BanningStatus.notBanned },
-      });
-      return { message: 'User successfully unbanned.' };
+      })
+      return { message: 'User successfully unbanned.' }
     } catch (error) {
-      throw new Error('An error occurred while unbanning the user.');
+      throw new Error('An error occurred while unbanning the user.')
     }
   }
 }

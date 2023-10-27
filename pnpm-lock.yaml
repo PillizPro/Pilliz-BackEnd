@@ -55,6 +55,9 @@ devDependencies:
   '@nestjs/testing':
     specifier: ^10.2.1
     version: 10.2.1(@nestjs/common@10.2.7)(@nestjs/core@10.2.1)(@nestjs/platform-express@10.2.1)
+  '@types/bcrypt':
+    specifier: ^5.0.1
+    version: 5.0.1
   '@types/express':
     specifier: ^4.17.19
     version: 4.17.19
@@ -1319,6 +1322,12 @@ packages:
     resolution: {integrity: sha512-MitHFXnhtgwsGZWtT68URpOvLN4EREih1u3QtQiN4VdAxWKRVvGCSvw/Qth0M0Qq3pJpnGOu5JaM/ydK7OGbqg==}
     dependencies:
       '@babel/types': 7.22.10
+    dev: true
+
+  /@types/bcrypt@5.0.1:
+    resolution: {integrity: sha512-dIIrEsLV1/v0AUNI8oHMaRRTSeVjoy5ID8oclJavtPj8CwPJoD1eFoNXEypuu6k091brEzBeOo3LlxeAH9zRZg==}
+    dependencies:
+      '@types/node': 20.5.3
     dev: true
 
   /@types/body-parser@1.19.2:
