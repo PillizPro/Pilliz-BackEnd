@@ -18,10 +18,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update file for Pull Request
-        run: "sed -i '40d' .github/workflows/pr-dependabot-updates-branch.yml && echo \"#\"Last update at: $(date +%D) $(date +%T) >> .github/workflows/pr-dependabot-updates-branch.yml"
+        run: "sed -i '2d' .github/workflows/pr-dependabot-updates-branch.txt && echo \"#\"$(date +%D) $(date +%T) >> .github/workflows/pr-dependabot-updates-branch.txt"
 
       - name: Create Pull Request
         id: cpr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: '[+] Update dependabot-updates branch to latest version'
