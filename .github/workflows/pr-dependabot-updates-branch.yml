@@ -22,6 +22,8 @@ jobs:
 
       - name: Create Pull Request
         id: cpr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: '[+] Update dependabot-updates branch to latest version'
