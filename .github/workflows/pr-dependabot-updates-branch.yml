@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  pull-request-branch:
+  pull-request-dependabot-updates-branch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,7 +22,8 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: '[+] Update dependabot-updates branch to latest version'
-          branch: ${{ github.ref_name }}
+          branch: GHA-update-dependabote-updates-branch
+          delete-branch: true
           base: dependabot-updates
           title: '[+] Update dependabot-updates branch to latest version'
           body: |
