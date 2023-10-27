@@ -36,7 +36,7 @@ export class UserService {
       await this.prismaService.users.delete({ where: { id: deleteDto.id } })
       return { message: 'User successfully deleted.' }
     } catch (error) {
-      throw new Error('An error occurred while deleting the user.')
+      throw new Error('An error occurred while deleting the user.');
     }
   }
 
