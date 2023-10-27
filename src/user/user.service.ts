@@ -60,7 +60,7 @@ export class UserService {
       })
       return { message: 'User successfully unbanned.' }
     } catch (error) {
-      throw new Error('An error occurred while unbanning the user.');
+      throw new Error('An error occurred while unbanning the user.')
     }
   }
 }
