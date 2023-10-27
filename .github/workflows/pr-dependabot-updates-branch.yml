@@ -1,7 +1,7 @@
 name: Update dependabot-updates branch
 
 on:
-  pull_request:
+  push:
     branches:
       - main
   workflow_dispatch:
