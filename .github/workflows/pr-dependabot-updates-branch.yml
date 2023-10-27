@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Update file for Pull Request
+        run: "sed -i '40d' .github/workflows/pr-dependabot-updates-branch.yml && echo \"#\"Last update at: $(date +%D) $(date +%T) >> .github/workflows/pr-dependabot-updates-branch.yml"
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
