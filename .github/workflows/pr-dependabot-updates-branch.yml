@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create Pull Request
+        continue-on-error: true
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr create -B dependabot-updates -H ${{ github.ref_name }} --title '[+] Update dependabot-updates branch to latest version' --body 'Update dependabot-updates branch via GitHub Actions' --label cicd_action,update_branch --assignee noaleclaire
