@@ -13,8 +13,8 @@ export class UserEntity implements Users {
   @Exclude()
   password: string
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
-  @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
   role: UserRoles
+  @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
