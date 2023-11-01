@@ -6,6 +6,7 @@ services:
       - '8080:3000'
     env_file:
       - ./.env.prod
+      - ./.env.prod.internal
     depends_on:
       - pilliz-db-prod
     tty: true
@@ -18,7 +19,6 @@ services:
       - '5432:5432'
     env_file:
       - ./.env.prod
-      - ./.env.prod.internal
     volumes:
       - pilliz-db-prod-data:/var/lib/postgresql/data
 volumes:
