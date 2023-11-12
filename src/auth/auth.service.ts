@@ -19,7 +19,6 @@ export class AuthService {
 
   private async _hashPassword(password: string): Promise<string> {
     const saltRounds = 10
-    console.log(password, saltRounds)
     const hash = await bcrypt.hash(password, saltRounds)
     return hash
   }
