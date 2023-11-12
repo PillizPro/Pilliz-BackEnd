@@ -5,7 +5,6 @@ on:
     branches-ignore:
       - staging
       - prod
-      - dependabot-updates
       - 'dependabot/**'
   workflow_dispatch:
 
