@@ -17,7 +17,13 @@ const ENV = process.env.NODE_ENV
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
-        ENV === 'production' ? 'env-prod/.env.prod' : 'env-dev/.env.dev',
+        ENV === 'production'
+          ? 'env-prod/.env.prod'
+          : ENV === 'staging'
+          ? 'env-staging/.env.staging'
+          : ENV === 'development'
+          ? 'env-dev/.env.dev'
+          : '',
       // eslint-disable-next-line @typescript-eslint/naming-convention
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
@@ -38,4 +44,4 @@ const ENV = process.env.NODE_ENV
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
