@@ -36,6 +36,7 @@ export class UserService {
       await this.prismaService.users.delete({ where: { id: deleteDto.id } })
       return { message: 'User successfully deleted.' }
     } catch (error) {
+      console.error(error)
       throw new Error('An error occurred when deleting the user.')
     }
   }
@@ -48,6 +49,7 @@ export class UserService {
       })
       return { message: 'User successfully banned.' }
     } catch (error) {
+      console.error(error)
       throw new Error('An error occurred when banning the user.')
     }
   }
@@ -60,6 +62,7 @@ export class UserService {
       })
       return { message: 'User successfully unbanned.' }
     } catch (error) {
+      console.error(error)
       throw new Error('An error occurred when unbanning the user.')
     }
   }
