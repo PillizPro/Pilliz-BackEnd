@@ -1,9 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator'
 
 export class CreatePostDto {
   @IsNotEmpty()
-  readonly userId: string;
+  readonly userId: string
 
   @IsNotEmpty()
-  readonly content: string;
+  readonly content: string
 }

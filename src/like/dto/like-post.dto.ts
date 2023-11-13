@@ -1,9 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator'
 
 export class LikePostDto {
   @IsNotEmpty()
-  readonly postId: string;
+  readonly postId: string
 
   @IsNotEmpty()
-  readonly userId: string;
+  readonly userId: string
 }
