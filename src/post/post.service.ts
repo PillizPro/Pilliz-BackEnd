@@ -44,4 +44,29 @@ export class PostService {
       throw new Error('An error occured when getting posts')
     }
   }
+
+  async findPostById(postId: string) {
+    try {
+      const post = await this.prismaService.post.findUnique({
+        where: { id: postId },
+        include: {
+          user: true, // Inclure les données de l'utilisateur associé
+        },
+      })
+
+      if (!post) {
+        throw new Error('Post introuvable')
+      }
+
+      return {
+        postId: post.id,
+        username: post.user.name,
+        content: post.content,
+        likes: post.likesCount,
+        createdAt: post.createdAt,
+      }
+    } catch (error) {
+      throw new Error('An error occured when getting the post')
+    }
+  }
 }
