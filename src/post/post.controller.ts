@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get } from '@nestjs/common'
+import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
 import { PostService } from './post.service'
 import { ApiTags } from '@nestjs/swagger'
@@ -16,5 +16,10 @@ export class PostController {
   @Get('findallpost')
   async findAllPosts() {
     return await this.PostService.findAllPosts();
+  }
+
+  @Get(':id')
+  async findPostById(@Param('id') postId: string) {
+    return await this.PostService.findPostById(postId);
   }
 }

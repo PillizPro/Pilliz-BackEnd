@@ -49,4 +49,30 @@ export class PostService {
       throw new Error('Erreur lors de la récupération des posts');
     }
   }
+
+  async findPostById(postId: string) {
+    try {
+      const post = await this.prisma.post.findUnique({
+        where: { id: postId },
+        include: {
+          user: true, // Inclure les données de l'utilisateur associé
+        },
+      });
+
+      if (!post) {
+        throw new Error('Post introuvable');
+      }
+
+      return {
+        postId: post.id,
+        username: post.user.name,
+        content: post.content,
+        likes: post.likesCount,
+        createdAt: post.createdAt,
+      };
+    } catch (error) {
+      console.error("Erreur détaillée:", error);
+      throw new Error('Erreur lors de la récupération du post');
+    }
+  }
 }
