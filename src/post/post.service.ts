@@ -18,6 +18,7 @@ export class PostService {
       })
       return new PostEntity(newPost)
     } catch (error) {
+      console.error(error)
       throw new Error('An error occured when creating a post')
     }
   }
@@ -41,6 +42,7 @@ export class PostService {
 
       return transformedPosts
     } catch (error) {
+      console.error(error)
       throw new Error('An error occured when getting posts')
     }
   }
@@ -66,6 +68,7 @@ export class PostService {
         createdAt: post.createdAt,
       }
     } catch (error) {
+      console.error(error)
       throw new Error('An error occured when getting the post')
     }
   }
