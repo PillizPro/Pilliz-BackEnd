@@ -7,6 +7,8 @@ import { AdminModule } from './admin/admin.module'
 import CONFIG_SCHEMA_VALIDATAION from './config.schema'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
+import { PostModule } from './post/post.module'
+import { LikeModule } from './like/like.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -22,13 +24,10 @@ const ENV = process.env.NODE_ENV
           : ENV === 'development'
           ? 'env-dev/.env.dev'
           : '',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
       validationOptions: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         allowUnknowns: false,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         abortEarly: true,
       },
     }),
@@ -36,6 +35,8 @@ const ENV = process.env.NODE_ENV
     AuthModule,
     AdminModule,
     UserModule,
+    PostModule,
+    LikeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

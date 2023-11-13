@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator'
 
-export class FindUserDto {
+export class FindPostDto {
   @IsNotEmpty()
   readonly id: string
 }
