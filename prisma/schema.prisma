@@ -32,7 +32,7 @@ model Users {
 
 model Post {
   id         String   @id @default(uuid())
-  userId     String   @map("user_id")
+  userId     String
   user       Users    @relation(fields: [userId], references: [id])
   content    String   @db.VarChar(1000)
   createdAt  DateTime @default(now())
@@ -43,9 +43,9 @@ model Post {
 
 model Like {
   id        String   @id @default(uuid())
-  userId    String   @map("user_id")
+  userId    String
   user      Users    @relation(fields: [userId], references: [id])
-  postId    String   @map("post_id")
+  postId    String
   post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
 }

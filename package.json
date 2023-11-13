@@ -33,7 +33,7 @@
     "prisma:pull:dev": "dotenv -e env-dev/.env.dev -- npx prisma db pull",
     "docker:staging": "docker image prune -f && docker compose -f env-staging/docker-compose-staging-dev.yaml up --build pilliz-backend-staging-dev",
     "prisma:studio:staging": "dotenv -e env-staging/.env.staging -- npx prisma studio",
-    "prisma:migrate:staging": "dotenv -e env-staging/.env.staging -- npx prisma migrate dev",
+    "prisma:migrate:staging": "dotenv -e env-staging/.env.staging -- npx prisma migrate deploy",
     "prisma:pull:staging": "dotenv -e env-staging/.env.staging -- npx prisma db pull",
     "prisma:studio:prod": "dotenv -e env-prod/.env.prod -- npx prisma studio",
     "prisma:migrate:prod": "dotenv -e env-prod/.env.prod -- npx prisma migrate deploy",
