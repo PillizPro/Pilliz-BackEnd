@@ -24,13 +24,10 @@ const ENV = process.env.NODE_ENV
           : ENV === 'development'
           ? 'env-dev/.env.dev'
           : '',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
       validationOptions: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         allowUnknowns: false,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         abortEarly: true,
       },
     }),

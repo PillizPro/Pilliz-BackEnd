@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { LikePostDto } from './dto/like-post.dto';
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { LikePostDto } from './dto/like-post.dto'
 
 @Injectable()
 export class LikeService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async likePost(likePostDto: LikePostDto) {
     // Vérifier si l'utilisateur a déjà liké le post
@@ -13,7 +13,7 @@ export class LikeService {
         userId: likePostDto.userId,
         postId: likePostDto.postId,
       },
-    });
+    })
 
     if (!existingLike) {
       // Si l'utilisateur n'a pas déjà liké, créer un nouveau like
@@ -22,13 +22,13 @@ export class LikeService {
           userId: likePostDto.userId,
           postId: likePostDto.postId,
         },
-      });
+      })
 
       // Augmenter le compteur de likes du post
       await this.prisma.post.update({
         where: { id: likePostDto.postId },
         data: { likesCount: { increment: 1 } },
-      });
+      })
     }
   }
 
@@ -39,7 +39,7 @@ export class LikeService {
         userId: likePostDto.userId,
         postId: likePostDto.postId,
       },
-    });
+    })
 
     if (existingLike) {
       // Si l'utilisateur a déjà liké, supprimer le like
@@ -47,13 +47,13 @@ export class LikeService {
         where: {
           id: existingLike.id,
         },
-      });
+      })
 
       // Diminuer le compteur de likes du post
       await this.prisma.post.update({
         where: { id: likePostDto.postId },
         data: { likesCount: { decrement: 1 } },
-      });
+      })
     }
   }
 
@@ -63,9 +63,9 @@ export class LikeService {
         userId: userId,
         postId: postId,
       },
-    });
+    })
 
-    return !!existingLike;
+    return !!existingLike
   }
 
   async getLikedPostsByUser(userId: string): Promise<string[]> {
@@ -76,9 +76,8 @@ export class LikeService {
       select: {
         postId: true,
       },
-    });
+    })
 
-    return likedPosts.map(like => like.postId);
+    return likedPosts.map((like) => like.postId)
   }
-
 }

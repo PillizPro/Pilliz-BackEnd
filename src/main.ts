@@ -20,7 +20,6 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
   app.useGlobalFilters(
     new PrismaClientExceptionFilter(app.get(HttpAdapterHost)),

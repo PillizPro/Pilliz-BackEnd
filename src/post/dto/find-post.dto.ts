@@ -1,3 +1,6 @@
+import { IsNotEmpty } from 'class-validator'
+
 export class FindPostDto {
-  id: string;
+  @IsNotEmpty()
+  readonly id: string
 }

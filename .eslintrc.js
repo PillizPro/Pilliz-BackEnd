@@ -45,28 +45,8 @@ module.exports = {
         'format': ['camelCase', 'UPPER_CASE']
       },
       {
-        'selector': ['objectLiteralProperty', 'typeProperty'],
-        'format': ['PascalCase'],
-        'types': ['boolean'],
-        'prefix': ["is", "should", "has", "had", "can", "could", "did", "will", "must"]
-      },
-      {
         'selector': ['class', 'typeParameter'],
         'format': ['PascalCase']
-      },
-      {
-        'selector': 'property',
-        'format': ['PascalCase'],
-        'types': ['boolean'],
-        'prefix': ["is", "should", "has", "had", "can", "could", "did", "will", "must"]
-      },
-      {
-        'selector': 'classProperty',
-        'modifiers': ['private'],
-        'format': ['PascalCase'],
-        'leadingUnderscore': 'require',
-        'types': ['boolean'],
-        'prefix': ["is", "should", "has", "had", "can", "could", "did", "will", "must"]
       },
       {
         'selector': ['classMethod', 'classProperty'],
@@ -84,30 +64,9 @@ module.exports = {
         'trailingUnderscore': 'allow'
       },
       {
-        'selector': ['parameterProperty', 'parameter', 'variable'],
-        'format': ['PascalCase'],
-        'trailingUnderscore': 'allow',
-        'types': ['boolean'],
-        'prefix': ["is", "should", "has", "had", "can", "could", "did", "will", "must"]
-      },
-      {
         'selector': ['parameterProperty', 'variable', 'parameter'],
         'format': ['camelCase'],
         'trailingUnderscore': 'allow'
-      },
-      {
-        'selector': 'variable',
-        'modifiers': ['const', 'global'],
-        'format': ['UPPER_CASE'],
-        'types': ['boolean'],
-        'prefix': ["IS_", "SHOULD_", "HAS_", "HAD_", "CAN_", "COULD_", "DID_", "WILL_", "MUST_"]
-      },
-      {
-        'selector': 'variable',
-        'modifiers': ['exported'],
-        'format': ['UPPER_CASE'],
-        'types': ['boolean'],
-        'prefix': ["IS_", "SHOULD_", "HAS_", "HAD_", "CAN_", "COULD_", "DID_", "WILL_", "MUST_"]
       },
       {
         'selector': 'variable',
