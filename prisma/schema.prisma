@@ -49,3 +49,7 @@ model Like {
   post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
 }
+
+model Poduct {
+  id String @id @default(uuid())
+}
