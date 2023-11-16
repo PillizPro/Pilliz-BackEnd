@@ -5,7 +5,7 @@ import { PostEntity } from './entities/post.entity'
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async postByUser(createPostDto: CreatePostDto) {
     try {
@@ -27,14 +27,14 @@ export class PostService {
     try {
       const posts = await this.prismaService.post.findMany({
         include: {
-          user: true, // Inclure les données de l'utilisateur associé
+          Users: true, // Inclure les données de l'utilisateur associé
         },
       })
 
       // Transformer les données pour ne conserver que les champs souhaités
       const transformedPosts = posts.map((post) => ({
         postId: post.id, // ID du post
-        username: post.user.name, // Nom de l'utilisateur
+        username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
         createdAt: post.createdAt, // Date de création
@@ -52,7 +52,7 @@ export class PostService {
       const post = await this.prismaService.post.findUnique({
         where: { id: postId },
         include: {
-          user: true, // Inclure les données de l'utilisateur associé
+          Users: true, // Inclure les données de l'utilisateur associé
         },
       })
 
@@ -62,7 +62,7 @@ export class PostService {
 
       return {
         postId: post.id,
-        username: post.user.name,
+        username: post.Users.name,
         content: post.content,
         likes: post.likesCount,
         createdAt: post.createdAt,

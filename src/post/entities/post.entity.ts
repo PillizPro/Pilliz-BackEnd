@@ -1,4 +1,5 @@
 import { Post } from '@prisma/client'
+import { UserEntity } from 'src/user/entities/user.entity'
 
 export class PostEntity implements Post {
   constructor(partial: Partial<PostEntity>) {
@@ -10,4 +11,5 @@ export class PostEntity implements Post {
   createdAt: Date
   likesCount: number
   comments: number
+  user: UserEntity
 }
