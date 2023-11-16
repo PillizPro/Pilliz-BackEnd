@@ -7,16 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRoles {
-  admin
-  user
-}
-
-enum BanningStatus {
-  banned
-  notBanned
-}
-
 model Users {
   id        String        @id @default(uuid())
   email     String        @unique @db.VarChar(255)
@@ -26,30 +16,40 @@ model Users {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   banned    BanningStatus @default(notBanned)
-  posts     Post[] // Relation vers tous les posts créés par l'utilisateur
-  likes     Like[] // Relation vers tous les likes faits par l'utilisateur
+  Like      Like[]
+  Post      Post[]
 }
 
 model Post {
   id         String   @id @default(uuid())
   userId     String
-  user       Users    @relation(fields: [userId], references: [id])
   content    String   @db.VarChar(1000)
   createdAt  DateTime @default(now())
   likesCount Int      @default(0)
   comments   Int      @default(0)
-  likedBy    Like[] // Relation vers tous les likes reçus par le post
+  Like       Like[]
+  Users      Users    @relation(fields: [userId], references: [id])
 }
 
 model Like {
   id        String   @id @default(uuid())
   userId    String
-  user      Users    @relation(fields: [userId], references: [id])
   postId    String
-  post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
+  Post      Post     @relation(fields: [postId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
 }
 
 model Poduct {
-  id String @id @default(uuid())
+  id String @id
+}
+
+enum UserRoles {
+  admin
+  user
+}
+
+enum BanningStatus {
+  banned
+  notBanned
 }
