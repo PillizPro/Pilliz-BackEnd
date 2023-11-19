@@ -31,7 +31,6 @@ export class PostService {
         },
       })
 
-      // Transformer les données pour ne conserver que les champs souhaités
       const transformedPosts = posts.map((post) => ({
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
@@ -70,6 +69,97 @@ export class PostService {
     } catch (error) {
       console.error(error)
       throw new Error('An error occured when getting the post')
+    }
+  }
+
+  async find20RecentsPosts(recentPostDate: Date) {
+    try {
+      console.log(recentPostDate);
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        where: {
+          createdAt: {
+            gt: recentPostDate,
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          Users: true, // Inclure les données de l'utilisateur associé
+        },
+      });
+
+      const transformedPosts = posts.map((post) => ({
+        postId: post.id, // ID du post
+        username: post.Users.name, // Nom de l'utilisateur
+        content: post.content, // Contenu du post
+        likes: post.likesCount, // Nombre de likes
+        createdAt: post.createdAt, // Date de création
+      }));
+
+      return transformedPosts;
+    } catch (error) {
+      console.error(error);
+      throw new Error('An error occurred when getting recents posts');
+    }
+  }
+
+  async find20LastsPosts() {
+    try {
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          Users: true, // Inclure les données de l'utilisateur associé
+        },
+      })
+
+      const transformedPosts = posts.map((post) => ({
+        postId: post.id, // ID du post
+        username: post.Users.name, // Nom de l'utilisateur
+        content: post.content, // Contenu du post
+        likes: post.likesCount, // Nombre de likes
+        createdAt: post.createdAt, // Date de création
+      }))
+
+      return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occured when getting posts')
+    }
+  }
+
+  async find20MorePosts(lastPostDate: Date) {
+    try {
+      console.log(lastPostDate);
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        where: {
+          createdAt: {
+            lt: lastPostDate,
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          Users: true, // Inclure les données de l'utilisateur associé
+        },
+      });
+
+      const transformedPosts = posts.map((post) => ({
+        postId: post.id, // ID du post
+        username: post.Users.name, // Nom de l'utilisateur
+        content: post.content, // Contenu du post
+        likes: post.likesCount, // Nombre de likes
+        createdAt: post.createdAt, // Date de création
+      }));
+
+      return transformedPosts;
+    } catch (error) {
+      console.error(error);
+      throw new Error('An error occurred when getting more posts');
     }
   }
 }
