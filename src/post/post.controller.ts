@@ -33,8 +33,8 @@ export class PostController {
     return await this.postService.find20RecentsPosts(dateString);
   }
 
-  @Get('find20MorePosts:date')
-  async find20MorePosts(@Param('date') dateString: Date) {
-    return await this.postService.find20MorePosts(dateString);
+  @Get('find20OlderPosts:date')
+  async find20OlderPosts(@Param('date') dateString: Date) {
+    return await this.postService.find20OlderPosts(dateString);
   }
 }

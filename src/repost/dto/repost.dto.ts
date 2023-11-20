@@ -1,9 +1,12 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class RepostDto {
-  @IsNotEmpty()
-  readonly postId: string
+  @IsOptional()
+  readonly postId?: string;
+
+  @IsOptional()
+  readonly commentId?: string;
 
   @IsNotEmpty()
-  readonly userId: string
+  readonly userId: string;
 }

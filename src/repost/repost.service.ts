@@ -6,54 +6,57 @@ import { RepostDto } from './dto/repost.dto'
 export class RepostService {
   constructor(private prisma: PrismaService) { }
 
-  async repostPost(repostDto: RepostDto) {
-    // Vérifier si l'utilisateur a déjà republier le post
-    const existingRepost = await this.prisma.repost.findFirst({
-      where: {
-        userId: repostDto.userId,
-        postId: repostDto.postId,
-      },
-    })
+  async repost(repostDto: RepostDto) {
+    // Vérifier si c'est un repost de post ou de commentaire
+    const whereClause = repostDto.postId
+      ? { userId: repostDto.userId, postId: repostDto.postId }
+      : { userId: repostDto.userId, commentId: repostDto.commentId };
+
+    const existingRepost = await this.prisma.repost.findFirst({ where: whereClause });
 
     if (!existingRepost) {
-      // Si l'utilisateur n'a pas déjà republier, créer une nouvelle republication
-      await this.prisma.repost.create({
-        data: {
-          userId: repostDto.userId,
-          postId: repostDto.postId,
-        },
-      })
+      // Créer une nouvelle republication
+      await this.prisma.repost.create({ data: { ...repostDto } });
 
-      // Augmenter le compteur de republication du post
-      await this.prisma.post.update({
-        where: { id: repostDto.postId },
-        data: { repostsCount: { increment: 1 } },
-      })
+      // Mise à jour du compteur de reposts
+      if (repostDto.postId) {
+        await this.prisma.post.update({
+          where: { id: repostDto.postId },
+          data: { repostsCount: { increment: 1 } },
+        });
+      } else if (repostDto.commentId) {
+        await this.prisma.comment.update({
+          where: { id: repostDto.commentId },
+          data: { repostsCount: { increment: 1 } },
+        });
+      }
     }
   }
 
-  async unrepostPost(repostDto: RepostDto) {
-    // Vérifier si l'utilisateur a déjà republier le post
-    const existingRepost = await this.prisma.repost.findFirst({
-      where: {
-        userId: repostDto.userId,
-        postId: repostDto.postId,
-      },
-    })
+  async unrepost(repostDto: RepostDto) {
+    // Vérifier si c'est un repost de post ou de commentaire
+    const whereClause = repostDto.postId
+      ? { userId: repostDto.userId, postId: repostDto.postId }
+      : { userId: repostDto.userId, commentId: repostDto.commentId };
+
+    const existingRepost = await this.prisma.repost.findFirst({ where: whereClause });
 
     if (existingRepost) {
-      // Si l'utilisateur a déjà republier, supprimer le repost
-      await this.prisma.repost.delete({
-        where: {
-          id: existingRepost.id,
-        },
-      })
+      // Supprimer le repost
+      await this.prisma.repost.delete({ where: { id: existingRepost.id } });
 
-      // Diminuer le compteur de reposts du post
-      await this.prisma.post.update({
-        where: { id: repostDto.postId },
-        data: { repostsCount: { decrement: 1 } },
-      })
+      // Mise à jour du compteur de reposts
+      if (repostDto.postId) {
+        await this.prisma.post.update({
+          where: { id: repostDto.postId },
+          data: { repostsCount: { decrement: 1 } },
+        });
+      } else if (repostDto.commentId) {
+        await this.prisma.comment.update({
+          where: { id: repostDto.commentId },
+          data: { repostsCount: { decrement: 1 } },
+        });
+      }
     }
   }
 
@@ -67,6 +70,24 @@ export class RepostService {
       },
     })
 
-    return repostedPosts.map((repost) => repost.postId)
+    return repostedPosts
+      .map((repost) => repost.postId)
+      .filter((postId): postId is string => postId !== null);
+  }
+
+  async getRepostedCommentsByUser(userId: string): Promise<string[]> {
+    const repostedComments = await this.prisma.repost.findMany({
+      where: {
+        userId: userId,
+      },
+      select: {
+        commentId: true,
+      },
+    })
+
+    // Filtrer les valeurs nulles et renvoyer seulement les string
+    return repostedComments
+      .map((repost) => repost.commentId)
+      .filter((commentId): commentId is string => commentId !== null);
   }
 }

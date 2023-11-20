@@ -133,7 +133,7 @@ export class PostService {
     }
   }
 
-  async find20MorePosts(lastPostDate: Date) {
+  async find20OlderPosts(lastPostDate: Date) {
     try {
       const posts = await this.prismaService.post.findMany({
         take: 20,

@@ -4,23 +4,29 @@ import { RepostService } from './repost.service'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Reposting')
-@Controller('repost')
+@Controller('reposting')
 export class RepostController {
   constructor(private readonly repostService: RepostService) { }
 
-  @Post('repostPost')
+  @Post('repost')
   async repostPost(@Body() repostDto: RepostDto) {
-    return await this.repostService.repostPost(repostDto)
+    return await this.repostService.repost(repostDto)
   }
 
-  @Post('unrepostPost')
+  @Post('unrepost')
   async unrepostPost(@Body() repostDto: RepostDto) {
-    return await this.repostService.unrepostPost(repostDto)
+    return await this.repostService.unrepost(repostDto)
   }
 
 
-  @Get('repostededPosts/:userId')
+  @Get('repostedPosts/:userId')
   async getRepostedPostsByUser(@Param('userId') userId: string) {
     return await this.repostService.getRepostedPostsByUser(userId)
   }
+
+  @Get('repostedComments/:userId')
+  async getRepostedCommentsByUser(@Param('userId') userId: string) {
+    return await this.repostService.getRepostedCommentsByUser(userId)
+  }
+
 }

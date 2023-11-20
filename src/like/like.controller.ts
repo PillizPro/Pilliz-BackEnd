@@ -4,22 +4,27 @@ import { LikeService } from './like.service'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Liking')
-@Controller('like')
+@Controller('liking')
 export class LikeController {
-  constructor(private readonly likeService: LikeService) {}
+  constructor(private readonly likeService: LikeService) { }
 
-  @Post('likepost')
+  @Post('like')
   async likePost(@Body() likePostDto: LikePostDto) {
-    return await this.likeService.likePost(likePostDto)
+    return await this.likeService.like(likePostDto)
   }
 
-  @Post('unlikepost')
+  @Post('unlike')
   async unlikePost(@Body() likePostDto: LikePostDto) {
-    return await this.likeService.unlikePost(likePostDto)
+    return await this.likeService.unlike(likePostDto)
   }
 
   @Get('likedPosts/:userId')
   async getLikedPostsByUser(@Param('userId') userId: string) {
     return await this.likeService.getLikedPostsByUser(userId)
+  }
+
+  @Get('likedComments/:userId')
+  async getLikedCommentsByUser(@Param('userId') userId: string) {
+    return await this.likeService.getLikedCommentsByUser(userId)
   }
 }
