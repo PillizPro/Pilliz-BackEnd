@@ -18,6 +18,8 @@ model Users {
   banned    BanningStatus @default(notBanned)
   Like      Like[]
   Post      Post[]
+  Comment   Comment[]
+  Repost    Repost[]
 }
 
 model Post {
@@ -26,7 +28,9 @@ model Post {
   content    String   @db.VarChar(1000)
   createdAt  DateTime @default(now())
   likesCount Int      @default(0)
+  repostsCount Int      @default(0)
   comments   Int      @default(0)
+  Repost     Repost[]
   Like       Like[]
   Comment   Comment[]
   Users      Users    @relation(fields: [userId], references: [id])
@@ -48,6 +52,16 @@ model Comment {
   postId    String
   createdAt DateTime @default(now())
   Post      Post     @relation(fields: [postId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
+}
+
+model Repost {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  Post      Post     @relation(fields: [postId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
 }
 
 model Poduct {

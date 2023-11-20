@@ -36,6 +36,7 @@ export class PostService {
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
         createdAt: post.createdAt, // Date de création
       }))
 
@@ -64,6 +65,7 @@ export class PostService {
         username: post.Users.name,
         content: post.content,
         likes: post.likesCount,
+        reposts: post.repostsCount,
         createdAt: post.createdAt,
       }
     } catch (error) {
@@ -74,7 +76,6 @@ export class PostService {
 
   async find20RecentsPosts(recentPostDate: Date) {
     try {
-      console.log(recentPostDate);
       const posts = await this.prismaService.post.findMany({
         take: 20,
         where: {
@@ -95,6 +96,7 @@ export class PostService {
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
         createdAt: post.createdAt, // Date de création
       }));
 
@@ -120,6 +122,7 @@ export class PostService {
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
         createdAt: post.createdAt, // Date de création
       }))
 
@@ -132,7 +135,6 @@ export class PostService {
 
   async find20MorePosts(lastPostDate: Date) {
     try {
-      console.log(lastPostDate);
       const posts = await this.prismaService.post.findMany({
         take: 20,
         where: {
@@ -153,6 +155,7 @@ export class PostService {
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
         createdAt: post.createdAt, // Date de création
       }));
 

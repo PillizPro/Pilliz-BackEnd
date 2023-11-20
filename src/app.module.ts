@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
+import { RepostModule } from './repost/repost.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -20,10 +21,10 @@ const ENV = process.env.NODE_ENV
         ENV === 'production'
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
-          ? 'env-staging/.env.staging'
-          : ENV === 'development'
-          ? 'env-dev/.env.dev'
-          : '',
+            ? 'env-staging/.env.staging'
+            : ENV === 'development'
+              ? 'env-dev/.env.dev'
+              : '',
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
       validationOptions: {
@@ -37,8 +38,9 @@ const ENV = process.env.NODE_ENV
     UserModule,
     PostModule,
     LikeModule,
+    RepostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

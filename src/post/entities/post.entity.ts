@@ -10,6 +10,7 @@ export class PostEntity implements Post {
   content: string
   createdAt: Date
   likesCount: number
+  repostsCount: number
   comments: number
   user: UserEntity
 }
