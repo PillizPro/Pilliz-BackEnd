@@ -1,0 +1,55 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - prod
+  pull_request:
+    branches:
+      - main
+      - staging
+      - prod
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Install dependencies
+          run: |
+            sudo apt-get update -y && sudo apt-get upgrade -y
+
+        - name: Extract metadata (tags, labels) for Build
+          id: metadata
+          uses: docker/metadata-action@v5
+          with:
+            images: gha/${{ env.IMAGE_NAME }}/build
+            tags: |
+              type=raw,value=latest
+
+        - name: Build
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: "Dockerfile.prod"
+            target: "gha"
+            load: true
+            tags: ${{ steps.metadata.outputs.tags }}
+            labels: ${{ steps.metadata.outputs.labels }}
+
+        - name: Run
+          run: |
+            echo "Run Docker Backend Container"
+            docker run -p 127.0.0.1:3000:3000 -d ${{ steps.metadata.outputs.tags }}
+            sleep 10
+            curl 127.0.0.1:3000/api/doc
+            sleep 10
+            curl 127.0.0.1:3000/api/v1

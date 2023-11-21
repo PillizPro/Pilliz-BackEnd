@@ -1,17 +1,17 @@
-name: Deploy Staging
+name: Deploy Prod
 
 on:
   push:
     branches:
-      - staging
+      - prod
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  deploy-staging:
+  deploy-prod:
     uses: PillizPro/Pilliz-BackEnd/.github/workflows/build-and-push.yml@main
     secrets: inherit
     with:
-      environment: staging
+      environment: prod

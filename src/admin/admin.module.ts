@@ -8,4 +8,4 @@ import { UserModule } from 'src/user/user.module'
   controllers: [AdminController],
   providers: [AdminService],
 })
-export class AdminModule { }
+export class AdminModule {}

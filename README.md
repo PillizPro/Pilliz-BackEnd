@@ -73,12 +73,6 @@ E.g:
 | :--------------: | :---------------------------------------: |
 | `docker:staging` | Start the Staging Server on port **8082** |
 
-### Production
-
-|    SCRIPTS    |                 DESCRIPTION                  |
-| :-----------: | :------------------------------------------: |
-| `docker:prod` | Start the Production Server on port **8080** |
-
 ### Prisma
 
 ⚠️ _**[dotenv-cli](docs/Setup.md)** is mandatory to execute studio, migrate or pull prisma scripts as well as a working database._
@@ -115,7 +109,7 @@ Like mentioned above in the different scripts regarding the database, you can ac
   - Pilliz API url: _http://localhost:8080/api/<a href="#versioning">**{version_number}**</a>_
   - pgAdmin 4 url: _http://localhost:8081_
 - **Staging:**
-  - Pilliz API url: _http://localhost:8082/api/<a href="#versioning">**{version_number}**</a>_
+  - Pilliz API url: _http://localhost:8082/api/<a href="#versioning">**{version_number}**</a>_ (to use when developing with staging database)
 - **Production:**
   - Pilliz API url: **_none_**
 
@@ -128,8 +122,9 @@ Pilliz API support versioning and is currently supporting:
 ## OpenAPI
 
 Pilliz API **OpenAPI** documentation is available here:
-  - _http://localhost:8080/api/doc_ (for development server)
-  - _http://localhost:8082/api/doc_ (for staging server)
+
+- _http://localhost:8080/api/doc_ (for development server)
+- _http://localhost:8082/api/doc_ (for staging server) (to use when developing with staging database)
 
 ### Files Syntax:
 

@@ -7,25 +7,25 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Administration')
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly AdminService: AdminService) { }
+  constructor(private readonly adminService: AdminService) {}
 
   @Post('delete')
   async deleteUser(@Body() deleteDto: DeleteDto) {
-    return await this.AdminService.deleteUser(deleteDto)
+    return await this.adminService.deleteUser(deleteDto)
   }
 
   @Post('ban')
   async banUser(@Body() banningDto: BanningDto) {
-    return await this.AdminService.banUser(banningDto)
+    return await this.adminService.banUser(banningDto)
   }
 
   @Post('unban')
   async unbanUser(@Body() banningDto: BanningDto) {
-    return await this.AdminService.unbanUser(banningDto)
+    return await this.adminService.unbanUser(banningDto)
   }
 
   @Get('usersList')
   async getAllUsers() {
-    return await this.AdminService.getAllUsers();
+    return await this.adminService.getAllUsers()
   }
 }
