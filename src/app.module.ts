@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { RepostModule } from './repost/repost.module'
+import { CommentModule } from './comment/comment.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -39,6 +40,7 @@ const ENV = process.env.NODE_ENV
     PostModule,
     LikeModule,
     RepostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
