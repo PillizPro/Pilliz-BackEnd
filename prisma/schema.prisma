@@ -8,14 +8,16 @@ datasource db {
 }
 
 model Users {
-  id        String        @id @default(uuid())
-  email     String        @unique @db.VarChar(255)
-  name      String        @db.VarChar(255)
-  password  String        @db.VarChar(255)
-  role      UserRoles     @default(user)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  banned    BanningStatus @default(notBanned)
+  id                String        @id @default(uuid())
+  email             String        @unique @db.VarChar(255)
+  name              String        @db.VarChar(255)
+  password          String        @db.VarChar(255)
+  role              UserRoles     @default(user)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  banned            BanningStatus @default(notBanned)
+  registered        Boolean       @default(false)
+  tokenVerification String        @db.VarChar(255)
 }
 
 enum UserRoles {

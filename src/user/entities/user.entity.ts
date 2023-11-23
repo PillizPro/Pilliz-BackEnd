@@ -18,4 +18,6 @@ export class UserEntity implements Users {
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
+  tokenVerification: string
+  registered: boolean
 }

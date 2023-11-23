@@ -17,6 +17,20 @@ export class AuthService {
     return await this.userService.createUser(userDtoWithHashedPassword)
   }
 
+  async verify(email: string, token: string) {
+    const user = await this.userService.findByEmail({ email })
+    if (!user) {
+      throw new UnauthorizedException('Invalid email.')
+    }
+    if (user.registered) {
+      throw new UnauthorizedException('User already verified.')
+    }
+    if (user.tokenVerification !== token) {
+      throw new UnauthorizedException('Invalid token.')
+    }
+    return await this.userService.verify(user)
+  }
+
   private async _hashPassword(password: string): Promise<string> {
     const saltRounds = 10
     const hash = await bcrypt.hash(password, saltRounds)

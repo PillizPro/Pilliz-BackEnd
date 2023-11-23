@@ -24,20 +24,37 @@ export class UserService {
     }
   }
 
-  async test(createUserDto: CreateUserDto) {
-    const token = Math.floor(1000 + Math.random() * 9000).toString()
+  async verify(user: UserEntity) {
+    await this.prismaService.users.update({
+      where: { id: user.id },
+      data: { registered: true },
+    })
+    return { message: 'User successfully verified.' }
+  }
+
+  async sendEmail(
+    createUserDto: CreateUserDto,
+    generateTokenVerification: string
+  ) {
     await this.mailService.sendUserConfirmation(
       createUserDto.email,
       createUserDto.name,
-      token
+      generateTokenVerification
     )
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    await this.test(createUserDto)
+    const generateTokenVerification = Math.floor(
+      1000 + Math.random() * 9000
+    ).toString()
+    this.sendEmail(createUserDto, generateTokenVerification)
     const user = await this.prismaService.users.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        tokenVerification: generateTokenVerification,
+      },
     })
+
     return new UserEntity(user)
   }
 
