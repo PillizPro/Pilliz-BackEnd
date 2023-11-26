@@ -17,6 +17,13 @@ export class CommentService {
           content,
         },
       })
+
+      // Ajoute un commentaire au compteur
+      await this.prismaService.post.update({
+        where: { id: createCommentDto.postId },
+        data: { commentsCount: { increment: 1 } },
+      });
+
       return new CommentEntity(newComment)
     } catch (error) {
       console.error(error)

@@ -37,6 +37,7 @@ export class PostService {
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
       }))
 
@@ -66,6 +67,7 @@ export class PostService {
         content: post.content,
         likes: post.likesCount,
         reposts: post.repostsCount,
+        comments: post.commentsCount,
         createdAt: post.createdAt,
       }
     } catch (error) {
@@ -97,6 +99,7 @@ export class PostService {
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
       }));
 
@@ -123,6 +126,7 @@ export class PostService {
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
       }))
 
@@ -156,6 +160,7 @@ export class PostService {
         content: post.content, // Contenu du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
       }));
 
