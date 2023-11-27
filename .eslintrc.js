@@ -20,10 +20,10 @@ module.exports = {
     '@typescript-eslint/naming-convention': [
       'error',
       {
-        'selector': 'default',
+        'selector': ['accessor', 'classMethod'],
         'format': ['camelCase'],
         'leadingUnderscore': 'allow',
-        'trailingUnderscore': 'allow',
+        'trailingUnderscore': 'allow'
       },
       {
         'selector': 'interface',
@@ -41,7 +41,7 @@ module.exports = {
         'format': ['PascalCase', 'UPPER_CASE']
       },
       {
-        'selector': ['enumMember', 'objectLiteralProperty', 'typeProperty'],
+        'selector': ['enumMember', 'typeProperty'],
         'format': ['camelCase', 'UPPER_CASE']
       },
       {
@@ -55,7 +55,7 @@ module.exports = {
         'leadingUnderscore': 'require'
       },
       {
-        'selector': 'memberLike',
+        'selector': ['objectLiteralMethod', 'typeMethod', 'classProperty'],
         'format': ['camelCase']
       },
       {
