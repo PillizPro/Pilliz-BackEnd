@@ -6,66 +6,62 @@ import { LikePostDto } from './dto/like-post.dto'
 export class LikeService {
   constructor(private prisma: PrismaService) {}
 
-  async likePost(likePostDto: LikePostDto) {
-    // Vérifier si l'utilisateur a déjà liké le post
+  async like(likeDto: LikePostDto) {
+    // Vérifier si c'est un like de post ou de commentaire
+    const whereClause = likeDto.postId
+      ? { userId: likeDto.userId, postId: likeDto.postId }
+      : { userId: likeDto.userId, commentId: likeDto.commentId }
+
     const existingLike = await this.prisma.like.findFirst({
-      where: {
-        userId: likePostDto.userId,
-        postId: likePostDto.postId,
-      },
+      where: whereClause,
     })
 
     if (!existingLike) {
-      // Si l'utilisateur n'a pas déjà liké, créer un nouveau like
-      await this.prisma.like.create({
-        data: {
-          userId: likePostDto.userId,
-          postId: likePostDto.postId,
-        },
-      })
+      // Créer un nouveau like
+      await this.prisma.like.create({ data: { ...likeDto } })
 
-      // Augmenter le compteur de likes du post
-      await this.prisma.post.update({
-        where: { id: likePostDto.postId },
-        data: { likesCount: { increment: 1 } },
-      })
+      // Mise à jour du compteur de likes
+      if (likeDto.postId) {
+        await this.prisma.post.update({
+          where: { id: likeDto.postId },
+          data: { likesCount: { increment: 1 } },
+        })
+      } else if (likeDto.commentId) {
+        await this.prisma.comment.update({
+          where: { id: likeDto.commentId },
+          data: { likesCount: { increment: 1 } },
+        })
+      }
     }
   }
 
-  async unlikePost(likePostDto: LikePostDto) {
-    // Vérifier si l'utilisateur a déjà liké le post
+  async unlike(likeDto: LikePostDto) {
+    // Vérifier si c'est un unlike de post ou de commentaire
+    const whereClause = likeDto.postId
+      ? { userId: likeDto.userId, postId: likeDto.postId }
+      : { userId: likeDto.userId, commentId: likeDto.commentId }
+
     const existingLike = await this.prisma.like.findFirst({
-      where: {
-        userId: likePostDto.userId,
-        postId: likePostDto.postId,
-      },
+      where: whereClause,
     })
 
     if (existingLike) {
-      // Si l'utilisateur a déjà liké, supprimer le like
-      await this.prisma.like.delete({
-        where: {
-          id: existingLike.id,
-        },
-      })
+      // Supprimer le like
+      await this.prisma.like.delete({ where: { id: existingLike.id } })
 
-      // Diminuer le compteur de likes du post
-      await this.prisma.post.update({
-        where: { id: likePostDto.postId },
-        data: { likesCount: { decrement: 1 } },
-      })
+      // Mise à jour du compteur de likes
+      if (likeDto.postId) {
+        await this.prisma.post.update({
+          where: { id: likeDto.postId },
+          data: { likesCount: { decrement: 1 } },
+        })
+      } else if (likeDto.commentId) {
+        await this.prisma.comment.update({
+          where: { id: likeDto.commentId },
+          data: { likesCount: { decrement: 1 } },
+        })
+      }
     }
-  }
-
-  async hasUserLikedPost(userId: string, postId: string): Promise<boolean> {
-    const existingLike = await this.prisma.like.findFirst({
-      where: {
-        userId: userId,
-        postId: postId,
-      },
-    })
-
-    return !!existingLike
   }
 
   async getLikedPostsByUser(userId: string): Promise<string[]> {
@@ -78,6 +74,23 @@ export class LikeService {
       },
     })
 
-    return likedPosts.map((like) => like.postId)
+    return likedPosts
+      .map((like) => like.postId)
+      .filter((postId): postId is string => postId !== null)
+  }
+
+  async getLikedCommentsByUser(userId: string): Promise<string[]> {
+    const likedComments = await this.prisma.like.findMany({
+      where: {
+        userId: userId,
+      },
+      select: {
+        commentId: true,
+      },
+    })
+
+    return likedComments
+      .map((like) => like.commentId)
+      .filter((commentId): commentId is string => commentId !== null)
   }
 }
