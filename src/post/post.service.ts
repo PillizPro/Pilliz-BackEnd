@@ -2,24 +2,34 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create-post.dto'
 import { PostEntity } from './entities/post.entity'
+import { ImageUploadService } from 'src/image/image-upload.service'
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService, private readonly imageUploadService: ImageUploadService // Injectez le service d'upload d'image
+  ) { }
 
   async postByUser(createPostDto: CreatePostDto) {
     try {
-      const { userId, content } = createPostDto
+      const { userId, content, imageBase64 } = createPostDto;
+
+      let imageUrl = null;
+      if (imageBase64) {
+        imageUrl = await this.imageUploadService.uploadBase64Image(imageBase64);
+      }
+
       const newPost = await this.prismaService.post.create({
         data: {
           userId,
           content,
+          imageUrl, // Utiliser l'URL de l'image Cloudinary
         },
-      })
-      return new PostEntity(newPost)
+      });
+
+      return new PostEntity(newPost);
     } catch (error) {
-      console.error(error)
-      throw new Error('An error occured when creating a post')
+      console.error(error);
+      throw new Error('An error occurred when creating a post');
     }
   }
 
@@ -35,6 +45,7 @@ export class PostService {
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
@@ -65,6 +76,7 @@ export class PostService {
         postId: post.id,
         username: post.Users.name,
         content: post.content,
+        imageUrl: post.imageUrl,
         likes: post.likesCount,
         reposts: post.repostsCount,
         comments: post.commentsCount,
@@ -97,6 +109,7 @@ export class PostService {
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
@@ -124,6 +137,7 @@ export class PostService {
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
@@ -158,6 +172,7 @@ export class PostService {
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires

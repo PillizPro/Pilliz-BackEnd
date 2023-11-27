@@ -8,6 +8,7 @@ export class PostEntity implements Post {
   id: string
   userId: string
   content: string
+  imageUrl: string | null
   createdAt: Date
   likesCount: number
   repostsCount: number

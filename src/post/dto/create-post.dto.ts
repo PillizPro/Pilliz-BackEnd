@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -6,4 +6,8 @@ export class CreatePostDto {
 
   @IsNotEmpty()
   readonly content: string
+
+  @IsOptional()
+  @IsString()
+  readonly imageBase64?: string;
 }

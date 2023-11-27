@@ -11,6 +11,7 @@ import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { RepostModule } from './repost/repost.module'
 import { CommentModule } from './comment/comment.module'
+import { ImageUploadModule } from './image/image-upload.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -41,6 +42,7 @@ const ENV = process.env.NODE_ENV
     LikeModule,
     RepostModule,
     CommentModule,
+    ImageUploadModule
   ],
   controllers: [AppController],
   providers: [AppService],

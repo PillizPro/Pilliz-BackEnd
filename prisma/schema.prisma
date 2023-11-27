@@ -26,6 +26,7 @@ model Post {
   id         String   @id @default(uuid())
   userId     String
   content    String   @db.VarChar(1000)
+  imageUrl   String?   @db.VarChar(1000)
   createdAt  DateTime @default(now())
   likesCount Int      @default(0)
   repostsCount Int      @default(0)
