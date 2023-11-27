@@ -74,14 +74,14 @@ model Comment {
 }
 
 model Product {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   price       Float
-  description String  @db.VarChar(200)
-  images      String  @db.VarChar(1000)
+  description String   @db.VarChar(200)
+  images      String[] @db.VarChar(1000)
   rating      Float
-  isFavourite Boolean @default(false)
-  isPopular   Boolean @default(false)
+  isFavourite Boolean  @default(false)
+  isPopular   Boolean  @default(false)
 }
 
 enum UserRoles {
