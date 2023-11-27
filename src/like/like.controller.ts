@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common'
 import { LikePostDto } from './dto/like-post.dto'
 import { LikeService } from './like.service'
 import { ApiTags } from '@nestjs/swagger'
@@ -19,7 +26,9 @@ export class LikeController {
   }
 
   @Get('likedPosts/:userId')
-  async getLikedPostsByUser(@Param('userId') userId: string) {
+  async getLikedPostsByUser(
+    @Param('userId', new ParseUUIDPipe()) userId: string
+  ) {
     return await this.likeService.getLikedPostsByUser(userId)
   }
 }
