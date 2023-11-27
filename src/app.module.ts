@@ -12,7 +12,7 @@ import { LikeModule } from './like/like.module'
 import { RepostModule } from './repost/repost.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
-import { ProductModule } from './product/product.module';
+import { ProductModule } from './product/product.module'
 
 const ENV = process.env.NODE_ENV
 
