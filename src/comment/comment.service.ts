@@ -5,7 +5,7 @@ import { CommentEntity } from './entities/comment.entity'
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async commentOnPost(createCommentDto: CreateCommentDto) {
     try {
@@ -22,7 +22,7 @@ export class CommentService {
       await this.prismaService.post.update({
         where: { id: createCommentDto.postId },
         data: { commentsCount: { increment: 1 } },
-      });
+      })
 
       return new CommentEntity(newComment)
     } catch (error) {
@@ -35,7 +35,7 @@ export class CommentService {
     try {
       const comments = await this.prismaService.comment.findMany({
         where: {
-          postId: postId
+          postId: postId,
         },
         orderBy: {
           createdAt: 'desc',
@@ -43,7 +43,7 @@ export class CommentService {
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
         },
-      });
+      })
 
       const transformedComments = comments.map((comment) => ({
         commentId: comment.id, // ID du commentaire
@@ -52,13 +52,12 @@ export class CommentService {
         likes: comment.likesCount, // Nombre de likes
         reposts: comment.repostsCount, // Nombre de reposts
         createdAt: comment.createdAt, // Date de création
-      }));
+      }))
 
-      return transformedComments;
+      return transformedComments
     } catch (error) {
-      console.error(error);
-      throw new Error('An error occurred when getting comments ont this post');
+      console.error(error)
+      throw new Error('An error occurred when getting comments ont this post')
     }
   }
-
 }

@@ -4,31 +4,33 @@ import { RepostDto } from './dto/repost.dto'
 
 @Injectable()
 export class RepostService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async repost(repostDto: RepostDto) {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
       ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId };
+      : { userId: repostDto.userId, commentId: repostDto.commentId }
 
-    const existingRepost = await this.prisma.repost.findFirst({ where: whereClause });
+    const existingRepost = await this.prisma.repost.findFirst({
+      where: whereClause,
+    })
 
     if (!existingRepost) {
       // Créer une nouvelle republication
-      await this.prisma.repost.create({ data: { ...repostDto } });
+      await this.prisma.repost.create({ data: { ...repostDto } })
 
       // Mise à jour du compteur de reposts
       if (repostDto.postId) {
         await this.prisma.post.update({
           where: { id: repostDto.postId },
           data: { repostsCount: { increment: 1 } },
-        });
+        })
       } else if (repostDto.commentId) {
         await this.prisma.comment.update({
           where: { id: repostDto.commentId },
           data: { repostsCount: { increment: 1 } },
-        });
+        })
       }
     }
   }
@@ -37,25 +39,27 @@ export class RepostService {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
       ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId };
+      : { userId: repostDto.userId, commentId: repostDto.commentId }
 
-    const existingRepost = await this.prisma.repost.findFirst({ where: whereClause });
+    const existingRepost = await this.prisma.repost.findFirst({
+      where: whereClause,
+    })
 
     if (existingRepost) {
       // Supprimer le repost
-      await this.prisma.repost.delete({ where: { id: existingRepost.id } });
+      await this.prisma.repost.delete({ where: { id: existingRepost.id } })
 
       // Mise à jour du compteur de reposts
       if (repostDto.postId) {
         await this.prisma.post.update({
           where: { id: repostDto.postId },
           data: { repostsCount: { decrement: 1 } },
-        });
+        })
       } else if (repostDto.commentId) {
         await this.prisma.comment.update({
           where: { id: repostDto.commentId },
           data: { repostsCount: { decrement: 1 } },
-        });
+        })
       }
     }
   }
@@ -72,7 +76,7 @@ export class RepostService {
 
     return repostedPosts
       .map((repost) => repost.postId)
-      .filter((postId): postId is string => postId !== null);
+      .filter((postId): postId is string => postId !== null)
   }
 
   async getRepostedCommentsByUser(userId: string): Promise<string[]> {
@@ -88,6 +92,6 @@ export class RepostService {
     // Filtrer les valeurs nulles et renvoyer seulement les string
     return repostedComments
       .map((repost) => repost.commentId)
-      .filter((commentId): commentId is string => commentId !== null);
+      .filter((commentId): commentId is string => commentId !== null)
   }
 }

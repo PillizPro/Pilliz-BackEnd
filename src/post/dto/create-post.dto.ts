@@ -9,5 +9,5 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
-  readonly imageBase64?: string;
+  readonly imageBase64?: string
 }

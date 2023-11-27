@@ -6,4 +6,4 @@ import { RepostService } from './repost.service'
   controllers: [RepostController],
   providers: [RepostService],
 })
-export class RepostModule { }
+export class RepostModule {}

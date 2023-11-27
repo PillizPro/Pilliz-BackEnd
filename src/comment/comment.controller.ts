@@ -6,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Commenting')
 @Controller('comment')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) { }
+  constructor(private readonly commentService: CommentService) {}
 
   @Post('commentingOnPost')
   async commentOnPost(@Body() createCommentDto: CreateCommentDto) {

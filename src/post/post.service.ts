@@ -6,16 +6,18 @@ import { ImageUploadService } from 'src/image/image-upload.service'
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService, private readonly imageUploadService: ImageUploadService // Injectez le service d'upload d'image
-  ) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly imageUploadService: ImageUploadService // Injectez le service d'upload d'image
+  ) {}
 
   async postByUser(createPostDto: CreatePostDto) {
     try {
-      const { userId, content, imageBase64 } = createPostDto;
+      const { userId, content, imageBase64 } = createPostDto
 
-      let imageUrl = null;
+      let imageUrl = null
       if (imageBase64) {
-        imageUrl = await this.imageUploadService.uploadBase64Image(imageBase64);
+        imageUrl = await this.imageUploadService.uploadBase64Image(imageBase64)
       }
 
       const newPost = await this.prismaService.post.create({
@@ -24,12 +26,12 @@ export class PostService {
           content,
           imageUrl, // Utiliser l'URL de l'image Cloudinary
         },
-      });
+      })
 
-      return new PostEntity(newPost);
+      return new PostEntity(newPost)
     } catch (error) {
-      console.error(error);
-      throw new Error('An error occurred when creating a post');
+      console.error(error)
+      throw new Error('An error occurred when creating a post')
     }
   }
 
@@ -103,7 +105,7 @@ export class PostService {
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
         },
-      });
+      })
 
       const transformedPosts = posts.map((post) => ({
         postId: post.id, // ID du post
@@ -114,12 +116,12 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
-      }));
+      }))
 
-      return transformedPosts;
+      return transformedPosts
     } catch (error) {
-      console.error(error);
-      throw new Error('An error occurred when getting recents posts');
+      console.error(error)
+      throw new Error('An error occurred when getting recents posts')
     }
   }
 
@@ -166,7 +168,7 @@ export class PostService {
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
         },
-      });
+      })
 
       const transformedPosts = posts.map((post) => ({
         postId: post.id, // ID du post
@@ -177,12 +179,12 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
-      }));
+      }))
 
-      return transformedPosts;
+      return transformedPosts
     } catch (error) {
-      console.error(error);
-      throw new Error('An error occurred when getting more posts');
+      console.error(error)
+      throw new Error('An error occurred when getting more posts')
     }
   }
 }

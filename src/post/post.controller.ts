@@ -6,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Posting')
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   @Post('posting')
   async postByUser(@Body() createPostDto: CreatePostDto) {
@@ -30,11 +30,11 @@ export class PostController {
 
   @Get('find20RecentsPosts:date')
   async find20RecentsPosts(@Param('date') dateString: Date) {
-    return await this.postService.find20RecentsPosts(dateString);
+    return await this.postService.find20RecentsPosts(dateString)
   }
 
   @Get('find20OlderPosts:date')
   async find20OlderPosts(@Param('date') dateString: Date) {
-    return await this.postService.find20OlderPosts(dateString);
+    return await this.postService.find20OlderPosts(dateString)
   }
 }

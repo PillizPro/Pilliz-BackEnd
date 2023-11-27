@@ -8,4 +8,4 @@ import { ImageUploadModule } from 'src/image/image-upload.module'
   controllers: [PostController],
   providers: [PostService],
 })
-export class PostModule { }
+export class PostModule {}
