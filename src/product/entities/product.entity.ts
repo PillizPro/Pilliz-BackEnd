@@ -8,7 +8,7 @@ export class ProductEntity implements Product {
   title: string
   price: number
   description: string
-  images: string
+  images: string[]
   rating: number
   isFavourite: boolean
   isPopular: boolean
