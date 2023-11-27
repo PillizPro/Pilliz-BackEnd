@@ -11,7 +11,8 @@ export class ProductService {
       const products = await this.prismaService.product.findMany()
 
       const entitiesProducts = products.map((product) => {
-        new ProductEntity(product)
+        const p = new ProductEntity(product)
+        return p
       })
       return entitiesProducts
     } catch (error) {
