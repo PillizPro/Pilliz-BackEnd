@@ -1,4 +1,4 @@
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger'
 import { Controller, Get } from '@nestjs/common'
 import { ProductService } from './product.service'
 
