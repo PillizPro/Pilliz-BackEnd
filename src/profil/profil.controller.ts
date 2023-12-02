@@ -18,7 +18,7 @@ export class ProfilController {
     return await this.profilService.getBio(userId)
   }
 
-  @Get('UserNbPost/:userId')
+  @Get('userNbPost/:userId')
   async getUserNumbersOfPost(@Param('userId') userId: string) {
     return await this.profilService.getNbPost(userId)
   }

@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { ProfilModule } from './profil/profil.module'
+import { FollowModule } from './follow/follow.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -38,7 +39,8 @@ const ENV = process.env.NODE_ENV
     UserModule,
     PostModule,
     LikeModule,
-    ProfilModule
+    ProfilModule,
+    FollowModule
   ],
   controllers: [AppController],
   providers: [AppService],

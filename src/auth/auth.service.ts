@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashPassword(registerDto.password)
@@ -52,6 +52,7 @@ export class AuthService {
       username: user.name,
       email: user.email,
       id: user.id,
+      bio: user.bio,
     }
   }
 
