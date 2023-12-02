@@ -6,11 +6,28 @@ import { ChangeBioDto } from './dto/change-bio.dto'
 export class ProfilService {
   constructor(private prisma: PrismaService) { }
 
-  async ChangeBio(changeBioDto: ChangeBioDto) {
-    // Mise a jour de la bio avec la nouvelle
+  async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
       where: { id: changeBioDto.id },
       data: { bio: changeBioDto.bio },
     })
+  }
+
+  async getBio(userId: string) {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        id: userId,
+      }
+    })
+    return user?.bio
+  }
+
+  async getNbPost(userId: string) {
+    const userPosts = await this.prisma.post.findMany({
+      where: {
+        userId: userId,
+      }
+    })
+    return userPosts.length;
   }
 }
