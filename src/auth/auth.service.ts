@@ -51,6 +51,7 @@ export class AuthService {
       isAdmin: false,
       username: user.name,
       email: user.email,
+      id: user.id,
     }
   }
 
