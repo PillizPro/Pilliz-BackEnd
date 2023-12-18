@@ -11,6 +11,10 @@ import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
 import { ProfilModule } from './profil/profil.module'
 import { FollowModule } from './follow/follow.module'
+import { RepostModule } from './repost/repost.module'
+import { CommentModule } from './comment/comment.module'
+import { ImageUploadModule } from './image/image-upload.module'
+import { ProductModule } from './product/product.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -40,7 +44,11 @@ const ENV = process.env.NODE_ENV
     PostModule,
     LikeModule,
     ProfilModule,
-    FollowModule
+    FollowModule,
+    RepostModule,
+    CommentModule,
+    ImageUploadModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],

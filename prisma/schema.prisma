@@ -16,8 +16,10 @@ model Users {
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   banned     BanningStatus @default(notBanned)
-  likes      Like[]
-  posts      Post[]
+  Post      Post[]
+  Like      Like[]
+  Repost    Repost[]
+  Comment   Comment[]
   bio        String        @default("A propos de moi") @db.VarChar(500)
   followedBy Follows[]     @relation("follower")
   following  Follows[]     @relation("following")
@@ -33,27 +35,65 @@ model Follows {
 }
 
 model Post {
-  id         String   @id @default(uuid())
-  userId     String
-  content    String   @db.VarChar(1000)
-  createdAt  DateTime @default(now())
-  likesCount Int      @default(0)
-  comments   Int      @default(0)
-  likedBy    Like[]
-  user       Users    @relation(fields: [userId], references: [id])
+  id            String    @id @default(uuid())
+  userId        String
+  content       String    @db.VarChar(1000)
+  imageUrl      String?   @db.VarChar(1000)
+  createdAt     DateTime  @default(now())
+  likesCount    Int       @default(0)
+  repostsCount  Int       @default(0)
+  commentsCount Int       @default(0)
+  Like          Like[]
+  Repost        Repost[]
+  Comment       Comment[]
+  Users         Users     @relation(fields: [userId], references: [id])
 }
 
 model Like {
   id        String   @id @default(uuid())
   userId    String
-  postId    String
+  postId    String?
+  commentId String?
   createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
-  user      Users    @relation(fields: [userId], references: [id])
+  Post      Post?    @relation(fields: [postId], references: [id])
+  Comment   Comment? @relation(fields: [commentId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
 }
 
-model Poduct {
-  id String @id @default(uuid())
+model Repost {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+  Post      Post?    @relation(fields: [postId], references: [id])
+  Comment   Comment? @relation(fields: [commentId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id           String   @id @default(uuid())
+  content      String   @db.VarChar(1000)
+  userId       String
+  postId       String
+  createdAt    DateTime @default(now())
+  likesCount   Int      @default(0)
+  repostsCount Int      @default(0)
+  Post         Post     @relation(fields: [postId], references: [id])
+  Users        Users    @relation(fields: [userId], references: [id])
+  Like         Like[]
+  Repost       Repost[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  price       Float
+  description String   @db.VarChar(200)
+  images      String[] @db.VarChar(1000)
+  rating      Float
+  isFavourite Boolean   @default(false)
+  isPopular   Boolean  @default(false)
 }
 
 enum UserRoles {

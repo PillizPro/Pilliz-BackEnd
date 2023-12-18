@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
+import { DeletePostDto } from './dto/delete-post.dto'
 import { PostService } from './post.service'
 import { ApiTags } from '@nestjs/swagger'
 
@@ -13,13 +14,33 @@ export class PostController {
     return await this.postService.postByUser(createPostDto)
   }
 
+  @Post('deletingPost')
+  async deletePostById(@Body() deletePostDto: DeletePostDto) {
+    return await this.postService.deletePostById(deletePostDto)
+  }
+
   @Get('findallpost')
   async findAllPosts() {
     return await this.postService.findAllPosts()
   }
 
-  @Get(':id')
+  @Get('find20LastsPosts')
+  async find20LastsPosts() {
+    return await this.postService.find20LastsPosts()
+  }
+
+  @Get('findPostInfo:id')
   async findPostById(@Param('id') postId: string) {
     return await this.postService.findPostById(postId)
+  }
+
+  @Get('find20RecentsPosts:date')
+  async find20RecentsPosts(@Param('date') dateString: Date) {
+    return await this.postService.find20RecentsPosts(dateString)
+  }
+
+  @Get('find20OlderPosts:date')
+  async find20OlderPosts(@Param('date') dateString: Date) {
+    return await this.postService.find20OlderPosts(dateString)
   }
 }

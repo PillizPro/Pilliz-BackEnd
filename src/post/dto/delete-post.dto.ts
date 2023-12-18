@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator'
 
-export class FindPostDto {
+export class DeletePostDto {
   @IsNotEmpty()
-  readonly id: string
+  readonly postId: string
 }

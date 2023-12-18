@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator'
 
-export class LikePostDto {
+export class RepostDto {
   @IsOptional()
   readonly postId?: string
 
