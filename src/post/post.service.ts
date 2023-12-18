@@ -38,6 +38,9 @@ export class PostService {
 
   async deletePostById(deletePostDto: DeletePostDto) {
     try {
+      await this.prismaService.comment.deleteMany({
+        where: { postId: deletePostDto.postId },
+      })
       await this.prismaService.post.delete({
         where: { id: deletePostDto.postId },
       })

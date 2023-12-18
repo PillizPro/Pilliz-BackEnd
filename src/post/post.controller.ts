@@ -15,7 +15,7 @@ export class PostController {
   }
 
   @Post('deletingPost')
-  async deleteUser(@Body() deletePostDto: DeletePostDto) {
+  async deletePostById(@Body() deletePostDto: DeletePostDto) {
     return await this.postService.deletePostById(deletePostDto)
   }
 
