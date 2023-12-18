@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create-post.dto'
+import { DeletePostDto } from './dto/delete-post.dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
 
@@ -8,7 +9,7 @@ import { ImageUploadService } from 'src/image/image-upload.service'
 export class PostService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly imageUploadService: ImageUploadService // Injectez le service d'upload d'image
+    private readonly imageUploadService: ImageUploadService
   ) {}
 
   async postByUser(createPostDto: CreatePostDto) {
@@ -35,6 +36,18 @@ export class PostService {
     }
   }
 
+  async deletePostById(deletePostDto: DeletePostDto) {
+    try {
+      await this.prismaService.post.delete({
+        where: { id: deletePostDto.postId },
+      })
+      return { message: 'Post successfully deleted.' }
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when deleting the post.')
+    }
+  }
+
   async findAllPosts() {
     try {
       const posts = await this.prismaService.post.findMany({
@@ -44,6 +57,7 @@ export class PostService {
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -75,6 +89,7 @@ export class PostService {
       }
 
       return {
+        userId: post.userId,
         postId: post.id,
         username: post.Users.name,
         content: post.content,
@@ -108,6 +123,7 @@ export class PostService {
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -136,6 +152,7 @@ export class PostService {
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -171,6 +188,7 @@ export class PostService {
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId,
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
