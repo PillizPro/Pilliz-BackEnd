@@ -8,18 +8,20 @@ datasource db {
 }
 
 model Users {
-  id        String        @id @default(uuid())
-  email     String        @unique @db.VarChar(255)
-  name      String        @db.VarChar(255)
-  password  String        @db.VarChar(255)
-  role      UserRoles     @default(user)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  banned    BanningStatus @default(notBanned)
-  Post      Post[]
-  Like      Like[]
-  Repost    Repost[]
-  Comment   Comment[]
+  id            String         @id @default(uuid())
+  email         String         @unique @db.VarChar(255)
+  name          String         @db.VarChar(255)
+  password      String         @db.VarChar(255)
+  role          UserRoles      @default(user)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  banned        BanningStatus  @default(notBanned)
+  Post          Post[]
+  Like          Like[]
+  Repost        Repost[]
+  Comment       Comment[]
+  Conversations Conversation[]
+  Messages      Message[]
 }
 
 model Post {
@@ -73,6 +75,24 @@ model Comment {
   Repost       Repost[]
 }
 
+model Conversation {
+  id       String    @id @default(uuid())
+  Messages Message[]
+  Users    Users[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  authorId       String
+  Author         Users        @relation(fields: [authorId], references: [id])
+  receiverId     String       @default("")
+  createdAt      DateTime     @default(now())
+  content        String
+  conversationId String
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  read           Boolean      @default(false)
+}
+
 model Product {
   id          String   @id @default(uuid())
   title       String
@@ -80,7 +100,7 @@ model Product {
   description String   @db.VarChar(200)
   images      String[] @db.VarChar(1000)
   rating      Float
-  isFavourite Boolean   @default(false)
+  isFavourite Boolean  @default(false)
   isPopular   Boolean  @default(false)
 }
 
