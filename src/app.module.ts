@@ -9,6 +9,8 @@ import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
 import { LikeModule } from './like/like.module'
+import { ProfilModule } from './profil/profil.module'
+import { FollowModule } from './follow/follow.module'
 import { RepostModule } from './repost/repost.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
@@ -41,6 +43,8 @@ const ENV = process.env.NODE_ENV
     UserModule,
     PostModule,
     LikeModule,
+    ProfilModule,
+    FollowModule,
     RepostModule,
     CommentModule,
     ImageUploadModule,
