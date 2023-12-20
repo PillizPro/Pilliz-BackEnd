@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param, Injectable } from '@nestjs/common'
+import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { FollowService } from './follow.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CreateFollowDto } from './dto/create-follow.dto'
@@ -7,7 +7,7 @@ import { DeleteFollowDto } from './dto/delete-follow.dto'
 @ApiTags('follow')
 @Controller('follow')
 export class FollowController {
-  constructor(private readonly followService: FollowService) { }
+  constructor(private readonly followService: FollowService) {}
 
   @Post('followUser')
   async followUser(@Body() createFollowDto: CreateFollowDto) {

@@ -6,7 +6,7 @@ import { DeleteFollowDto } from './dto/delete-follow.dto'
 
 @Injectable()
 export class FollowService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createFollowers(createFollowDto: CreateFollowDto) {
     const follow = await this.prismaService.follows.create({
@@ -17,10 +17,10 @@ export class FollowService {
 
   async deleteFollowers(deleteFollowDto: DeleteFollowDto) {
     try {
-      const follow = await this.prismaService.follows.delete({
+      await this.prismaService.follows.delete({
         where: {
           followerId_followingId: deleteFollowDto,
-        }
+        },
       })
       return { message: 'Followers successfully unfollow' }
     } catch (error) {
@@ -35,11 +35,11 @@ export class FollowService {
         following: {
           some: {
             followerId: userId,
-          }
-        }
-      }
+          },
+        },
+      },
     })
-    return userNbFollowers.length;
+    return userNbFollowers.length
   }
 
   async getNbFollowing(userId: string) {
@@ -48,10 +48,10 @@ export class FollowService {
         following: {
           some: {
             followingId: userId,
-          }
-        }
-      }
+          },
+        },
+      },
     })
-    return userNbFollowing.length;
+    return userNbFollowing.length
   }
 }

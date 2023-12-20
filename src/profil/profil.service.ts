@@ -4,7 +4,7 @@ import { ChangeBioDto } from './dto/change-bio.dto'
 
 @Injectable()
 export class ProfilService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
@@ -17,7 +17,7 @@ export class ProfilService {
     const user = await this.prisma.users.findFirst({
       where: {
         id: userId,
-      }
+      },
     })
     return user?.bio
   }
@@ -26,8 +26,8 @@ export class ProfilService {
     const userPosts = await this.prisma.post.findMany({
       where: {
         userId: userId,
-      }
+      },
     })
-    return userPosts.length;
+    return userPosts.length
   }
 }
