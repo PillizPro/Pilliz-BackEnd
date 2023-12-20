@@ -18,4 +18,5 @@ export class UserEntity implements Users {
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
+  bio: string
 }
