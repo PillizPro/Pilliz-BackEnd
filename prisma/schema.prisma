@@ -47,6 +47,13 @@ model Post {
   Repost        Repost[]
   Comment       Comment[]
   Users         Users     @relation(fields: [userId], references: [id])
+  Tags          Tags[]
+}
+
+model Tags {
+  id   String @id @default(uuid())
+  name String @unique
+  Post Post[]
 }
 
 model Like {

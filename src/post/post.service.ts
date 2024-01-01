@@ -14,7 +14,7 @@ export class PostService {
 
   async postByUser(createPostDto: CreatePostDto) {
     try {
-      const { userId, content, imageBase64 } = createPostDto
+      const { userId, content, imageBase64, tagsList } = createPostDto
 
       let imageUrl = null
       if (imageBase64) {
@@ -28,6 +28,31 @@ export class PostService {
           imageUrl, // Utiliser l'URL de l'image Cloudinary
         },
       })
+
+      if (tagsList) {
+        const tags = await Promise.all(
+          tagsList.map((tagName) =>
+            this.prismaService.tags.findUnique({
+              where: { name: tagName },
+            })
+          )
+        )
+
+        if (tags.includes(null)) {
+          throw new Error('One or more tags do not exist')
+        }
+
+        await this.prismaService.post.update({
+          where: { id: newPost.id },
+          data: {
+            Tags: {
+              connect: tagsList.map((tag) => ({
+                name: tag,
+              })),
+            },
+          },
+        })
+      }
 
       return new PostEntity(newPost)
     } catch (error) {
@@ -56,6 +81,7 @@ export class PostService {
       const posts = await this.prismaService.post.findMany({
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true, // Inclure les données des tags associés
         },
       })
 
@@ -69,6 +95,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -84,6 +111,7 @@ export class PostService {
         where: { id: postId },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true, // Inclure les données des tags associés
         },
       })
 
@@ -101,6 +129,7 @@ export class PostService {
         reposts: post.repostsCount,
         comments: post.commentsCount,
         createdAt: post.createdAt,
+        tags: post.Tags.map((tag) => tag.name),
       }
     } catch (error) {
       console.error(error)
@@ -122,6 +151,7 @@ export class PostService {
         },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
@@ -135,6 +165,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -151,6 +182,7 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
@@ -164,6 +196,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -187,6 +220,7 @@ export class PostService {
         },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
@@ -200,6 +234,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts

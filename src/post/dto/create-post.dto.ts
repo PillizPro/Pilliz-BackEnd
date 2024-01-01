@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -10,4 +10,8 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   readonly imageBase64?: string
+
+  @IsOptional()
+  @IsArray()
+  readonly tagsList?: Array<string>
 }
