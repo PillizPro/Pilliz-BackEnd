@@ -67,7 +67,7 @@ jobs:
           strip_components: 1
 
       - name: Execute Docker Container on Server
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
