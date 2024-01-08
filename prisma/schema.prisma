@@ -8,21 +8,25 @@ datasource db {
 }
 
 model Users {
-  id         String        @id @default(uuid())
-  email      String        @unique @db.VarChar(255)
-  name       String        @db.VarChar(255)
-  password   String        @db.VarChar(255)
-  role       UserRoles     @default(user)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  banned     BanningStatus @default(notBanned)
-  Post       Post[]
-  Like       Like[]
-  Repost     Repost[]
-  Comment    Comment[]
-  bio        String        @default("A propos de moi") @db.VarChar(500)
-  followedBy Follows[]     @relation("follower")
-  following  Follows[]     @relation("following")
+  id                  String        @id @default(uuid())
+  email               String        @unique @db.VarChar(255)
+  name                String        @db.VarChar(255)
+  password            String        @db.VarChar(255)
+  role                UserRoles     @default(user)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  firstConnection     Boolean       @default(true)
+  tutorialFeed        Boolean       @default(false)
+  tutorialMarketplace Boolean       @default(false)
+  tutorialPro         Boolean       @default(false)
+  banned              BanningStatus @default(notBanned)
+  Post                Post[]
+  Like                Like[]
+  Repost              Repost[]
+  Comment             Comment[]
+  bio                 String        @default("A propos de moi") @db.VarChar(500)
+  followedBy          Follows[]     @relation("follower")
+  following           Follows[]     @relation("following")
 }
 
 model Follows {
