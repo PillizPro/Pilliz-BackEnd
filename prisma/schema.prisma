@@ -22,6 +22,8 @@ model Users {
   Comment       Comment[]
   Conversations Conversation[]
   Messages      Message[]
+  isConnected   Boolean        @default(false)
+  EncryptKeys   EncryptKeys[]
 }
 
 model Post {
@@ -76,9 +78,10 @@ model Comment {
 }
 
 model Conversation {
-  id       String    @id @default(uuid())
-  Messages Message[]
-  Users    Users[]
+  id          String        @id @default(uuid())
+  Messages    Message[]
+  Users       Users[]
+  EncryptKeys EncryptKeys[]
 }
 
 model Message {
@@ -91,6 +94,16 @@ model Message {
   conversationId String
   Conversation   Conversation @relation(fields: [conversationId], references: [id])
   read           Boolean      @default(false)
+}
+
+model EncryptKeys {
+  id                String       @id @default(uuid())
+  userId            String
+  User              Users        @relation(fields: [userId], references: [id])
+  conversationId    String
+  Conversation      Conversation @relation(fields: [conversationId], references: [id])
+  publicKeyReceiver String
+  privateKeySender  String
 }
 
 model Product {
