@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger'
-import { Users, UserRoles, BanningStatus, Prisma } from '@prisma/client'
+import { Users, UserRoles, BanningStatus } from '@prisma/client'
 import { Exclude } from 'class-transformer'
 
 export class UserEntity implements Users {
