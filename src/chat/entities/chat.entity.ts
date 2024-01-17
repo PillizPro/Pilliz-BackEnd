@@ -11,4 +11,6 @@ export class ChatEntity implements Message {
   content: string
   conversationId: string
   read: boolean
+  status: number
+  type: number
 }

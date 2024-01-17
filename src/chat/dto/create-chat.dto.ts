@@ -9,4 +9,7 @@ export class CreateChatDto {
 
   @IsNotEmpty()
   readonly content: string
+
+  @IsNotEmpty()
+  readonly type: number
 }

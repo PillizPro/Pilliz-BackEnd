@@ -16,7 +16,8 @@ export class ChatService {
 
   async createChat(createChatDto: CreateChatDto) {
     try {
-      const { conversationId, authorId, content } = createChatDto
+      const { conversationId, authorId, content, type } = createChatDto
+
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversationId },
         include: {
@@ -38,6 +39,7 @@ export class ChatService {
           content,
           conversationId,
           receiverId,
+          type,
         },
       })
       return { receiverId, chat: new ChatEntity(newMessage) }
@@ -61,7 +63,7 @@ export class ChatService {
       const conversation_ = await this._getOrCreateConversation(findChatDto)
       await this.prismaService.message.updateMany({
         where: { conversationId: conversation_?.id },
-        data: { read: true },
+        data: { status: 2 }, //2 corresponds to a viewed message
       })
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversation_?.id },
@@ -69,10 +71,24 @@ export class ChatService {
           Messages: true,
         },
       })
-      const messages = conversation?.Messages.map(
-        (message) => new ChatEntity(message)
-      )
-      return messages
+      if (conversation?.Messages) {
+        const messages = await Promise.all(
+          conversation.Messages.map(async (message) => {
+            const user = await this.prismaService.users.findUnique({
+              where: { id: message.authorId },
+            })
+            return {
+              text: message.content,
+              name: user?.name,
+              messageType: message.type,
+              messageStatus: message.status,
+              isSender: message.authorId === findChatDto.userId,
+            }
+          })
+        )
+        return { messages }
+      }
+      return {}
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting the last messages')
