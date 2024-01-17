@@ -1,6 +1,12 @@
-import { PickType } from '@nestjs/swagger'
-import { CreateChatDto } from './create-chat.dto'
+import { IsUUID } from 'class-validator'
 
-export class FindChatDto extends PickType(CreateChatDto, [
-  'conversationId',
-] as const) {}
+export class FindChatDto {
+  @IsUUID()
+  readonly conversationId?: string
+
+  @IsUUID()
+  readonly userId: string
+
+  @IsUUID()
+  readonly receiverId?: string
+}

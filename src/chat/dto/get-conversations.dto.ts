@@ -1,6 +1,6 @@
-import { PickType } from '@nestjs/swagger'
-import { CreateConversationDto } from './create-conversation.dto'
+import { IsUUID } from 'class-validator'
 
-export class GetConversationsDto extends PickType(CreateConversationDto, [
-  'userId',
-] as const) {}
+export class GetConversationsDto {
+  @IsUUID()
+  readonly userId: string
+}
