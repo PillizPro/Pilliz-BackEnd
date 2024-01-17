@@ -13,6 +13,7 @@ import { FindChatDto } from './dto/find-chat-dto'
 import { UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
+import { GetConversationsDto } from './dto/get-conversations.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -71,6 +72,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const allChat = await this.chatService.findAllChat(findChatDto)
     client.emit('allChat', allChat)
+    return allChat
+  }
+
+  @SubscribeMessage('getConversations')
+  async getConversations(
+    @MessageBody() getConversationsDto: GetConversationsDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const conversations =
+      await this.chatService.getConversations(getConversationsDto)
+    client.emit('getConversations', conversations)
+    return conversations
   }
 
   // @SubscribeMessage('updateChat')

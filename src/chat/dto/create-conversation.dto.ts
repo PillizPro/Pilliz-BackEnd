@@ -2,8 +2,8 @@ import { IsUUID } from 'class-validator'
 
 export class CreateConversationDto {
   @IsUUID()
-  readonly receiverId: string
+  readonly userId: string
 
   @IsUUID()
-  readonly userId: string
+  readonly receiverId: string
 }

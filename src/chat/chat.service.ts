@@ -5,7 +5,8 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { FindChatDto } from './dto/find-chat-dto'
 import { ChatEntity } from './entities/chat.entity'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { CreateConversationDto } from './dto/create-conversation-dto'
+import { CreateConversationDto } from './dto/create-conversation.dto'
+import { GetConversationsDto } from './dto/get-conversations.dto'
 
 @Injectable()
 export class ChatService {
@@ -78,32 +79,42 @@ export class ChatService {
     }
   }
 
-  async getConversations(userId: string) {
+  async getConversations(getConversationsDto: GetConversationsDto) {
     try {
       const conversations = await this.prismaService.conversation.findMany({
         where: {
           Users: {
             some: {
-              id: userId,
+              id: getConversationsDto.userId,
             },
           },
         },
         include: {
           Users: true,
+          Messages: { orderBy: { createdAt: 'desc' } },
         },
       })
-      let receiverId: string = ''
-      let receiverName: string = ''
       const transformedConversations = conversations.map((conv) => {
+        let name: string = ''
+        let isActive: boolean = false
         for (const user of conv.Users) {
-          if (user.id !== userId) {
-            receiverId = user.id
-            receiverName = user.name
+          if (user.id !== getConversationsDto.userId) {
+            name = user.name
+            isActive = user.isConnected
             break
           }
         }
+        let lastMessage: string | undefined = ''
+        if (conv.Messages.length !== 0) lastMessage = conv.Messages[0]?.content
         const conversationId = conv.id
-        return { conversationId, receiverId, receiverName }
+        return {
+          conversationId,
+          name,
+          isActive,
+          image: 'null',
+          time: 'null',
+          lastMessage,
+        }
       })
       return transformedConversations
     } catch (err) {
