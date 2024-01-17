@@ -86,9 +86,9 @@ export class ChatService {
             }
           })
         )
-        return { messages }
+        return messages
       }
-      return {}
+      return
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting the last messages')
