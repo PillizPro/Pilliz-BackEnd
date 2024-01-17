@@ -4,6 +4,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  ConnectedSocket,
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
@@ -11,6 +12,7 @@ import { CreateChatDto } from './dto/create-chat.dto'
 import { FindChatDto } from './dto/find-chat-dto'
 import { UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
+import { UserService } from 'src/user/user.service'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -21,14 +23,17 @@ import { Socket } from 'socket.io'
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private _connectedUsers: Map<string, Socket> = new Map()
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly userService: UserService
+  ) {}
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
     client.on('authChat', (payload: { userId: string }) => {
       this._connectedUsers.set(payload.userId, client)
       console.log(this._connectedUsers)
-      this.chatService.changeConnectedStatus(payload.userId, true)
+      this.userService.changeConnectedStatus(payload.userId, true)
     })
   }
 
@@ -37,31 +42,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const [userId, socket] of this._connectedUsers.entries()) {
       if (socket === client) {
         this._connectedUsers.delete(userId)
-        this.chatService.changeConnectedStatus(userId, false)
+        this.userService.changeConnectedStatus(userId, false)
         break
       }
     }
   }
 
   @SubscribeMessage('createChat')
-  create(@MessageBody() createChatDto: CreateChatDto) {
-    const receiverSocket = this._connectedUsers.get(createChatDto.receiverId)
+  async createChat(@MessageBody() createChatDto: CreateChatDto) {
+    const newChatEntity = await this.chatService.createChat(createChatDto)
+    const receiverSocket = this._connectedUsers.get(newChatEntity.receiverId)
     if (receiverSocket) {
-      const newChatEntity = this.chatService.create(createChatDto, true)
-      receiverSocket.emit('privateChat', {
+      receiverSocket.emit('newChat', {
         author: createChatDto.authorId,
         content: createChatDto.content,
       })
-      return newChatEntity
+      return newChatEntity.chat
     } else {
-      this.chatService.create(createChatDto, false)
+      this.chatService.emitEventCreateChat(createChatDto)
       console.log('The receiver is not connected')
     }
   }
 
   @SubscribeMessage('findAllChat')
-  findAll(@MessageBody() findChatDto: FindChatDto) {
-    return this.chatService.findAll(findChatDto)
+  async findAllChat(
+    @MessageBody() findChatDto: FindChatDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const allChat = await this.chatService.findAllChat(findChatDto)
+    client.emit('allChat', allChat)
   }
 
   // @SubscribeMessage('updateChat')

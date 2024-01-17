@@ -66,4 +66,16 @@ export class UserService {
       throw new Error('An error occurred when unbanning the user.')
     }
   }
+
+  async changeConnectedStatus(userId: string, connectedStatus: boolean) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId },
+        data: { isConnected: connectedStatus },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when changing connected user status')
+    }
+  }
 }

@@ -9,7 +9,4 @@ export class CreateChatDto {
 
   @IsNotEmpty()
   readonly content: string
-
-  @IsUUID()
-  readonly receiverId: string
 }

@@ -13,21 +13,24 @@ export class ChatService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async changeConnectedStatus(userId: string, connectedStatus: boolean) {
+  async createChat(createChatDto: CreateChatDto) {
     try {
-      await this.prismaService.users.update({
-        where: { id: userId },
-        data: { isConnected: connectedStatus },
+      const { conversationId, authorId, content } = createChatDto
+      const conversation = await this.prismaService.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+          Users: true,
+        },
       })
-    } catch (err) {
-      console.error(err)
-      throw new Error('An error occured when changing connected user status')
-    }
-  }
-
-  async create(createChatDto: CreateChatDto, receiverConnected: boolean) {
-    try {
-      const { conversationId, authorId, content, receiverId } = createChatDto
+      if (!conversation?.Users)
+        throw new Error('There is no Users in this conversation')
+      let receiverId: string = ''
+      for (const user of conversation.Users) {
+        if (user.id !== authorId) {
+          receiverId = user.id
+          break
+        }
+      }
       const newMessage = await this.prismaService.message.create({
         data: {
           authorId,
@@ -36,22 +39,28 @@ export class ChatService {
           receiverId,
         },
       })
-      if (!receiverConnected) {
-        const user = await this.prismaService.users.findUnique({
-          where: { id: authorId },
-        })
-        const userName = user?.name
-        this.eventEmitter.emit('createChat', { userName, content })
-      }
-      return new ChatEntity(newMessage)
+      return { receiverId, chat: new ChatEntity(newMessage) }
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when sending a message')
     }
   }
 
-  async findAll(findChatDto: FindChatDto) {
+  async emitEventCreateChat(createChatDto: CreateChatDto) {
+    const { authorId, content } = createChatDto
+    const user = await this.prismaService.users.findUnique({
+      where: { id: authorId },
+    })
+    const userName = user?.name
+    this.eventEmitter.emit('createChat', { userName, content })
+  }
+
+  async findAllChat(findChatDto: FindChatDto) {
     try {
+      await this.prismaService.message.updateMany({
+        where: { conversationId: findChatDto.conversationId },
+        data: { read: true },
+      })
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: findChatDto.conversationId },
         include: {
@@ -65,6 +74,50 @@ export class ChatService {
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting the last messages')
+    }
+  }
+
+  async getConversations(userId: string) {
+    try {
+      const conversations = await this.prismaService.conversation.findMany({
+        where: {
+          Users: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+        include: {
+          Users: true,
+        },
+      })
+      const transformedConversations = conversations.map((conv) => {
+        let receiverName: string = ''
+        for (const user of conv.Users) {
+          if (user.id !== userId) {
+            receiverName = user.name
+            break
+          }
+        }
+        const conversationId = conv.id
+        return { conversationId, receiverName }
+      })
+      return transformedConversations
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when getting conversations')
+    }
+  }
+
+  async createConversation() {
+    try {
+      const newConversation = await this.prismaService.conversation.create({
+        data: {},
+      })
+      return newConversation
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when creating a conversation')
     }
   }
 

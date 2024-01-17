@@ -8,22 +8,22 @@ datasource db {
 }
 
 model Users {
-  id            String         @id @default(uuid())
-  email         String         @unique @db.VarChar(255)
-  name          String         @db.VarChar(255)
-  password      String         @db.VarChar(255)
-  role          UserRoles      @default(user)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  banned        BanningStatus  @default(notBanned)
-  Post          Post[]
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Conversations Conversation[]
-  Messages      Message[]
-  isConnected   Boolean        @default(false)
-  EncryptKeys   EncryptKeys[]
+  id               String         @id @default(uuid())
+  email            String         @unique @db.VarChar(255)
+  name             String         @db.VarChar(255)
+  password         String         @db.VarChar(255)
+  role             UserRoles      @default(user)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  banned           BanningStatus  @default(notBanned)
+  Post             Post[]
+  Like             Like[]
+  Repost           Repost[]
+  Comment          Comment[]
+  Conversations    Conversation[]
+  MessagesSend     Message[]      @relation("send")
+  MessagesReceived Message[]      @relation("received")
+  isConnected      Boolean        @default(false)
 }
 
 model Post {
@@ -78,32 +78,22 @@ model Comment {
 }
 
 model Conversation {
-  id          String        @id @default(uuid())
-  Messages    Message[]
-  Users       Users[]
-  EncryptKeys EncryptKeys[]
+  id       String    @id @default(uuid())
+  Messages Message[]
+  Users    Users[]
 }
 
 model Message {
   id             String       @id @default(uuid())
   authorId       String
-  Author         Users        @relation(fields: [authorId], references: [id])
-  receiverId     String       @default("")
+  Author         Users        @relation("send", fields: [authorId], references: [id])
+  receiverId     String
+  Receiver       Users        @relation("received", fields: [receiverId], references: [id])
   createdAt      DateTime     @default(now())
   content        String
   conversationId String
   Conversation   Conversation @relation(fields: [conversationId], references: [id])
   read           Boolean      @default(false)
-}
-
-model EncryptKeys {
-  id                String       @id @default(uuid())
-  userId            String
-  User              Users        @relation(fields: [userId], references: [id])
-  conversationId    String
-  Conversation      Conversation @relation(fields: [conversationId], references: [id])
-  publicKeyReceiver String
-  privateKeySender  String
 }
 
 model Product {
