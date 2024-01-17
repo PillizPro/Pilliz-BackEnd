@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create-post.dto'
+import { DeletePostDto } from './dto/delete-post.dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
 
@@ -8,12 +9,12 @@ import { ImageUploadService } from 'src/image/image-upload.service'
 export class PostService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly imageUploadService: ImageUploadService // Injectez le service d'upload d'image
+    private readonly imageUploadService: ImageUploadService
   ) {}
 
   async postByUser(createPostDto: CreatePostDto) {
     try {
-      const { userId, content, imageBase64 } = createPostDto
+      const { userId, content, imageBase64, tagsList } = createPostDto
 
       let imageUrl = null
       if (imageBase64) {
@@ -28,10 +29,50 @@ export class PostService {
         },
       })
 
+      if (tagsList) {
+        const tags = await Promise.all(
+          tagsList.map((tagName) =>
+            this.prismaService.tags.findUnique({
+              where: { name: tagName },
+            })
+          )
+        )
+
+        if (tags.includes(null)) {
+          throw new Error('One or more tags do not exist')
+        }
+
+        await this.prismaService.post.update({
+          where: { id: newPost.id },
+          data: {
+            Tags: {
+              connect: tagsList.map((tag) => ({
+                name: tag,
+              })),
+            },
+          },
+        })
+      }
+
       return new PostEntity(newPost)
     } catch (error) {
       console.error(error)
       throw new Error('An error occurred when creating a post')
+    }
+  }
+
+  async deletePostById(deletePostDto: DeletePostDto) {
+    try {
+      await this.prismaService.comment.deleteMany({
+        where: { postId: deletePostDto.postId },
+      })
+      await this.prismaService.post.delete({
+        where: { id: deletePostDto.postId },
+      })
+      return { message: 'Post successfully deleted.' }
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when deleting the post.')
     }
   }
 
@@ -40,10 +81,12 @@ export class PostService {
       const posts = await this.prismaService.post.findMany({
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true, // Inclure les données des tags associés
         },
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -52,6 +95,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -67,6 +111,7 @@ export class PostService {
         where: { id: postId },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true, // Inclure les données des tags associés
         },
       })
 
@@ -75,6 +120,7 @@ export class PostService {
       }
 
       return {
+        userId: post.userId,
         postId: post.id,
         username: post.Users.name,
         content: post.content,
@@ -83,6 +129,7 @@ export class PostService {
         reposts: post.repostsCount,
         comments: post.commentsCount,
         createdAt: post.createdAt,
+        tags: post.Tags.map((tag) => tag.name),
       }
     } catch (error) {
       console.error(error)
@@ -104,10 +151,12 @@ export class PostService {
         },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -116,6 +165,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -132,10 +182,12 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -144,6 +196,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts
@@ -167,10 +220,12 @@ export class PostService {
         },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
+          Tags: true,
         },
       })
 
       const transformedPosts = posts.map((post) => ({
+        userId: post.userId,
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
         content: post.content, // Contenu du post
@@ -179,6 +234,7 @@ export class PostService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
+        tags: post.Tags.map((tag) => tag.name),
       }))
 
       return transformedPosts

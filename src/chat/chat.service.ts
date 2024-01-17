@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { FindChatDto } from './dto/find-chat-dto'
 import { ChatEntity } from './entities/chat.entity'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import { CreateConversationDto } from './dto/create-conversation-dto'
 
 @Injectable()
 export class ChatService {
@@ -91,16 +92,18 @@ export class ChatService {
           Users: true,
         },
       })
+      let receiverId: string = ''
+      let receiverName: string = ''
       const transformedConversations = conversations.map((conv) => {
-        let receiverName: string = ''
         for (const user of conv.Users) {
           if (user.id !== userId) {
+            receiverId = user.id
             receiverName = user.name
             break
           }
         }
         const conversationId = conv.id
-        return { conversationId, receiverName }
+        return { conversationId, receiverId, receiverName }
       })
       return transformedConversations
     } catch (err) {
@@ -109,12 +112,22 @@ export class ChatService {
     }
   }
 
-  async createConversation() {
+  async createConversation(createConversationDto: CreateConversationDto) {
     try {
-      const newConversation = await this.prismaService.conversation.create({
-        data: {},
-      })
-      return newConversation
+      // const newConversation = await this.prismaService.conversation.create({
+      //   data: {
+      //     Users: {
+      //       connectOrCreate: {
+      //         where: {
+      //           OR: {
+      //           }
+      //           id: createConversationDto.userId
+      //         },
+      //       },
+      //     },
+      //   },
+      // })
+      // return newConversation
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when creating a conversation')

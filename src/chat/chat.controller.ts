@@ -1,6 +1,14 @@
-import { Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common'
 import { ChatService } from './chat.service'
 import { ApiTags } from '@nestjs/swagger'
+import { CreateConversationDto } from './dto/create-conversation-dto'
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -13,7 +21,9 @@ export class ChatController {
   }
 
   @Post('createConversation')
-  async createConversation() {
-    return await this.chatService.createConversation()
+  async createConversation(
+    @Body() createConversationDto: CreateConversationDto
+  ) {
+    return await this.chatService.createConversation(createConversationDto)
   }
 }

@@ -52,6 +52,10 @@ export class AuthService {
       username: user.name,
       email: user.email,
       id: user.id,
+      bio: user.bio,
+      firstConnection: user.firstConnection,
+      tutorialMarketplace: user.tutorialMarketplace,
+      tutorialPro: user.tutorialPro,
     }
   }
 

@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
+import { DeletePostDto } from './dto/delete-post.dto'
 import { PostService } from './post.service'
 import { ApiTags } from '@nestjs/swagger'
 
@@ -11,6 +12,11 @@ export class PostController {
   @Post('posting')
   async postByUser(@Body() createPostDto: CreatePostDto) {
     return await this.postService.postByUser(createPostDto)
+  }
+
+  @Post('deletingPost')
+  async deletePostById(@Body() deletePostDto: DeletePostDto) {
+    return await this.postService.deletePostById(deletePostDto)
   }
 
   @Get('findallpost')
