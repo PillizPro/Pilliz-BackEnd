@@ -114,7 +114,9 @@ export class ChatService {
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversation_?.id },
         include: {
-          Messages: true,
+          Messages: {
+            orderBy: { createdAt: 'asc' },
+          },
         },
       })
       if (conversation?.Messages) {
