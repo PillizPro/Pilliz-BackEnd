@@ -67,7 +67,7 @@ export class UserService {
     }
   }
 
-  async changeConnectedStatus(userId: string, connectedStatus: boolean) {
+  async updateConnectedStatus(userId: string, connectedStatus: boolean) {
     try {
       await this.prismaService.users.update({
         where: { id: userId },

@@ -34,7 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('authChat', (payload: { userId: string }) => {
       this._connectedUsers.set(payload.userId, client)
       console.log(this._connectedUsers)
-      this.userService.changeConnectedStatus(payload.userId, true)
+      this.userService.updateConnectedStatus(payload.userId, true)
     })
   }
 
@@ -43,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const [userId, socket] of this._connectedUsers.entries()) {
       if (socket === client) {
         this._connectedUsers.delete(userId)
-        this.userService.changeConnectedStatus(userId, false)
+        this.userService.updateConnectedStatus(userId, false)
         break
       }
     }
@@ -73,6 +73,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.chatService.emitEventCreateChat(createChatDto)
       console.log('The receiver is not connected')
     }
+  }
+
+  @SubscribeMessage('viewMessage')
+  async viewMessage(
+    @MessageBody() idMessage: string,
+    @ConnectedSocket() client: Socket
+  ) {
+    this.chatService.updateOneMessageStatus(idMessage, 2)
+    client.emit('viewMessage')
   }
 
   @SubscribeMessage('findAllChat')

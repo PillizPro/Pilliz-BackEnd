@@ -13,6 +13,41 @@ export class ChatService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
+  async updateOneMessageStatus(messageId: string, messageStatus: number) {
+    //0 corresponds to a not-sent message
+    //1 corresponds to a not-viewed message
+    //2 corresponds to a viewed message
+    await this.prismaService.message.update({
+      where: {
+        id: messageId,
+      },
+      data: { status: messageStatus },
+    })
+  }
+
+  async updateAllMessagesStatus(
+    message: { conversationId: string | undefined; userId: string },
+    messagesStatus: number
+  ) {
+    //0 corresponds to a not-sent message
+    //1 corresponds to a not-viewed message
+    //2 corresponds to a viewed message
+    let statusArray: number[] = []
+    if (messagesStatus === 0) statusArray = [1, 2]
+    if (messagesStatus === 1) statusArray = [0, 2]
+    if (messagesStatus === 2) statusArray = [0]
+    await this.prismaService.message.updateMany({
+      where: {
+        AND: [
+          { conversationId: message.conversationId },
+          { receiverId: message.userId },
+          { status: { notIn: statusArray } },
+        ],
+      },
+      data: { status: messagesStatus },
+    })
+  }
+
   async createChat(createChatDto: CreateChatDto) {
     try {
       const { conversationId, authorId, content, type } = createChatDto
@@ -43,9 +78,11 @@ export class ChatService {
           type,
         },
       })
+      this.updateOneMessageStatus(newMessage.id, 1)
       return {
         receiverId,
         chat: {
+          idMessage: newMessage.id,
           text: content,
           name: authorName,
           messageType: type,
@@ -70,10 +107,10 @@ export class ChatService {
   async findAllChat(findChatDto: FindChatDto) {
     try {
       const conversation_ = await this._getOrCreateConversation(findChatDto)
-      await this.prismaService.message.updateMany({
-        where: { conversationId: conversation_?.id },
-        data: { status: 2 }, //2 corresponds to a viewed message
-      })
+      this.updateAllMessagesStatus(
+        { conversationId: conversation_?.id, userId: findChatDto.userId },
+        2
+      )
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversation_?.id },
         include: {
@@ -87,6 +124,7 @@ export class ChatService {
               where: { id: message.authorId },
             })
             return {
+              idMessage: message.id,
               text: message.content,
               name: user?.name,
               messageType: message.type,
