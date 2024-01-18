@@ -14,6 +14,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
+import { MessageStatusDto } from './dto/message-status.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -77,10 +78,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('viewMessage')
   async viewMessage(
-    @MessageBody() idMessage: string,
+    @MessageBody() messageStatusDto: MessageStatusDto,
     @ConnectedSocket() client: Socket
   ) {
-    this.chatService.updateOneMessageStatus(idMessage, 2)
+    this.chatService.updateOneMessageStatus(messageStatusDto.idMessage, 2)
     client.emit('viewMessage')
   }
 
