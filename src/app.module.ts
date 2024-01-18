@@ -15,6 +15,9 @@ import { RepostModule } from './repost/repost.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
 import { ProductModule } from './product/product.module'
+import { ChatModule } from './chat/chat.module'
+import { PushNotificationModule } from './push-notification/push-notification.module'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 
@@ -39,6 +42,7 @@ const ENV = process.env.NODE_ENV
         abortEarly: true,
       },
     }),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     AuthModule,
     AdminModule,
@@ -51,6 +55,8 @@ const ENV = process.env.NODE_ENV
     CommentModule,
     ImageUploadModule,
     ProductModule,
+    ChatModule,
+    PushNotificationModule,
     TagsModule,
     TutorialsModule,
   ],
