@@ -50,15 +50,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('createChat')
-  async createChat(@MessageBody() createChatDto: CreateChatDto) {
+  async createChat(
+    @MessageBody() createChatDto: CreateChatDto,
+    @ConnectedSocket() client: Socket
+  ) {
     const newChatEntity = await this.chatService.createChat(createChatDto)
     const receiverSocket = this._connectedUsers.get(newChatEntity.receiverId)
+    client.emit('newChat', {
+      ...newChatEntity.chat,
+      isSender: true,
+    })
     if (receiverSocket) {
       receiverSocket.emit('newChat', {
-        author: createChatDto.authorId,
-        content: createChatDto.content,
+        ...newChatEntity.chat,
+        isSender: false,
       })
-      return newChatEntity.chat
+      return {
+        ...newChatEntity.chat,
+        isSender: false,
+      }
     } else {
       this.chatService.emitEventCreateChat(createChatDto)
       console.log('The receiver is not connected')

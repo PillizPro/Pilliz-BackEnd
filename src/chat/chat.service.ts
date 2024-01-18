@@ -3,7 +3,6 @@ import { CreateChatDto } from './dto/create-chat.dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { FindChatDto } from './dto/find-chat-dto'
-import { ChatEntity } from './entities/chat.entity'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 
@@ -27,10 +26,12 @@ export class ChatService {
       if (!conversation?.Users)
         throw new Error('There is no Users in this conversation')
       let receiverId: string = ''
+      let authorName: string = ''
       for (const user of conversation.Users) {
         if (user.id !== authorId) {
           receiverId = user.id
-          break
+        } else {
+          authorName = user.name
         }
       }
       const newMessage = await this.prismaService.message.create({
@@ -42,7 +43,15 @@ export class ChatService {
           type,
         },
       })
-      return { receiverId, chat: new ChatEntity(newMessage) }
+      return {
+        receiverId,
+        chat: {
+          text: content,
+          name: authorName,
+          messageType: type,
+          messageStatus: newMessage.status,
+        },
+      }
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when sending a message')
