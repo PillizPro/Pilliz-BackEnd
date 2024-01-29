@@ -30,28 +30,20 @@ export class FollowService {
   }
 
   async getNbFollowers(userId: string) {
-    const userNbFollowers = await this.prismaService.users.findMany({
+    const userNbFollowers = await this.prismaService.follows.count({
       where: {
-        following: {
-          some: {
-            followerId: userId,
-          },
-        },
+        followerId: userId,
       },
     })
-    return userNbFollowers.length
+    return userNbFollowers
   }
 
   async getNbFollowing(userId: string) {
-    const userNbFollowing = await this.prismaService.users.findMany({
+    const userNbFollowing = await this.prismaService.follows.count({
       where: {
-        following: {
-          some: {
-            followingId: userId,
-          },
-        },
+        followingId: userId,
       },
     })
-    return userNbFollowing.length
+    return userNbFollowing
   }
 }
