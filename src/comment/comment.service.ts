@@ -58,6 +58,7 @@ export class CommentService {
           })
 
           return {
+            userId: comment.userId,
             commentId: comment.id, // ID du commentaire
             username: comment.Users.name, // Nom de l'utilisateur
             content: comment.content, // Contenu du commentaire
@@ -149,6 +150,7 @@ export class CommentService {
           }
 
           return {
+            userId: responses.userId,
             commentId: responses.id, // ID du commentaire
             username: responses.Users.name, // Nom de l'utilisateur
             respondedToThisUser: originalUsername,
@@ -175,6 +177,12 @@ export class CommentService {
   ) {
     try {
       const { commentId } = deleteCommentOrReponseDto
+
+      const comment = await this.prismaService.comment.findUnique({
+        where: { id: commentId },
+      })
+
+      if (!comment) throw new Error('Comment not found')
 
       const responses = await this.prismaService.comment.findMany({
         where: {
@@ -204,6 +212,14 @@ export class CommentService {
       await this.prismaService.comment.deleteMany({
         where: { id: { in: responseIds } },
       })
+
+      // Réduit le compteur de commentaire sur le post d'origine
+      if (!comment.rootCommentId && !comment.parentId) {
+        await this.prismaService.post.update({
+          where: { id: comment.postId },
+          data: { commentsCount: { decrement: 1 } },
+        })
+      }
 
       // Supprimer les reposts du commentaires
       await this.prismaService.repost.deleteMany({
