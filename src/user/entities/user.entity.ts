@@ -18,5 +18,10 @@ export class UserEntity implements Users {
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
+  firstConnection: boolean
+  tutorialFeed: boolean
+  tutorialMarketplace: boolean
+  tutorialPro: boolean
   bio: string
+  isConnected: boolean
 }

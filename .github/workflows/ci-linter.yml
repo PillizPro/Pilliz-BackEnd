@@ -42,7 +42,7 @@ jobs:
       - if: matrix.node-version == '18.x'
         name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: '[+] Lint files'
           branch: GHA-lint-files

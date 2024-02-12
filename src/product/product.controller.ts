@@ -1,5 +1,5 @@
 import { ApiTags } from '@nestjs/swagger'
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { ProductService } from './product.service'
 
 @ApiTags('Product')
@@ -10,5 +10,10 @@ export class ProductController {
   @Get('findAllProducts')
   async findAllProducts() {
     return await this.productService.findAllProducts()
+  }
+
+  @Get('searchProducts')
+  async searchProducts(@Query('product') queryProduct: string) {
+    return await this.productService.searchProducts(queryProduct)
   }
 }
