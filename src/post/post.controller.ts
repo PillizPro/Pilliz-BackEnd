@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { Body, Controller, Post, Get } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
 import { RecoverPostDto } from './dto/recover-post.dto'
