@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { ChangeBioDto } from './dto/change-bio.dto'
+import { UserFetchInfos } from './dto/other-user-infos.dto'
 import { ProfilService } from './profil.service'
 import { ApiTags } from '@nestjs/swagger'
 
@@ -21,5 +22,10 @@ export class ProfilController {
   @Get('userNbPost/:userId')
   async getUserNumbersOfPost(@Param('userId') userId: string) {
     return await this.profilService.getNbPost(userId)
+  }
+
+  @Post('otherUsersInfos')
+  async fetchUserInfos(@Body() userFetchInfos: UserFetchInfos) {
+    return await this.profilService.fetchUserInfos(userFetchInfos)
   }
 }
