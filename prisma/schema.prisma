@@ -24,6 +24,7 @@ model Users {
   Like                Like[]
   Repost              Repost[]
   Comment             Comment[]
+  profilPicture       String        @default("")
   bio                 String        @default("A propos de moi") @db.VarChar(500)
   followedBy          Follows[]     @relation("follower")
   following           Follows[]     @relation("following")

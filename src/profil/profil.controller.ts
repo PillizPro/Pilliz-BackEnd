@@ -2,11 +2,12 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { ChangeBioDto } from './dto/change-bio.dto'
 import { ProfilService } from './profil.service'
 import { ApiTags } from '@nestjs/swagger'
+import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
-  constructor(private readonly profilService: ProfilService) {}
+  constructor(private readonly profilService: ProfilService) { }
 
   @Post('changebio')
   async changeBio(@Body() changeBioDto: ChangeBioDto) {
@@ -21,5 +22,15 @@ export class ProfilController {
   @Get('userNbPost/:userId')
   async getUserNumbersOfPost(@Param('userId') userId: string) {
     return await this.profilService.getNbPost(userId)
+  }
+
+  @Post('changeProfilImg')
+  async changeProfilImg(@Body() changeProfilImgDto: ChangeProfilImgDto) {
+    return await this.profilService.changeProfilImage(changeProfilImgDto)
+  }
+
+  @Get('userProfilImg/:userId')
+  async getUserProfilImg(@Param('userId') userId: string) {
+    return await this.profilService.getUserProfilImg(userId);
   }
 }
