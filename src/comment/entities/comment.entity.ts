@@ -9,9 +9,13 @@ export class CommentEntity implements Comment {
   content: string
   userId: string
   postId: string
+  parentId: string | null
+  rootCommentId: string | null
   createdAt: Date
   likesCount: number
   repostsCount: number
   commentsCount: number
   user: UserEntity
+  parent?: CommentEntity
+  children?: CommentEntity[]
 }
