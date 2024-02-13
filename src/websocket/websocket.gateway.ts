@@ -58,6 +58,7 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     content: string,
     likerName: string | undefined
   ) {
+    console.log(postOrComment, receiverId, content, likerName)
     const receiverSocket = this._connectedUsers.get(receiverId)
     if (receiverSocket) {
       receiverSocket.emit('newLike', {
@@ -65,6 +66,7 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
         name: likerName,
         content,
       })
+      console.log('ok')
       return {
         id: postOrComment,
         name: likerName,
@@ -77,11 +79,13 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @OnEvent('notifyOnFollow')
   async notifyOnFollow(receiverId: string, followerName: string) {
+    console.log(receiverId, followerName)
     const receiverSocket = this._connectedUsers.get(receiverId)
     if (receiverSocket) {
       receiverSocket.emit('newFollow', {
         name: followerName,
       })
+      console.log('ok')
       return {
         name: followerName,
       }
