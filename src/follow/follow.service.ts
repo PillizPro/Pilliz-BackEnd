@@ -22,7 +22,10 @@ export class FollowService {
       createFollowDto.followingId,
       follow.follower.name
     )
-    return new FollowEntity(follow)
+    return new FollowEntity({
+      followerId: follow.followerId,
+      followingId: follow.followingId,
+    })
   }
 
   async deleteFollowers(deleteFollowDto: DeleteFollowDto) {

@@ -33,7 +33,7 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
-    client.on('authChat', (payload: { userId: string }) => {
+    client.on('authWS', (payload: { userId: string }) => {
       this._connectedUsers.set(payload.userId, client)
       console.log(this._connectedUsers)
       this.userService.updateConnectedStatus(payload.userId, true)
@@ -58,7 +58,6 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     content: string,
     likerName: string | undefined
   ) {
-    console.log(postOrComment, receiverId, content, likerName)
     const receiverSocket = this._connectedUsers.get(receiverId)
     if (receiverSocket) {
       receiverSocket.emit('newLike', {
@@ -66,7 +65,6 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
         name: likerName,
         content,
       })
-      console.log('ok')
       return {
         id: postOrComment,
         name: likerName,
@@ -79,13 +77,11 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @OnEvent('notifyOnFollow')
   async notifyOnFollow(receiverId: string, followerName: string) {
-    console.log(receiverId, followerName)
     const receiverSocket = this._connectedUsers.get(receiverId)
     if (receiverSocket) {
       receiverSocket.emit('newFollow', {
         name: followerName,
       })
-      console.log('ok')
       return {
         name: followerName,
       }
