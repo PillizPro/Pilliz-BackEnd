@@ -3,15 +3,25 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateFollowDto } from './dto/create-follow.dto'
 import { FollowEntity } from './entities/follow.entity'
 import { DeleteFollowDto } from './dto/delete-follow.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class FollowService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async createFollowers(createFollowDto: CreateFollowDto) {
     const follow = await this.prismaService.follows.create({
       data: createFollowDto,
+      include: { follower: true },
     })
+    this.eventEmitter.emit(
+      'notifyOnFollow',
+      createFollowDto.followingId,
+      follow.follower.name
+    )
     return new FollowEntity(follow)
   }
 
