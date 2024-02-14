@@ -33,4 +33,12 @@ export class FollowController {
   async getUserFollowers(@Param('userId') userId: string) {
     return await this.followService.getFollowers(userId)
   }
+
+  @Get('isUserFollowedBy/:followerUid/:followingUid')
+  async isUserFollowedBy(
+    @Param('followerUid') followerUid: string,
+    @Param('followingUid') followingUid: string
+  ) {
+    return await this.followService.isUserFollowBy(followerUid, followingUid)
+  }
 }
