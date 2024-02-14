@@ -15,6 +15,7 @@ import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
+import { OnEvent } from '@nestjs/event-emitter'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -22,7 +23,7 @@ import { MessageStatusDto } from './dto/message-status.dto'
     origin: '*',
   },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private _connectedUsers: Map<string, Socket> = new Map()
 
   constructor(
@@ -32,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
-    client.on('authChat', (payload: { userId: string }) => {
+    client.on('authWS', (payload: { userId: string }) => {
       this._connectedUsers.set(payload.userId, client)
       console.log(this._connectedUsers)
       this.userService.updateConnectedStatus(payload.userId, true)
@@ -47,6 +48,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.userService.updateConnectedStatus(userId, false)
         break
       }
+    }
+  }
+
+  @OnEvent('notifyOnLike')
+  async notifyOnLike(
+    postOrComment: number,
+    receiverId: string,
+    content: string,
+    likerName: string | undefined
+  ) {
+    const receiverSocket = this._connectedUsers.get(receiverId)
+    if (receiverSocket) {
+      receiverSocket.emit('newLike', {
+        id: postOrComment,
+        name: likerName,
+        content,
+      })
+      return {
+        id: postOrComment,
+        name: likerName,
+        content,
+      }
+    } else {
+      // faire la push notification
+    }
+  }
+
+  @OnEvent('notifyOnFollow')
+  async notifyOnFollow(receiverId: string, followerName: string) {
+    const receiverSocket = this._connectedUsers.get(receiverId)
+    if (receiverSocket) {
+      receiverSocket.emit('newFollow', {
+        name: followerName,
+      })
+      return {
+        name: followerName,
+      }
+    } else {
+      // faire la push notification
     }
   }
 

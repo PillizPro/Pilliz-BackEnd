@@ -15,7 +15,7 @@ import { RepostModule } from './repost/repost.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
 import { ProductModule } from './product/product.module'
-import { ChatModule } from './chat/chat.module'
+import { WSModule } from './websocket/websocket.module'
 import { PushNotificationModule } from './push-notification/push-notification.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
@@ -55,7 +55,7 @@ const ENV = process.env.NODE_ENV
     CommentModule,
     ImageUploadModule,
     ProductModule,
-    ChatModule,
+    WSModule,
     PushNotificationModule,
     TagsModule,
     TutorialsModule,

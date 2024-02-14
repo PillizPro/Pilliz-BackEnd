@@ -3,16 +3,29 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateFollowDto } from './dto/create-follow.dto'
 import { FollowEntity } from './entities/follow.entity'
 import { DeleteFollowDto } from './dto/delete-follow.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class FollowService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async createFollowers(createFollowDto: CreateFollowDto) {
     const follow = await this.prismaService.follows.create({
       data: createFollowDto,
+      include: { follower: true },
     })
-    return new FollowEntity(follow)
+    this.eventEmitter.emit(
+      'notifyOnFollow',
+      createFollowDto.followingId,
+      follow.follower.name
+    )
+    return new FollowEntity({
+      followerId: follow.followerId,
+      followingId: follow.followingId,
+    })
   }
 
   async deleteFollowers(deleteFollowDto: DeleteFollowDto) {
@@ -45,5 +58,41 @@ export class FollowService {
       },
     })
     return userNbFollowing
+  }
+
+  async getFollowers(userId: string) {
+    const userFollowers = await this.prismaService.users.findUnique({
+      where: {
+        id: userId,
+      },
+      include: { followedBy: true },
+    })
+    if (userFollowers?.followedBy) {
+      const allFollowers = await Promise.all(
+        userFollowers.followedBy.map(async (follower) => {
+          const userFollower = await this.prismaService.users.findUnique({
+            where: { id: follower.followerId },
+          })
+          return {
+            id: userFollower?.id,
+            name: userFollower?.name,
+          }
+        })
+      )
+      return allFollowers
+    }
+    return
+  }
+
+  async isUserFollowBy(followerUid: string, followingUid: string) {
+    const followingUser = await this.prismaService.follows.findMany({
+      where: {
+        followingId: followingUid,
+        followerId: followerUid,
+      },
+    })
+
+    if (followingUser.length === 0) return 1
+    else return 0
   }
 }

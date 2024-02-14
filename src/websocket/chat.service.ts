@@ -17,12 +17,17 @@ export class ChatService {
     //0 corresponds to a not-sent message
     //1 corresponds to a not-viewed message
     //2 corresponds to a viewed message
-    await this.prismaService.message.update({
-      where: {
-        id: messageId,
-      },
-      data: { status: messageStatus },
-    })
+    try {
+      return await this.prismaService.message.update({
+        where: {
+          id: messageId,
+        },
+        data: { status: messageStatus },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when updating a message status')
+    }
   }
 
   async updateAllMessagesStatus(
@@ -32,20 +37,25 @@ export class ChatService {
     //0 corresponds to a not-sent message
     //1 corresponds to a not-viewed message
     //2 corresponds to a viewed message
-    let statusArray: number[] = []
-    if (messagesStatus === 0) statusArray = [1, 2]
-    if (messagesStatus === 1) statusArray = [0, 2]
-    if (messagesStatus === 2) statusArray = [0]
-    await this.prismaService.message.updateMany({
-      where: {
-        AND: [
-          { conversationId: message.conversationId },
-          { receiverId: message.userId },
-          { status: { notIn: statusArray } },
-        ],
-      },
-      data: { status: messagesStatus },
-    })
+    try {
+      let statusArray: number[] = []
+      if (messagesStatus === 0) statusArray = [1, 2]
+      if (messagesStatus === 1) statusArray = [0, 2]
+      if (messagesStatus === 2) statusArray = [0]
+      await this.prismaService.message.updateMany({
+        where: {
+          AND: [
+            { conversationId: message.conversationId },
+            { receiverId: message.userId },
+            { status: { notIn: statusArray } },
+          ],
+        },
+        data: { status: messagesStatus },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when updating multiple messages status')
+    }
   }
 
   async createChat(createChatDto: CreateChatDto) {
@@ -78,15 +88,15 @@ export class ChatService {
           type,
         },
       })
-      this.updateOneMessageStatus(newMessage.id, 1)
+      const updatedMessage = await this.updateOneMessageStatus(newMessage.id, 1)
       return {
         receiverId,
         chat: {
-          idMessage: newMessage.id,
+          idMessage: updatedMessage.id,
           text: content,
           name: authorName,
           messageType: type,
-          messageStatus: newMessage.status,
+          messageStatus: updatedMessage.status,
         },
       }
     } catch (err) {
@@ -97,17 +107,23 @@ export class ChatService {
 
   async emitEventCreateChat(createChatDto: CreateChatDto) {
     const { authorId, content } = createChatDto
-    const user = await this.prismaService.users.findUnique({
-      where: { id: authorId },
-    })
-    const userName = user?.name
-    this.eventEmitter.emit('createChat', { userName, content })
+    try {
+      const user = await this.prismaService.users.findUnique({
+        where: { id: authorId },
+      })
+      this.eventEmitter.emit('notifyOnCreateChat', user?.name, content)
+    } catch (err) {
+      console.error(err)
+      throw new Error(
+        'An error occured when emitting an event for creating chat'
+      )
+    }
   }
 
   async findAllChat(findChatDto: FindChatDto) {
     try {
       const conversation_ = await this._getOrCreateConversation(findChatDto)
-      this.updateAllMessagesStatus(
+      await this.updateAllMessagesStatus(
         { conversationId: conversation_?.id, userId: findChatDto.userId },
         2
       )
