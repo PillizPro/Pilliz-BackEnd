@@ -59,4 +59,28 @@ export class FollowService {
     })
     return userNbFollowing
   }
+
+  async getFollowers(userId: string) {
+    const userFollowers = await this.prismaService.users.findUnique({
+      where: {
+        id: userId,
+      },
+      include: { followedBy: true },
+    })
+    if (userFollowers?.followedBy) {
+      const allFollowers = await Promise.all(
+        userFollowers.followedBy.map(async (follower) => {
+          const userFollower = await this.prismaService.users.findUnique({
+            where: { id: follower.followerId },
+          })
+          return {
+            id: userFollower?.id,
+            name: userFollower?.name,
+          }
+        })
+      )
+      return allFollowers
+    }
+    return
+  }
 }
