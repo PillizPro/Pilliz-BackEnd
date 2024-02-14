@@ -7,14 +7,8 @@ import { request } from 'https'
 export class PushNotificationService {
   constructor(private readonly configService: ConfigService) {}
 
-  @OnEvent('createChat')
-  notifyOnCreateChat({
-    userName,
-    content,
-  }: {
-    userName: string
-    content: string
-  }) {
+  @OnEvent('notifyOnCreateChat')
+  notifyOnCreateChat(userName: string | undefined, content: string) {
     console.log(userName, content)
     const message = {
       app_id: this.configService.get('ONESIGNAL_APP_ID'),

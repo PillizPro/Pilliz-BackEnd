@@ -10,7 +10,6 @@ export class ChatEntity implements Message {
   createdAt: Date
   content: string
   conversationId: string
-  read: boolean
   status: number
   type: number
 }

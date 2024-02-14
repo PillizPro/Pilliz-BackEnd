@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { LikePostDto } from './dto/like-post.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class LikeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async like(likeDto: LikePostDto) {
     // Vérifier si c'est un like de post ou de commentaire
@@ -20,17 +24,36 @@ export class LikeService {
       // Créer un nouveau like
       await this.prisma.like.create({ data: { ...likeDto } })
 
+      const user = await this.prisma.users.findUnique({
+        where: { id: likeDto.userId },
+      })
       // Mise à jour du compteur de likes
       if (likeDto.postId) {
-        await this.prisma.post.update({
+        const post = await this.prisma.post.update({
           where: { id: likeDto.postId },
           data: { likesCount: { increment: 1 } },
+          include: { Users: true },
         })
+        this.eventEmitter.emit(
+          'notifyOnLike',
+          0,
+          post.userId,
+          post.content,
+          user?.name
+        )
       } else if (likeDto.commentId) {
-        await this.prisma.comment.update({
+        const comment = await this.prisma.comment.update({
           where: { id: likeDto.commentId },
           data: { likesCount: { increment: 1 } },
+          include: { Users: true },
         })
+        this.eventEmitter.emit(
+          'notifyOnLike',
+          1,
+          comment.userId,
+          comment.content,
+          user?.name
+        )
       }
     }
   }

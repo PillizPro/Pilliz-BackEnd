@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { ChangeBioDto } from './dto/change-bio.dto'
 import { UserFetchInfos } from './dto/other-user-infos.dto'
 import { FollowService } from 'src/follow/follow.service'
+import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 
 @Injectable()
 export class ProfilService {
@@ -69,5 +70,21 @@ export class ProfilService {
       console.error(error)
       throw new Error('An error occurred when getting user infos')
     }
+  }
+
+  async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
+    await this.prisma.users.update({
+      where: { id: changeProfilImageDto.id },
+      data: { profilPicture: changeProfilImageDto.imgBytes },
+    })
+  }
+
+  async getUserProfilImg(userId: string) {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+    return user?.profilPicture
   }
 }
