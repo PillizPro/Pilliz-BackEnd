@@ -11,8 +11,7 @@ export class ProfilService {
     private readonly prisma: PrismaService,
     private readonly followService: FollowService
   ) {}
-    
-  
+
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
       where: { id: changeBioDto.id },
@@ -72,7 +71,7 @@ export class ProfilService {
       throw new Error('An error occurred when getting user infos')
     }
   }
-  
+
   async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
     await this.prisma.users.update({
       where: { id: changeProfilImageDto.id },
