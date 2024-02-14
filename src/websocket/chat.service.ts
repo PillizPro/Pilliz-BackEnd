@@ -105,13 +105,10 @@ export class ChatService {
     }
   }
 
-  async emitEventCreateChat(createChatDto: CreateChatDto) {
+  async emitEventCreateChat(createChatDto: CreateChatDto, receiverId: string) {
     const { authorId, content } = createChatDto
     try {
-      const user = await this.prismaService.users.findUnique({
-        where: { id: authorId },
-      })
-      this.eventEmitter.emit('notifyOnCreateChat', user?.name, content)
+      this.eventEmitter.emit('notifyUser', 0, authorId, content, receiverId)
     } catch (err) {
       console.error(err)
       throw new Error(
@@ -142,6 +139,7 @@ export class ChatService {
               where: { id: message.authorId },
             })
             return {
+              conversationId: conversation.id,
               idMessage: message.id,
               text: message.content,
               name: user?.name,
@@ -151,9 +149,11 @@ export class ChatService {
             }
           })
         )
-        return messages
+        return {
+          messages,
+        }
       }
-      return
+      return { conversationId: conversation?.id }
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting the last messages')
@@ -220,25 +220,35 @@ export class ChatService {
         },
       })
       const transformedConversations = conversations.map((conv) => {
+        let receiverId: string = ''
         let name: string = ''
+        let profilPicture: string = ''
         let isActive: boolean = false
         for (const user of conv.Users) {
           if (user.id !== getConversationsDto.userId) {
+            receiverId = user.id
             name = user.name
+            profilPicture = user.profilPicture
             isActive = user.isConnected
             break
           }
         }
         let lastMessage: string | undefined = ''
-        if (conv.Messages.length !== 0) lastMessage = conv.Messages[0]?.content
+        let messageType: number | undefined
+        if (conv.Messages.length !== 0) {
+          lastMessage = conv.Messages[0]?.content
+          messageType = conv.Messages[0]?.type
+        }
         const conversationId = conv.id
         return {
           conversationId,
+          receiverId,
           name,
           isActive,
-          image: 'null',
+          image: profilPicture,
           time: 'null',
           lastMessage,
+          messageType,
         }
       })
       return transformedConversations

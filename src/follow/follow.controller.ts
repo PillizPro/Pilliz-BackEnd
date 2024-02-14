@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { CreateFollowDto } from './dto/create-follow.dto'
 import { DeleteFollowDto } from './dto/delete-follow.dto'
 
-@ApiTags('follow')
+@ApiTags('Follow')
 @Controller('follow')
 export class FollowController {
   constructor(private readonly followService: FollowService) {}

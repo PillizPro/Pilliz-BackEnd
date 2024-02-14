@@ -15,7 +15,6 @@ import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
-import { OnEvent } from '@nestjs/event-emitter'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -51,45 +50,6 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @OnEvent('notifyOnLike')
-  async notifyOnLike(
-    postOrComment: number,
-    receiverId: string,
-    content: string,
-    likerName: string | undefined
-  ) {
-    const receiverSocket = this._connectedUsers.get(receiverId)
-    if (receiverSocket) {
-      receiverSocket.emit('newLike', {
-        id: postOrComment,
-        name: likerName,
-        content,
-      })
-      return {
-        id: postOrComment,
-        name: likerName,
-        content,
-      }
-    } else {
-      // faire la push notification
-    }
-  }
-
-  @OnEvent('notifyOnFollow')
-  async notifyOnFollow(receiverId: string, followerName: string) {
-    const receiverSocket = this._connectedUsers.get(receiverId)
-    if (receiverSocket) {
-      receiverSocket.emit('newFollow', {
-        name: followerName,
-      })
-      return {
-        name: followerName,
-      }
-    } else {
-      // faire la push notification
-    }
-  }
-
   @SubscribeMessage('createChat')
   async createChat(
     @MessageBody() createChatDto: CreateChatDto,
@@ -111,7 +71,10 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
         isSender: false,
       }
     } else {
-      this.chatService.emitEventCreateChat(createChatDto)
+      this.chatService.emitEventCreateChat(
+        createChatDto,
+        newChatEntity.receiverId
+      )
       console.log('The receiver is not connected')
     }
   }

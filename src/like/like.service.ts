@@ -24,9 +24,6 @@ export class LikeService {
       // Créer un nouveau like
       await this.prisma.like.create({ data: { ...likeDto } })
 
-      const user = await this.prisma.users.findUnique({
-        where: { id: likeDto.userId },
-      })
       // Mise à jour du compteur de likes
       if (likeDto.postId) {
         const post = await this.prisma.post.update({
@@ -35,11 +32,11 @@ export class LikeService {
           include: { Users: true },
         })
         this.eventEmitter.emit(
-          'notifyOnLike',
-          0,
-          post.userId,
+          'notifyUser',
+          1,
+          likeDto.userId,
           post.content,
-          user?.name
+          post.userId
         )
       } else if (likeDto.commentId) {
         const comment = await this.prisma.comment.update({
@@ -48,11 +45,11 @@ export class LikeService {
           include: { Users: true },
         })
         this.eventEmitter.emit(
-          'notifyOnLike',
-          1,
-          comment.userId,
+          'notifyUser',
+          2,
+          likeDto.userId,
           comment.content,
-          user?.name
+          comment.userId
         )
       }
     }
