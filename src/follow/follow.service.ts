@@ -71,7 +71,7 @@ export class FollowService {
       const allFollowers = await Promise.all(
         userFollowers.followedBy.map(async (follower) => {
           const userFollower = await this.prismaService.users.findUnique({
-            where: { id: follower.followerId },
+            where: { id: follower.followingId },
           })
           return {
             id: userFollower?.id,
