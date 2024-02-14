@@ -59,4 +59,16 @@ export class FollowService {
     })
     return userNbFollowing
   }
+
+  async isUserFollowBy(followerUid: string, followingUid: string) {
+    const followingUser = await this.prismaService.follows.findMany({
+      where: {
+        followingId: followingUid,
+        followerId: followerUid,
+      },
+    })
+
+    if (followingUser.length == 0) return 1
+    else return 0
+  }
 }
