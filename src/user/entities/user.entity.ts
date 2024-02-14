@@ -25,4 +25,6 @@ export class UserEntity implements Users {
   bio: string
   isConnected: boolean
   profilPicture: string
+  // Métriques
+  country: string
 }

@@ -20,6 +20,7 @@ import { PushNotificationModule } from './push-notification/push-notification.mo
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
+import { MetricModule } from './metric/metric.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -31,10 +32,10 @@ const ENV = process.env.NODE_ENV
         ENV === 'production'
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
-          ? 'env-staging/.env.staging'
-          : ENV === 'development'
-          ? 'env-dev/.env.dev'
-          : '',
+            ? 'env-staging/.env.staging'
+            : ENV === 'development'
+              ? 'env-dev/.env.dev'
+              : '',
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
       validationOptions: {
@@ -59,8 +60,9 @@ const ENV = process.env.NODE_ENV
     PushNotificationModule,
     TagsModule,
     TutorialsModule,
+    MetricModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
