@@ -8,7 +8,7 @@ import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
-  constructor(private readonly profilService: ProfilService) { }
+  constructor(private readonly profilService: ProfilService) {}
 
   @Post('changebio')
   async changeBio(@Body() changeBioDto: ChangeBioDto) {
@@ -29,7 +29,7 @@ export class ProfilController {
   async fetchUserInfos(@Body() userFetchInfos: UserFetchInfos) {
     return await this.profilService.fetchUserInfos(userFetchInfos)
   }
-  
+
   @Post('changeProfilImg')
   async changeProfilImg(@Body() changeProfilImgDto: ChangeProfilImgDto) {
     return await this.profilService.changeProfilImage(changeProfilImgDto)
@@ -37,6 +37,6 @@ export class ProfilController {
 
   @Get('userProfilImg/:userId')
   async getUserProfilImg(@Param('userId') userId: string) {
-    return await this.profilService.getUserProfilImg(userId);
+    return await this.profilService.getUserProfilImg(userId)
   }
 }
