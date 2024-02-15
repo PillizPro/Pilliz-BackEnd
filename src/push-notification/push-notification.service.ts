@@ -17,7 +17,7 @@ export class PushNotificationService {
       include: {
         userThatNotify: true,
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
     })
     await this.prismaService.notificatifion.updateMany({
       where: { userNotifiedId: userId },
