@@ -149,9 +149,7 @@ export class ChatService {
             }
           })
         )
-        return {
-          messages,
-        }
+        return messages
       }
       return { conversationId: conversation?.id }
     } catch (err) {
