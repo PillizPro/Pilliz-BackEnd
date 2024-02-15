@@ -17,6 +17,11 @@ export class PushNotificationService {
       include: {
         userThatNotify: true,
       },
+      orderBy: { createdAt: 'asc' },
+    })
+    await this.prismaService.notificatifion.updateMany({
+      where: { userNotifiedId: userId },
+      data: { read: true },
     })
     const transformedNotifications = notifications.map((notif) => {
       return {
