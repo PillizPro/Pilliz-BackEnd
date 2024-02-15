@@ -234,10 +234,10 @@ export class ChatService {
           }
         }
         let lastMessage: string | undefined = ''
-        let messageType: number | undefined
-        if (conv.Messages.length !== 0) {
-          lastMessage = conv.Messages[0]?.content
-          messageType = conv.Messages[0]?.type
+        let messageType: number = 0
+        if (conv.Messages[0]) {
+          lastMessage = conv.Messages[0].content
+          messageType = conv.Messages[0].type
         }
         const conversationId = conv.id
         return {
