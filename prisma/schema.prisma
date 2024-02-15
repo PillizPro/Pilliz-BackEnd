@@ -129,6 +129,7 @@ model Message {
 
 model Notificatifion {
   id               String   @id @default(uuid())
+  read             Boolean  @default(false)
   createdAt        DateTime @default(now())
   notifType        Int
   userNotifiedId   String
