@@ -34,6 +34,7 @@ model Users {
   profilPicture          String           @default("")
   NotificatifionReceived Notificatifion[] @relation("notified")
   NotificationSend       Notificatifion[] @relation("hasNotified")
+  Reports                Reports[]
 }
 
 model Follows {
@@ -59,6 +60,7 @@ model Post {
   Comment       Comment[]
   Users         Users     @relation(fields: [userId], references: [id])
   Tags          Tags[]
+  Reports       Reports[]
 }
 
 model Tags {
@@ -105,6 +107,7 @@ model Comment {
   Users         Users     @relation(fields: [userId], references: [id])
   Like          Like[]
   Repost        Repost[]
+  Reports       Reports[]
 }
 
 model Conversation {
@@ -148,6 +151,20 @@ model Product {
   rating      Float
   isFavourite Boolean  @default(false)
   isPopular   Boolean  @default(false)
+}
+
+model Reports {
+  id          String   @id @default(uuid())
+  reportedBy  String
+  postId      String?
+  commentId   String?
+  reportedFor String
+  solved      Boolean  @default(false)
+  mesureTaken String   @default("Pas encore de mesure prise")
+  createdAt   DateTime @default(now())
+  Users       Users    @relation(fields: [reportedBy], references: [id])
+  Post        Post?    @relation(fields: [postId], references: [id])
+  Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
 enum UserRoles {
