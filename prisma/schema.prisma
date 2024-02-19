@@ -32,8 +32,6 @@ model Users {
   MessagesReceived       Message[]        @relation("received")
   isConnected            Boolean          @default(false)
   profilPicture          String           @default("")
-  // NotificatifionReceived Notificatifion[]
-  // NotificatifionReceived      Notificatifion[]
   NotificationSent       Notificatifion[]
   NotificatifionReceived Notificatifion[] @relation("notified")
 }
