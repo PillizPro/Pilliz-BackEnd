@@ -4,6 +4,7 @@ import { CreateFollowDto } from './dto/create-follow.dto'
 import { FollowEntity } from './entities/follow.entity'
 import { DeleteFollowDto } from './dto/delete-follow.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import NotifType from 'src/utils/enum/notif-type'
 
 @Injectable()
 export class FollowService {
@@ -18,9 +19,10 @@ export class FollowService {
     })
     this.eventEmitter.emit(
       'notifyUser',
-      3,
+      NotifType.USER_FOLLOWED,
       createFollowDto.followerId,
       '',
+      createFollowDto.followingId,
       createFollowDto.followingId
     )
     return new FollowEntity(follow)

@@ -73,7 +73,8 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       this.chatService.emitEventCreateChat(
         createChatDto,
-        newChatEntity.receiverId
+        newChatEntity.receiverId,
+        newChatEntity.chat.idMessage
       )
       console.log('The receiver is not connected')
     }

@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { FindChatDto } from './dto/find-chat-dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
+import NotifType from 'src/utils/enum/notif-type'
 
 @Injectable()
 export class ChatService {
@@ -105,10 +106,21 @@ export class ChatService {
     }
   }
 
-  async emitEventCreateChat(createChatDto: CreateChatDto, receiverId: string) {
+  async emitEventCreateChat(
+    createChatDto: CreateChatDto,
+    receiverId: string,
+    messageId: string
+  ) {
     const { authorId, content } = createChatDto
     try {
-      this.eventEmitter.emit('notifyUser', 0, authorId, content, receiverId)
+      this.eventEmitter.emit(
+        'notifyUser',
+        NotifType.MESSAGE_SENT,
+        authorId,
+        content,
+        receiverId,
+        messageId
+      )
     } catch (err) {
       console.error(err)
       throw new Error(

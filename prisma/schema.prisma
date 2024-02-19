@@ -32,8 +32,10 @@ model Users {
   MessagesReceived       Message[]        @relation("received")
   isConnected            Boolean          @default(false)
   profilPicture          String           @default("")
+  // NotificatifionReceived Notificatifion[]
+  // NotificatifionReceived      Notificatifion[]
+  NotificationSent       Notificatifion[]
   NotificatifionReceived Notificatifion[] @relation("notified")
-  NotificationSend       Notificatifion[] @relation("hasNotified")
 }
 
 model Follows {
@@ -46,19 +48,20 @@ model Follows {
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  content       String    @db.VarChar(1000)
-  imageUrl      String?   @db.VarChar(1000)
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  commentsCount Int       @default(0)
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Users         Users     @relation(fields: [userId], references: [id])
-  Tags          Tags[]
+  id             String           @id @default(uuid())
+  userId         String
+  content        String           @db.VarChar(1000)
+  imageUrl       String?          @db.VarChar(1000)
+  createdAt      DateTime         @default(now())
+  likesCount     Int              @default(0)
+  repostsCount   Int              @default(0)
+  commentsCount  Int              @default(0)
+  Like           Like[]
+  Repost         Repost[]
+  Comment        Comment[]
+  Users          Users            @relation(fields: [userId], references: [id])
+  Tags           Tags[]
+  Notificatifion Notificatifion[]
 }
 
 model Tags {
@@ -90,21 +93,22 @@ model Repost {
 }
 
 model Comment {
-  id            String    @id @default(uuid())
-  content       String    @db.VarChar(1000)
-  userId        String
-  postId        String
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  parentId      String?   @db.VarChar(36)
-  rootCommentId String?   @db.VarChar(36)
-  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
-  children      Comment[] @relation("ChildComments")
-  Post          Post      @relation(fields: [postId], references: [id])
-  Users         Users     @relation(fields: [userId], references: [id])
-  Like          Like[]
-  Repost        Repost[]
+  id             String           @id @default(uuid())
+  content        String           @db.VarChar(1000)
+  userId         String
+  postId         String
+  createdAt      DateTime         @default(now())
+  likesCount     Int              @default(0)
+  repostsCount   Int              @default(0)
+  parentId       String?          @db.VarChar(36)
+  rootCommentId  String?          @db.VarChar(36)
+  parent         Comment?         @relation("ChildComments", fields: [parentId], references: [id])
+  children       Comment[]        @relation("ChildComments")
+  Post           Post             @relation(fields: [postId], references: [id])
+  Users          Users            @relation(fields: [userId], references: [id])
+  Like           Like[]
+  Repost         Repost[]
+  Notificatifion Notificatifion[]
 }
 
 model Conversation {
@@ -114,29 +118,35 @@ model Conversation {
 }
 
 model Message {
-  id             String       @id @default(uuid())
+  id             String           @id @default(uuid())
   authorId       String
-  Author         Users        @relation("send", fields: [authorId], references: [id])
+  Author         Users            @relation("send", fields: [authorId], references: [id])
   receiverId     String
-  Receiver       Users        @relation("received", fields: [receiverId], references: [id])
-  createdAt      DateTime     @default(now())
+  Receiver       Users            @relation("received", fields: [receiverId], references: [id])
+  createdAt      DateTime         @default(now())
   content        String
   conversationId String
-  Conversation   Conversation @relation(fields: [conversationId], references: [id])
-  status         Int          @default(0)
+  Conversation   Conversation     @relation(fields: [conversationId], references: [id])
+  status         Int              @default(0)
   type           Int
+  Notificatifion Notificatifion[]
 }
 
 model Notificatifion {
-  id               String   @id @default(uuid())
-  read             Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  notifType        Int
-  userNotifiedId   String
-  userNotified     Users    @relation("notified", fields: [userNotifiedId], references: [id])
-  userThatNotifyId String
-  userThatNotify   Users    @relation("hasNotified", fields: [userThatNotifyId], references: [id])
-  notifContent     String
+  id              String   @id @default(uuid())
+  read            Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  notifType       Int
+  messageSentId   String?  @unique
+  MessageSent     Message? @relation(fields: [messageSentId], references: [id])
+  postLikedId     String?  @unique
+  PostLiked       Post?    @relation(fields: [postLikedId], references: [id])
+  commentLikedId  String?  @unique
+  CommentLiked    Comment? @relation(fields: [commentLikedId], references: [id])
+  userFollowedId  String?  @unique
+  UsersThatNotify Users[]
+  userNotifiedId  String
+  UserNotified    Users    @relation("notified", fields: [userNotifiedId], references: [id])
 }
 
 model Product {

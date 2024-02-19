@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { OnEvent } from '@nestjs/event-emitter'
 import { request } from 'https'
 import { PrismaService } from 'src/prisma/prisma.service'
+import NotifType from 'src/utils/enum/notif-type'
 
 @Injectable()
 export class PushNotificationService {
@@ -15,7 +16,10 @@ export class PushNotificationService {
     const notifications = await this.prismaService.notificatifion.findMany({
       where: { userNotifiedId: userId },
       include: {
-        userThatNotify: true,
+        UsersThatNotify: true,
+        MessageSent: true,
+        PostLiked: true,
+        CommentLiked: true,
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -24,12 +28,20 @@ export class PushNotificationService {
       data: { read: true },
     })
     const transformedNotifications = notifications.map((notif) => {
+      let content: string | undefined = ''
+      if (notif.messageSentId) content = notif.MessageSent?.content
+      if (notif.postLikedId) content = notif.PostLiked?.content
+      if (notif.commentLikedId) content = notif.CommentLiked?.content
       return {
         notifType: notif.notifType,
-        name: notif.userThatNotify.name,
-        image: notif.userThatNotify.profilPicture,
+        users: notif.UsersThatNotify.map((user) => {
+          return {
+            name: user.name,
+            image: user.profilPicture,
+          }
+        }),
         time: 'null',
-        content: notif.notifContent,
+        content: content,
       }
     })
     return transformedNotifications
@@ -42,10 +54,11 @@ export class PushNotificationService {
   //  3: a user has been followed
   @OnEvent('notifyUser')
   async notifyOnCreateChat(
-    notifType: number,
+    notifType: NotifType,
     notifUserId: string,
     content: string,
-    receiverId: string
+    receiverId: string,
+    actionId: string
   ) {
     const user = await this.prismaService.users.findUnique({
       where: { id: notifUserId },
@@ -61,17 +74,50 @@ export class PushNotificationService {
         PushTitle: 'Custom Notification',
       },
     }
-    await this.prismaService.notificatifion.create({
-      data: {
-        notifType,
-        userNotifiedId: receiverId,
-        userThatNotifyId: notifUserId,
-        notifContent: content,
-      },
-    })
+    this.upsertNotification(notifType, notifUserId, receiverId, actionId)
     console.log(message)
 
     // return this.sendNotification(message)
+  }
+
+  async upsertNotification(
+    notifType: NotifType,
+    notifUserId: string,
+    receiverId: string,
+    actionId: string
+  ) {
+    let whereClause: any = null
+    let id: string = ''
+    switch (notifType) {
+      case NotifType.MESSAGE_SENT:
+        whereClause = { messageSentId: actionId }
+        id = 'messageSentId'
+        break
+      case NotifType.POST_LIKED:
+        whereClause = { postLikedId: actionId }
+        id = 'postLikedId'
+        break
+      case NotifType.COMMENT_LIKED:
+        whereClause = { commentLikedId: actionId }
+        id = 'commentLikedId'
+        break
+      case NotifType.USER_FOLLOWED:
+        whereClause = { userFollowedId: actionId }
+        id = 'userFollowedId'
+        break
+      default:
+        break
+    }
+    await this.prismaService.notificatifion.upsert({
+      where: whereClause,
+      create: {
+        [id]: actionId,
+        notifType: notifType,
+        UsersThatNotify: { connect: { id: notifUserId } },
+        userNotifiedId: receiverId,
+      },
+      update: { UsersThatNotify: { connect: { id: notifUserId } } },
+    })
   }
 
   sendNotification(message: any) {

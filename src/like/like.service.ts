@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { LikePostDto } from './dto/like-post.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import NotifType from 'src/utils/enum/notif-type'
 
 @Injectable()
 export class LikeService {
@@ -33,10 +34,11 @@ export class LikeService {
         })
         this.eventEmitter.emit(
           'notifyUser',
-          1,
+          NotifType.POST_LIKED,
           likeDto.userId,
           post.content,
-          post.userId
+          post.userId,
+          post.id
         )
       } else if (likeDto.commentId) {
         const comment = await this.prisma.comment.update({
@@ -46,10 +48,11 @@ export class LikeService {
         })
         this.eventEmitter.emit(
           'notifyUser',
-          2,
+          NotifType.COMMENT_LIKED,
           likeDto.userId,
           comment.content,
-          comment.userId
+          comment.userId,
+          comment.id
         )
       }
     }
