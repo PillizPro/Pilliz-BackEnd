@@ -10,13 +10,15 @@ import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { FindChatDto } from './dto/find-chat-dto'
-import { UsePipes, ValidationPipe } from '@nestjs/common'
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
+import { WsExceptionFilter } from 'src/exceptions/ws-exception/ws-exception.filter'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
+@UseFilters(new WsExceptionFilter())
 @WebSocketGateway({
   cors: {
     origin: '*',
