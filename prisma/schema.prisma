@@ -150,6 +150,25 @@ model Product {
   isPopular   Boolean  @default(false)
 }
 
+model Metrics {
+  id               String @id @default(uuid())
+  numberOfUsers    Int    @default(0)
+  numberOfPosts    Int    @default(0)
+  numberOfLikes    Int    @default(0)
+  numberOfReposts  Int    @default(0)
+  numberOfComments Int    @default(0)
+  numberOfReplies  Int    @default(0)
+
+  weeklyNumberOfUsers    Int @default(0)
+  weeklyNumberOfPosts    Int @default(0)
+  weeklyNumberOfLikes    Int @default(0)
+  weeklyNumberOfReposts  Int @default(0)
+  weeklyNumberOfComments Int @default(0)
+  weeklyNumberOfReplies  Int @default(0)
+
+  Date DateTime @default(now())
+}
+
 enum UserRoles {
   admin
   user

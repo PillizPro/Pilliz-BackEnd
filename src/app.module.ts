@@ -20,6 +20,7 @@ import { PushNotificationModule } from './push-notification/push-notification.mo
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
+import { CronModule } from './cron/cron.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -59,6 +60,7 @@ const ENV = process.env.NODE_ENV
     PushNotificationModule,
     TagsModule,
     TutorialsModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
