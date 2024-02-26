@@ -1,12 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
+import { ResetPassword } from './dto/reset-password.dto'
 import { UserService } from 'src/user/user.service'
+import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
+import e from 'express'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService
+  ) {}
 
   async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashPassword(registerDto.password)
@@ -64,5 +70,35 @@ export class AuthService {
     hashedPassword: string
   ): Promise<boolean> {
     return await bcrypt.compare(plainPassword, hashedPassword)
+  }
+
+  async resetPassword(resetPassDto: ResetPassword) {
+    const { email, oldPassword, newPassword } = resetPassDto
+
+    console.log(email, oldPassword, newPassword)
+
+    const user = await this.userService.findByEmail({ email })
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email.')
+    }
+
+    const isPasswordMatch = await this._verifyPassword(
+      oldPassword,
+      user.password
+    )
+
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid old password.')
+    }
+
+    const hashedPassword = await this._hashPassword(newPassword)
+
+    const reseting = await this.prisma.users.update({
+      where: { email: email },
+      data: { password: hashedPassword },
+    })
+
+    return reseting
   }
 }
