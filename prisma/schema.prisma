@@ -31,9 +31,10 @@ model Users {
   MessagesSend        Message[]      @relation("send")
   MessagesReceived    Message[]      @relation("received")
   isConnected         Boolean        @default(false)
-  profilPicture       String        @default("")
+  profilPicture       String         @default("")
   // Métriques
   country             String         @default("")
+  totalAppTime        Int            @default(0)
 }
 
 model Follows {

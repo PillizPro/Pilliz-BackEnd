@@ -27,4 +27,5 @@ export class UserEntity implements Users {
   profilPicture: string
   // Métriques
   country: string
+  totalAppTime: number
 }
