@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { CreateFollowDto } from './dto/create-follow.dto'
 import { DeleteFollowDto } from './dto/delete-follow.dto'
 
-@ApiTags('follow')
+@ApiTags('Follow')
 @Controller('follow')
 export class FollowController {
   constructor(private readonly followService: FollowService) {}
@@ -27,6 +27,11 @@ export class FollowController {
   @Get('userNbFollowing/:userId')
   async getUserNbFollowing(@Param('userId') userId: string) {
     return await this.followService.getNbFollowing(userId)
+  }
+
+  @Get('userFollowers/:userId')
+  async getUserFollowers(@Param('userId') userId: string) {
+    return await this.followService.getFollowers(userId)
   }
 
   @Get('isUserFollowedBy/:followerUid/:followingUid')

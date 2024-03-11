@@ -15,17 +15,15 @@ export class FollowService {
   async createFollowers(createFollowDto: CreateFollowDto) {
     const follow = await this.prismaService.follows.create({
       data: createFollowDto,
-      include: { follower: true },
     })
     this.eventEmitter.emit(
-      'notifyOnFollow',
-      createFollowDto.followingId,
-      follow.follower.name
+      'notifyUser',
+      3,
+      createFollowDto.followerId,
+      '',
+      createFollowDto.followingId
     )
-    return new FollowEntity({
-      followerId: follow.followerId,
-      followingId: follow.followingId,
-    })
+    return new FollowEntity(follow)
   }
 
   async deleteFollowers(deleteFollowDto: DeleteFollowDto) {
@@ -58,6 +56,30 @@ export class FollowService {
       },
     })
     return userNbFollowing
+  }
+
+  async getFollowers(userId: string) {
+    const userFollowers = await this.prismaService.users.findUnique({
+      where: {
+        id: userId,
+      },
+      include: { followedBy: true },
+    })
+    if (userFollowers?.followedBy) {
+      const allFollowers = await Promise.all(
+        userFollowers.followedBy.map(async (follower) => {
+          const userFollower = await this.prismaService.users.findUnique({
+            where: { id: follower.followingId },
+          })
+          return {
+            id: userFollower?.id,
+            name: userFollower?.name,
+          }
+        })
+      )
+      return allFollowers
+    }
+    return
   }
 
   async isUserFollowBy(followerUid: string, followingUid: string) {
