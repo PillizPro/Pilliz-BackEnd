@@ -5,7 +5,6 @@ import { ResetPassword } from './dto/reset-password.dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
-import e from 'express'
 
 @Injectable()
 export class AuthService {
