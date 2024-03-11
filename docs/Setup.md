@@ -20,7 +20,7 @@ Install **dotenv-cli**.
 $ npm install -g dotenv-cli
 ```
 
-<a href="https://pnpm.io/installation#using-npm" target="_blank">**pnpm**</a> version _8.11.0_ (the latest version).
+<a href="https://pnpm.io/installation#using-npm" target="_blank">**pnpm**</a> version _8.15.4_ (the latest version).
 <br/>
 Using **npm** to install **pnpm** is recommended but you can try other ways.
 

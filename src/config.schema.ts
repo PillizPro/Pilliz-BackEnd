@@ -18,6 +18,7 @@ const CONFIG_SCHEMA_VALIDATAION = Joi.object({
           'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}?schema=${POSTGRES_SCHEMA}'
         )
       : Joi.string().required(),
+  SESSION_SECRET: ENV === 'gha' ? Joi.string() : Joi.string().required(),
 })
 
 export default CONFIG_SCHEMA_VALIDATAION
