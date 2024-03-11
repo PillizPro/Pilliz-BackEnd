@@ -6,4 +6,4 @@ import { MetricService } from './metric.service'
   controllers: [MetricController],
   providers: [MetricService],
 })
-export class MetricModule { }
+export class MetricModule {}

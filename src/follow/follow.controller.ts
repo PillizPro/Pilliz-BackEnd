@@ -7,7 +7,7 @@ import { DeleteFollowDto } from './dto/delete-follow.dto'
 @ApiTags('follow')
 @Controller('follow')
 export class FollowController {
-  constructor(private readonly followService: FollowService) { }
+  constructor(private readonly followService: FollowService) {}
 
   @Post('followUser')
   async followUser(@Body() createFollowDto: CreateFollowDto) {
@@ -30,7 +30,10 @@ export class FollowController {
   }
 
   @Get('isUserFollowedBy/:followerUid/:followingUid')
-  async isUserFollowedBy(@Param('followerUid') followerUid: string, @Param('followingUid') followingUid: string) {
-    return await this.followService.isUserFollowBy(followerUid, followingUid);
+  async isUserFollowedBy(
+    @Param('followerUid') followerUid: string,
+    @Param('followingUid') followingUid: string
+  ) {
+    return await this.followService.isUserFollowBy(followerUid, followingUid)
   }
 }
