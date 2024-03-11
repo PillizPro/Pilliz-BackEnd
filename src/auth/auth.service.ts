@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { LoginDto } from './dto/login.dto'
+import { LoginDto, VerifyDto } from './dto/login.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { UserService } from 'src/user/user.service'
-// import { isAcademic } from 'swot-node'
+import { isAcademic } from 'swot-node'
 import { MailerService } from 'src/mailer/mailer.service'
 import * as bcrypt from 'bcrypt'
 import { ValidationEmail } from 'src/mailer/dto/mailer.dto'
@@ -15,10 +15,10 @@ export class AuthService {
   ) {}
 
   async register(registerDto: CreateUserDto) {
-    // const boolAcademic = await isAcademic(registerDto.email)
-    // if (!boolAcademic) {
-    //   throw new UnauthorizedException('You must use an academic email.')
-    // }
+    const boolAcademic = await isAcademic(registerDto.email)
+    if (!boolAcademic) {
+      throw new UnauthorizedException('You must use an academic email.')
+    }
     const hashedPassword = await this._hashPassword(registerDto.password)
     const numberVerification = await this._generateCode()
     const userDtoWithHashedPassword = {
@@ -78,6 +78,19 @@ export class AuthService {
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
       tutorialPro: user.tutorialPro,
+    }
+  }
+
+  async verify(verifyDto: VerifyDto) {
+    const user = await this.userService.findByEmail({ email: verifyDto.email })
+    if (user) {
+      if (user.codeVerification === parseInt(verifyDto.code)) {
+        this.userService.updateVerifiedStatus(user.id)
+      } else {
+        throw new UnauthorizedException('Invalid code.')
+      }
+    } else {
+      throw new UnauthorizedException('Invalid email.')
     }
   }
 

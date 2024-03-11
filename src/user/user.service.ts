@@ -78,4 +78,16 @@ export class UserService {
       throw new Error('An error occured when changing connected user status')
     }
   }
+
+  async updateVerifiedStatus(userId: string) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId },
+        data: { isVerified: true },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when changing verified user status')
+    }
+  }
 }
