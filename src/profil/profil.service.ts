@@ -14,9 +14,8 @@ export class ProfilService {
     private readonly prisma: PrismaService,
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
-    private readonly docService: DocumentUploadService,
-  ) { }
-
+    private readonly docService: DocumentUploadService
+  ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
@@ -81,7 +80,7 @@ export class ProfilService {
   async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
     const { id, imgBytes } = changeProfilImageDto
 
-    let imageUrl = ""
+    let imageUrl = ''
     if (imgBytes) {
       imageUrl = await this.imageService.uploadBase64Image(imgBytes)
     }
@@ -95,11 +94,11 @@ export class ProfilService {
   async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
     const { userId, docName, docBytes, docType } = uploadFilesDto
 
-    let docUrl = ""
+    let docUrl = ''
     if (docBytes) {
       docUrl = await this.imageService.uploadBase64Files(docBytes, docType)
     }
-    this.docService.uploadUserDocument(userId, docName, docUrl);
+    this.docService.uploadUserDocument(userId, docName, docUrl)
   }
 
   async getUserProfilImg(userId: string) {
