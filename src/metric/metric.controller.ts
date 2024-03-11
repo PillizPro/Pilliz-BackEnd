@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { MetricService } from './metric.service'
 import { AddCountryToUserDto } from './dto/add-country-to-user.dto'
@@ -9,35 +9,49 @@ import { AddKeyActivityTimeToUserDto } from './dto/add-key-activity-time-to-user
 @ApiTags('Metric')
 @Controller('metric')
 export class MetricController {
-  constructor(private readonly metricService: MetricService) { }
+  constructor(private readonly metricService: MetricService) {}
 
-  @Post("addCountryToUser")
+  @Post('addCountryToUser')
   async addCountryToUser(@Body() addCountryToUserDto: AddCountryToUserDto) {
     return await this.metricService.addCountry(addCountryToUserDto)
   }
 
-  @Post("addAppTime")
+  @Post('addAppTime')
   async addAppTimeToUser(@Body() addAppTimeToUser: AddAppTimeToUserDto) {
-    return await this.metricService.addAppTime(addAppTimeToUser);
+    return await this.metricService.addAppTime(addAppTimeToUser)
   }
 
-  @Post("addDeviceDetails")
-  async addDeviceDetailsToUser(@Body() addDeviceDetailsToUser: AddDeviceDetailsDto) {
-    return await this.metricService.addDeviceDetails(addDeviceDetailsToUser);
+  @Post('addDeviceDetails')
+  async addDeviceDetailsToUser(
+    @Body() addDeviceDetailsToUser: AddDeviceDetailsDto
+  ) {
+    return await this.metricService.addDeviceDetails(addDeviceDetailsToUser)
   }
 
-  @Post("addFeedTime")
-  async addFeedTimeToUser(@Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto) {
-    return await this.metricService.addActivityTimeToFeed(addKeyActivityTimeToUserDto);
+  @Post('addFeedTime')
+  async addFeedTimeToUser(
+    @Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+  ) {
+    return await this.metricService.addActivityTimeToFeed(
+      addKeyActivityTimeToUserDto
+    )
   }
 
-  @Post("addMarketTime")
-  async addMarketTimeToUser(@Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto) {
-    return await this.metricService.addActivityTimeToMarket(addKeyActivityTimeToUserDto);
+  @Post('addMarketTime')
+  async addMarketTimeToUser(
+    @Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+  ) {
+    return await this.metricService.addActivityTimeToMarket(
+      addKeyActivityTimeToUserDto
+    )
   }
 
-  @Post("addProTime")
-  async addProTimeToUser(@Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto) {
-    return await this.metricService.addActivityTimeToPro(addKeyActivityTimeToUserDto);
+  @Post('addProTime')
+  async addProTimeToUser(
+    @Body() addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+  ) {
+    return await this.metricService.addActivityTimeToPro(
+      addKeyActivityTimeToUserDto
+    )
   }
 }
