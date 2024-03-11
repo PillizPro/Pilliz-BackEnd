@@ -34,6 +34,8 @@ model Users {
   profilPicture          String           @default("")
   NotificatifionReceived Notificatifion[] @relation("notified")
   NotificationSend       Notificatifion[] @relation("hasNotified")
+  codeVerification       Int              @default(0)
+  isVerified             Boolean          @default(false)
 }
 
 model Follows {

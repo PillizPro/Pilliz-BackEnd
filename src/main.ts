@@ -13,7 +13,9 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger'
 import * as express from 'express'
+import * as dotenv from 'dotenv'
 
+dotenv.config()
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   app.setGlobalPrefix('api')
