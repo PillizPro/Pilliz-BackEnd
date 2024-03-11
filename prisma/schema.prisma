@@ -32,9 +32,18 @@ model Users {
   MessagesReceived    Message[]      @relation("received")
   isConnected         Boolean        @default(false)
   profilPicture       String         @default("")
+  Documents           Document[]
   // Métriques
   country             String         @default("")
   totalAppTime        Int            @default(0)
+  totalFeedTime       Int            @default(0)
+  totalMarketTime     Int            @default(0)
+  totalProTime        Int            @default(0)
+  deviceRelease       String         @default("")
+  deviceVersion       String         @default("")
+  deviceName          String         @default("")
+  deviceWidth         Int            @default(0)
+  deviceHeight        Int            @default(0)
 }
 
 model Follows {
@@ -44,6 +53,13 @@ model Follows {
   followingId String
 
   @@id([followerId, followingId])
+}
+
+model Document {
+  docName String @unique @db.VarChar(255)
+  docUrl  String @db.VarChar(255)
+  userId  String
+  Users   Users  @relation(fields: [userId], references: [id])
 }
 
 model Post {

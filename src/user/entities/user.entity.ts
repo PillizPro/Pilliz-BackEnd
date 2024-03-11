@@ -28,4 +28,12 @@ export class UserEntity implements Users {
   // Métriques
   country: string
   totalAppTime: number
+  totalFeedTime: number
+  totalMarketTime: number
+  totalProTime: number
+  deviceRelease: string
+  deviceVersion: string
+  deviceName: string
+  deviceWidth: number
+  deviceHeight: number
 }
