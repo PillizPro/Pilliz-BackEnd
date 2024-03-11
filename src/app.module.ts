@@ -20,7 +20,7 @@ import { PushNotificationModule } from './push-notification/push-notification.mo
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
-import { MailerService } from './mailer/mailer.service';
+import { MailerService } from './mailer/mailer.service'
 
 const ENV = process.env.NODE_ENV
 
