@@ -4,12 +4,17 @@ import { ChangeBioDto } from './dto/change-bio.dto'
 import { UserFetchInfos } from './dto/other-user-infos.dto'
 import { FollowService } from 'src/follow/follow.service'
 import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
+import { ImageUploadService } from 'src/image/image-upload.service'
+import { UploadFilesDto } from './dto/upload-files.dto'
+import { DocumentUploadService } from 'src/document/upload-document.service'
 
 @Injectable()
 export class ProfilService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly followService: FollowService
+    private readonly followService: FollowService,
+    private readonly imageService: ImageUploadService,
+    private readonly docService: DocumentUploadService
   ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
@@ -73,10 +78,27 @@ export class ProfilService {
   }
 
   async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
+    const { id, imgBytes } = changeProfilImageDto
+
+    let imageUrl = ''
+    if (imgBytes) {
+      imageUrl = await this.imageService.uploadBase64Image(imgBytes)
+    }
+
     await this.prisma.users.update({
-      where: { id: changeProfilImageDto.id },
-      data: { profilPicture: changeProfilImageDto.imgBytes },
+      where: { id: id },
+      data: { profilPicture: imageUrl },
     })
+  }
+
+  async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
+    const { userId, docName, docBytes, docType } = uploadFilesDto
+
+    let docUrl = ''
+    if (docBytes) {
+      docUrl = await this.imageService.uploadBase64Files(docBytes, docType)
+    }
+    this.docService.uploadUserDocument(userId, docName, docUrl)
   }
 
   async getUserProfilImg(userId: string) {
