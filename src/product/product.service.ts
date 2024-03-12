@@ -65,6 +65,6 @@ export class ProductService {
   async recoveringAllProductTags() {
     const productTags = await this.prismaService.productTags.findMany()
     const transformedProductTags = productTags.map((tag) => tag.name)
-    return { tags: transformedProductTags }
+    return transformedProductTags
   }
 }
