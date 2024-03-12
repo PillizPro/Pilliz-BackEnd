@@ -92,6 +92,7 @@ export class AuthService {
     } else {
       throw new UnauthorizedException('Invalid email.')
     }
+    return { status: 'success' }
   }
 
   private async _verifyPassword(
