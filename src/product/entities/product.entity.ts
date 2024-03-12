@@ -12,4 +12,6 @@ export class ProductEntity implements Product {
   rating: number
   isFavourite: boolean
   isPopular: boolean
+  isAddedToCart: boolean
+  productTags: string[]
 }

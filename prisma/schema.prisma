@@ -162,14 +162,22 @@ model Notificatifion {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  title       String
-  price       Float
-  description String   @db.VarChar(200)
-  images      String[] @db.VarChar(1000)
-  rating      Float
-  isFavourite Boolean  @default(false)
-  isPopular   Boolean  @default(false)
+  id            String        @id @default(uuid())
+  title         String
+  price         Float
+  description   String        @db.VarChar(200)
+  images        String[]      @db.VarChar(1000)
+  rating        Float
+  isFavourite   Boolean       @default(false)
+  isPopular     Boolean       @default(false)
+  isAddedToCart Boolean       @default(false)
+  ProductTags   ProductTags[]
+}
+
+model ProductTags {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  Products Product[]
 }
 
 model Metrics {
