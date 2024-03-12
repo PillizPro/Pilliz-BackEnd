@@ -13,10 +13,7 @@ import {
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger'
-import { ConfigService } from '@nestjs/config'
 import * as express from 'express'
-import * as session from 'express-session'
-import * as passport from 'passport'
 
 const ENV = process.env.NODE_ENV
 
@@ -43,19 +40,6 @@ async function bootstrap() {
   )
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
-
-  const configService = app.get(ConfigService)
-  let sessionSecret = configService.get('SESSION_SECRET')
-  if (!sessionSecret) sessionSecret = 'defaultSessionSecret'
-  app.use(
-    session({
-      secret: sessionSecret,
-      resave: false,
-      saveUninitialized: false,
-    })
-  )
-  app.use(passport.initialize())
-  app.use(passport.session())
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Pilliz API')

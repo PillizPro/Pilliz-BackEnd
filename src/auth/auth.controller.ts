@@ -1,17 +1,8 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
 import { AuthService } from './auth.service'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { ApiTags } from '@nestjs/swagger'
-import { LogInWithCredentialsGuard } from './guards/login-with-credentials.guard'
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -24,10 +15,8 @@ export class AuthController {
     return await this.authService.register(registerDto)
   }
 
-  @UseGuards(LogInWithCredentialsGuard)
   @Post('login')
-  async login(@Req() request: RequestWithUser) {
-    return request.user
+  async login(@Body() loginDto: LoginDto) {
     return await this.authService.login(loginDto)
   }
 }
