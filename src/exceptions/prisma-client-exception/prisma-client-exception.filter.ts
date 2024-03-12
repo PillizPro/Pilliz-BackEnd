@@ -1,10 +1,15 @@
-import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common'
-import { BaseExceptionFilter } from '@nestjs/core'
+import {
+  ExceptionFilter,
+  ArgumentsHost,
+  Catch,
+  HttpStatus,
+} from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { Request, Response } from 'express'
+import PRISMA_CODE from './prisma-codes'
 
 @Catch(Prisma.PrismaClientKnownRequestError)
-export class PrismaClientExceptionFilter extends BaseExceptionFilter {
+export class PrismaClientExceptionFilter implements ExceptionFilter {
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
@@ -12,24 +17,26 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     const message = exception.message.split('\n').at(-1)
     let status: HttpStatus
 
-    console.error(exception.message, '\n')
     // See here for error reference: https://www.prisma.io/docs/reference/api-reference/error-reference#prisma-client-query-engine
-    switch (exception.code) {
-      case 'P2001' || 'P2021' || 'P2022' || 'P2025':
-        status = HttpStatus.NOT_FOUND
+    switch (true) {
+      case PRISMA_CODE.NOT_FOUND.prismaCode.includes(exception.code):
+        status = PRISMA_CODE.NOT_FOUND.returnStatusCode
         response
           .status(status)
-          .json({ statusCode: status, message: message, route: request.url })
+          .json({ message: message, statusCode: status, route: request.url })
         break
-      case 'P2002' || 'P2003' || 'P2004':
-        status = HttpStatus.CONFLICT
+      case PRISMA_CODE.CONFLICT.prismaCode.includes(exception.code):
+        status = PRISMA_CODE.CONFLICT.returnStatusCode
         response
           .status(status)
-          .json({ statusCode: status, message: message, route: request.url })
+          .json({ message: message, statusCode: status, route: request.url })
         break
       default:
         // default 500 error code
-        super.catch(exception, host)
+        status = HttpStatus.INTERNAL_SERVER_ERROR
+        response
+          .status(status)
+          .json({ message: message, statusCode: status, route: request.url })
         break
     }
   }

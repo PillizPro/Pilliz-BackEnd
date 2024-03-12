@@ -1,7 +1,8 @@
-import { NestFactory, HttpAdapterHost, Reflector } from '@nestjs/core'
+import { NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
 import {
   ClassSerializerInterceptor,
+  LogLevel,
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common'
@@ -14,8 +15,16 @@ import {
 } from '@nestjs/swagger'
 import * as express from 'express'
 
+const ENV = process.env.NODE_ENV
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const logLevels: LogLevel[] =
+    ENV === 'production'
+      ? ['fatal', 'error', 'warn', 'log']
+      : ['fatal', 'error', 'warn', 'log', 'debug', 'verbose']
+  const app = await NestFactory.create(AppModule, {
+    logger: logLevels,
+  })
   app.setGlobalPrefix('api')
   app.enableVersioning({
     type: VersioningType.URI,
@@ -23,8 +32,8 @@ async function bootstrap() {
   })
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
   app.useGlobalFilters(
-    new PrismaClientExceptionFilter(app.get(HttpAdapterHost)),
-    new HttpExceptionFilter()
+    new HttpExceptionFilter(),
+    new PrismaClientExceptionFilter()
   )
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
   const swaggerConfig = new DocumentBuilder()
