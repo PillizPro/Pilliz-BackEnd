@@ -1,12 +1,14 @@
-import { Body, Controller, Post, Get } from '@nestjs/common'
+import { Body, Controller, Post, Get, UseGuards } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
 import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
 import { RecoverDatePostDto } from './dto/recover-date-post.dto'
 import { PostService } from './post.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard'
 
+@ApiBearerAuth()
 @ApiTags('Posting')
 @Controller('post')
 export class PostController {
@@ -22,6 +24,7 @@ export class PostController {
     return await this.postService.deletePostById(deletePostDto)
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('findallpost')
   async findAllPosts() {
     return await this.postService.findAllPosts()
