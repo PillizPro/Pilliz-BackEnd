@@ -18,4 +18,22 @@ export class UserEntity implements Users {
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
+  firstConnection: boolean
+  tutorialFeed: boolean
+  tutorialMarketplace: boolean
+  tutorialPro: boolean
+  bio: string
+  isConnected: boolean
+  profilPicture: string
+  // Métriques
+  country: string
+  totalAppTime: number
+  totalFeedTime: number
+  totalMarketTime: number
+  totalProTime: number
+  deviceRelease: string
+  deviceVersion: string
+  deviceName: string
+  deviceWidth: number
+  deviceHeight: number
 }

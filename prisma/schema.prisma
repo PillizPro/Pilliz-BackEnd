@@ -8,18 +8,61 @@ datasource db {
 }
 
 model Users {
-  id        String        @id @default(uuid())
-  email     String        @unique @db.VarChar(255)
-  name      String        @db.VarChar(255)
-  password  String        @db.VarChar(255)
-  role      UserRoles     @default(user)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  banned    BanningStatus @default(notBanned)
-  Post      Post[]
-  Like      Like[]
-  Repost    Repost[]
-  Comment   Comment[]
+  id                     String           @id @default(uuid())
+  email                  String           @unique @db.VarChar(255)
+  name                   String           @db.VarChar(255)
+  password               String           @db.VarChar(255)
+  role                   UserRoles        @default(user)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  firstConnection        Boolean          @default(true)
+  tutorialFeed           Boolean          @default(false)
+  tutorialMarketplace    Boolean          @default(false)
+  tutorialPro            Boolean          @default(false)
+  banned                 BanningStatus    @default(notBanned)
+  Post                   Post[]
+  Like                   Like[]
+  Repost                 Repost[]
+  Comment                Comment[]
+  bio                    String           @default("A propos de moi") @db.VarChar(500)
+  followedBy             Follows[]        @relation("follower")
+  following              Follows[]        @relation("following")
+  Conversations          Conversation[]
+  MessagesSend           Message[]        @relation("send")
+  MessagesReceived       Message[]        @relation("received")
+  isConnected            Boolean          @default(false)
+  profilPicture          String           @default("")
+  NotificatifionReceived Notificatifion[] @relation("notified")
+  NotificationSend       Notificatifion[] @relation("hasNotified")
+  Reports                Reports[]
+  Documents              Document[]
+  // Métriques
+  country                String           @default("")
+  totalAppTime           Int              @default(0)
+  totalFeedTime          Int              @default(0)
+  totalMarketTime        Int              @default(0)
+  totalProTime           Int              @default(0)
+  deviceRelease          String           @default("")
+  deviceVersion          String           @default("")
+  deviceName             String           @default("")
+  deviceWidth            Int              @default(0)
+  deviceHeight           Int              @default(0)
+}
+
+model Follows {
+  follower    Users  @relation("follower", fields: [followerId], references: [id])
+  followerId  String
+  following   Users  @relation("following", fields: [followingId], references: [id])
+  followingId String
+
+  @@id([followerId, followingId])
+}
+
+model Document {
+  docName String @unique @db.VarChar(255)
+  docUrl  String @db.VarChar(255)
+  userId  String
+  Users   Users  @relation(fields: [userId], references: [id])
 }
 
 model Post {
@@ -35,6 +78,14 @@ model Post {
   Repost        Repost[]
   Comment       Comment[]
   Users         Users     @relation(fields: [userId], references: [id])
+  Tags          Tags[]
+  Reports       Reports[]
+}
+
+model Tags {
+  id   String @id @default(uuid())
+  name String @unique
+  Post Post[]
 }
 
 model Like {
@@ -60,28 +111,106 @@ model Repost {
 }
 
 model Comment {
-  id           String   @id @default(uuid())
-  content      String   @db.VarChar(1000)
-  userId       String
-  postId       String
-  createdAt    DateTime @default(now())
-  likesCount   Int      @default(0)
-  repostsCount Int      @default(0)
-  Post         Post     @relation(fields: [postId], references: [id])
-  Users        Users    @relation(fields: [userId], references: [id])
-  Like         Like[]
-  Repost       Repost[]
+  id            String    @id @default(uuid())
+  content       String    @db.VarChar(1000)
+  userId        String
+  postId        String
+  createdAt     DateTime  @default(now())
+  likesCount    Int       @default(0)
+  repostsCount  Int       @default(0)
+  parentId      String?   @db.VarChar(36)
+  rootCommentId String?   @db.VarChar(36)
+  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children      Comment[] @relation("ChildComments")
+  Post          Post      @relation(fields: [postId], references: [id])
+  Users         Users     @relation(fields: [userId], references: [id])
+  Like          Like[]
+  Repost        Repost[]
+  Reports       Reports[]
+}
+
+model Conversation {
+  id       String    @id @default(uuid())
+  Messages Message[]
+  Users    Users[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  authorId       String
+  Author         Users        @relation("send", fields: [authorId], references: [id])
+  receiverId     String
+  Receiver       Users        @relation("received", fields: [receiverId], references: [id])
+  createdAt      DateTime     @default(now())
+  content        String
+  conversationId String
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  status         Int          @default(0)
+  type           Int
+}
+
+model Notificatifion {
+  id               String   @id @default(uuid())
+  read             Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  notifType        Int
+  userNotifiedId   String
+  userNotified     Users    @relation("notified", fields: [userNotifiedId], references: [id])
+  userThatNotifyId String
+  userThatNotify   Users    @relation("hasNotified", fields: [userThatNotifyId], references: [id])
+  notifContent     String
 }
 
 model Product {
+  id            String        @id @default(uuid())
+  title         String
+  price         Float
+  description   String        @db.VarChar(200)
+  images        String[]      @db.VarChar(1000)
+  rating        Float
+  isFavourite   Boolean       @default(false)
+  isPopular     Boolean       @default(false)
+  isAddedToCart Boolean       @default(false)
+  ProductTags   ProductTags[]
+}
+
+model ProductTags {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  Products Product[]
+}
+
+model Metrics {
+  id               String @id @default(uuid())
+  numberOfUsers    Int    @default(0)
+  numberOfPosts    Int    @default(0)
+  numberOfLikes    Int    @default(0)
+  numberOfReposts  Int    @default(0)
+  numberOfComments Int    @default(0)
+  numberOfReplies  Int    @default(0)
+
+  weeklyNumberOfUsers    Int @default(0)
+  weeklyNumberOfPosts    Int @default(0)
+  weeklyNumberOfLikes    Int @default(0)
+  weeklyNumberOfReposts  Int @default(0)
+  weeklyNumberOfComments Int @default(0)
+  weeklyNumberOfReplies  Int @default(0)
+
+  Date DateTime @default(now())
+}
+
+model Reports {
   id          String   @id @default(uuid())
-  title       String
-  price       Float
-  description String   @db.VarChar(200)
-  images      String[] @db.VarChar(1000)
-  rating      Float
-  isFavourite Boolean   @default(false)
-  isPopular   Boolean  @default(false)
+  reportedBy  String
+  postId      String?
+  commentId   String?
+  reportedFor String
+  solved      Boolean  @default(false)
+  mesureTaken String   @default("Pas encore de mesure prise")
+  createdAt   DateTime @default(now())
+  Users       Users    @relation(fields: [reportedBy], references: [id])
+  Post        Post?    @relation(fields: [postId], references: [id])
+  Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
 enum UserRoles {
