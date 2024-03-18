@@ -24,6 +24,7 @@ export class UserEntity implements Users {
   tutorialPro: boolean
   bio: string
   isConnected: boolean
+  isVerified: boolean
   profilPicture: string
   codeVerification: number
   isVerified: boolean

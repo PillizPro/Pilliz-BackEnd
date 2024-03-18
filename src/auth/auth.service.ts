@@ -52,6 +52,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password.')
     }
 
+    if (user.isVerified === false) {
+      throw new UnauthorizedException('You must verify your email.')
+    }
+
     const isPasswordMatch = await this._verifyPassword(
       loginDto.password,
       user.password
