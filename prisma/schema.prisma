@@ -19,6 +19,7 @@ model Users {
   tutorialFeed           Boolean          @default(false)
   tutorialMarketplace    Boolean          @default(false)
   tutorialPro            Boolean          @default(false)
+  isacompany             Boolean          @default(false)
   banned                 BanningStatus    @default(notBanned)
   Post                   Post[]
   Like                   Like[]
