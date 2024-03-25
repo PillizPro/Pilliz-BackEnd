@@ -23,6 +23,8 @@ import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 import { MetricModule } from './metric/metric.module'
 import { CronModule } from './cron/cron.module'
+import { TicketController } from './ticket/ticket.controller';
+import { TicketService } from './ticket/ticket.service';
 
 const ENV = process.env.NODE_ENV
 
@@ -66,7 +68,7 @@ const ENV = process.env.NODE_ENV
     MetricModule,
     CronModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, TicketController],
+  providers: [AppService, TicketService],
 })
 export class AppModule {}

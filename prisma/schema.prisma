@@ -213,6 +213,25 @@ model Reports {
   Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
+enum TicketCategory {
+  confidentialite
+  acces
+  assistance
+  securite
+  donnees
+  compte
+}
+
+model Ticket {
+  id          String         @id @default(uuid())
+  email       String
+  category    TicketCategory
+  description String
+  createdAt   DateTime       @default(now())
+  solved      Boolean        @default(false)
+  solvedAt    DateTime?
+}
+
 enum UserRoles {
   admin
   user
