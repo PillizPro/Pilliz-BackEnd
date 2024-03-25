@@ -12,6 +12,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(email: string, password: string): Promise<any> {
     const user = await this.authService.validateUser({ email, password })
     if (!user) throw new UnauthorizedException('Invalid email or password.')
+    if (user.status === 'banned')
+      throw new UnauthorizedException(
+        'You are currently banned from the application'
+      )
     return user
   }
 }

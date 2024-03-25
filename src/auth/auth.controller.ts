@@ -4,14 +4,21 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
+  Req,
   UseGuards,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { ApiTags } from '@nestjs/swagger'
 import { ResetPasswordDto } from './dto/reset-password.dto'
-import { LocalAuthGuard } from './guard/local-auth.guard'
+import { Request } from 'express'
+import { JwtRefreshAuthGuard, LocalAuthGuard } from 'src/common/guards'
+import { CurrentUser, CurrentUserId, Public } from 'src/common/decorators'
+
+export type Tokens = {
+  accessToken: string
+  refreshToken: string
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -19,20 +26,40 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.CREATED)
+  @Public()
   @Post('register')
-  async register(@Body() registerDto: CreateUserDto) {
+  async register(@Body() registerDto: CreateUserDto): Promise<Tokens> {
     return await this.authService.register(registerDto)
   }
 
   @HttpCode(HttpStatus.OK)
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req: any) {
+  async login(@Req() req: Request): Promise<Tokens> {
     return await this.authService.login(req.user)
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(@CurrentUserId() userId: string) {
+    return await this.authService.logout(userId)
+  }
+
+  @HttpCode(HttpStatus.CREATED)
   @Post('resetPassword')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return await this.authService.resetPassword(resetPasswordDto)
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('refreshTokens')
+  async refresh(
+    @CurrentUserId() userId: string,
+    @CurrentUser('refreshToken') refreshToken: string
+  ): Promise<Tokens> {
+    return await this.authService.refreshTokens(userId, refreshToken)
   }
 }

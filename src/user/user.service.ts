@@ -12,10 +12,14 @@ export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.prismaService.users.create({
-      data: createUserDto,
-    })
-    return new UserEntity(user)
+    try {
+      const user = await this.prismaService.users.create({
+        data: createUserDto,
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
   }
 
   async findByEmail(findByEmailDto: FindByEmailDto) {

@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -7,8 +12,9 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 import { UserEntity } from 'src/user/entities/user.entity'
 import { JwtService } from '@nestjs/jwt'
-import { ITokenPayload } from './strategy/jwt.strategy'
+import { ITokenPayload } from './strategies/jwt.strategy'
 import { ConfigService } from '@nestjs/config'
+import { Tokens } from './auth.controller'
 
 @Injectable()
 export class AuthService {
@@ -19,13 +25,17 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async register(registerDto: CreateUserDto) {
-    const hashedPassword = await this._hashPassword(registerDto.password)
+  async register(registerDto: CreateUserDto): Promise<Tokens> {
+    const hashedPassword = await this._hashData(registerDto.password)
     const userDtoWithHashedPassword = {
       ...registerDto,
       password: hashedPassword,
     }
-    return await this.userService.createUser(userDtoWithHashedPassword)
+    const newUser = await this.userService.createUser(userDtoWithHashedPassword)
+    if (!newUser) throw new ConflictException('User already exists')
+    const tokens = await this._generateTokens(newUser.id, newUser.email)
+    await this._updateRefreshTokenHash(newUser.id, tokens.refreshToken)
+    return tokens
   }
 
   async validateUser(loginDto: LoginDto) {
@@ -63,23 +73,24 @@ export class AuthService {
     }
   }
 
-  async login(user: any) {
-    if (user.status === 'banned') return user
-    const payload: ITokenPayload = { sub: user.id, email: user.email }
-    return {
-      access_token: this.jwtService.sign(payload, {
-        secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-        expiresIn: `${this.configService.get(
-          'JWT_ACCESS_TOKEN_EXPIRATION_TIME'
-        )}s`,
-      }),
-      refresh_token: this.jwtService.sign(payload, {
-        secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-        expiresIn: `${this.configService.get(
-          'JWT_REFRESH_TOKEN_EXPIRATION_TIME'
-        )}s`,
-      }),
-    }
+  async login(user: any): Promise<Tokens> {
+    const tokens = await this._generateTokens(user.id, user.email)
+    await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
+    return tokens
+  }
+
+  async logout(userId: string) {
+    await this.prisma.users.updateMany({
+      where: {
+        id: userId,
+        hashedRefreshToken: {
+          not: null,
+        },
+      },
+      data: {
+        hashedRefreshToken: null,
+      },
+    })
   }
 
   async resetPassword(resetPassDto: ResetPasswordDto) {
@@ -99,7 +110,7 @@ export class AuthService {
     if (!isPasswordMatching)
       throw new UnauthorizedException('Invalid old password.')
 
-    const hashedPassword = await this._hashPassword(newPassword)
+    const hashedPassword = await this._hashData(newPassword)
 
     const reseting = await this.prisma.users.update({
       where: { email: email },
@@ -109,9 +120,25 @@ export class AuthService {
     return new UserEntity(reseting)
   }
 
-  private async _hashPassword(password: string): Promise<string> {
+  async refreshTokens(userId: string, refreshToken: string): Promise<Tokens> {
+    const user = await this.prisma.users.findUnique({
+      where: { id: userId },
+    })
+    if (!user || !user.hashedRefreshToken || !refreshToken)
+      throw new ForbiddenException('Access Denied')
+    const isRefreshTokensMatching = await bcrypt.compare(
+      refreshToken,
+      user.hashedRefreshToken
+    )
+    if (!isRefreshTokensMatching) throw new ForbiddenException('Access Denied')
+    const tokens = await this._generateTokens(user.id, user.email)
+    await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
+    return tokens
+  }
+
+  private async _hashData(data: string): Promise<string> {
     const saltRounds = 10
-    const hash = await bcrypt.hash(password, saltRounds)
+    const hash = await bcrypt.hash(data, saltRounds)
     return hash
   }
 
@@ -120,5 +147,38 @@ export class AuthService {
     hashedPassword: string
   ): Promise<boolean> {
     return await bcrypt.compare(plainPassword, hashedPassword)
+  }
+
+  private async _generateTokens(
+    userId: string,
+    email: string
+  ): Promise<Tokens> {
+    const payload: ITokenPayload = { sub: userId, email: email }
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+        expiresIn: `${this.configService.get(
+          'JWT_ACCESS_TOKEN_EXPIRATION_TIME'
+        )}s`,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+        expiresIn: `${this.configService.get(
+          'JWT_REFRESH_TOKEN_EXPIRATION_TIME'
+        )}s`,
+      }),
+    ])
+    return {
+      accessToken,
+      refreshToken,
+    }
+  }
+
+  private async _updateRefreshTokenHash(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await this._hashData(refreshToken)
+    await this.prisma.users.update({
+      where: { id: userId },
+      data: { hashedRefreshToken: hashedRefreshToken },
+    })
   }
 }

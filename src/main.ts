@@ -50,6 +50,7 @@ async function bootstrap() {
       'pilliz.pro@gmail.com'
     )
     .setVersion('1')
+    .addBearerAuth()
     .build()
   const swaggerOptions: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

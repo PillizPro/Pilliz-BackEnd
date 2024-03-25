@@ -12,6 +12,9 @@ export class UserEntity implements Users {
   @ApiHideProperty()
   @Exclude()
   password: string
+  @ApiHideProperty()
+  @Exclude()
+  hashedRefreshToken: string | null
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
   role: UserRoles
   @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
