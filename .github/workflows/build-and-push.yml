@@ -54,18 +54,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy Docker Env
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-          port: ${{ secrets.SSH_PORT }}
-          source: ${{ secrets.SCP_SOURCE_FILE }}
-          target: ${{ secrets.SCP_TARGET_DIR }}
-          strip_components: 1
-
       - name: Execute Docker Container on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
