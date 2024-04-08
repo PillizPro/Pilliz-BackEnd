@@ -133,28 +133,24 @@ export class ChatService {
       },
     })
     if (!conversation?.Users) return
-    const users = conversation.Users.map((user) => {
+    const usersList = conversation.Users.map((user) => {
       return {
         id: user.id,
         name: user.name,
         profilePhoto: user.profilPicture,
       }
     })
-    function customSort(a: any, b: any): number {
-      if (a === findAllUsersConv.userId && b !== findAllUsersConv.userId) {
-        return -1
-      } else if (
-        a !== findAllUsersConv.userId &&
-        b === findAllUsersConv.userId
-      ) {
-        return 1
+    let sortUsersList: object = {}
+    let firstUserInList: object = {}
+    for (const user of usersList) {
+      if (user.id === findAllUsersConv.userId) {
+        firstUserInList = { ...user }
       } else {
-        return 0
+        sortUsersList = { ...sortUsersList, ...usersList }
       }
     }
-
-    users.sort(customSort)
-    return users
+    sortUsersList = { ...firstUserInList, ...sortUsersList }
+    return sortUsersList
   }
 
   async findAllChat(findChatDto: FindChatDto) {
