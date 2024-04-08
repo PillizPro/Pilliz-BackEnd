@@ -199,8 +199,8 @@ export class ChatService {
               message: 'testmessage',
               replyBy: 'jsp',
               replyTo: 'jspnonplus',
-              messageType: 0,
-              messageId: 1,
+              message_type: 0,
+              id: 1,
             },
           }
         })
