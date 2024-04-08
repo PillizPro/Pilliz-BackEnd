@@ -155,4 +155,102 @@ export class BlockingService {
       throw new Error('An error occurred when unhiding a word.')
     }
   }
+
+  async findUsersBlocked(userId: string) {
+    try {
+      return await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true },
+      })
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when retrieving blocked users.')
+    }
+  }
+
+  async findUsersHided(userId: string) {
+    try {
+      return await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { hiddenUsers: true },
+      })
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when retrieving hidden users.')
+    }
+  }
+
+  async findWordsHided(userId: string) {
+    try {
+      return await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { hiddenWords: true },
+      })
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when retrieving hidden words.')
+    }
+  }
+
+  async findUsersDetailsBlocked(userId: string) {
+    try {
+      const userWithBlockedIds = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true },
+      })
+
+      if (userWithBlockedIds && userWithBlockedIds.blockedUsers.length > 0) {
+        const blockedUsersDetails = await this.prismaService.users.findMany({
+          where: {
+            id: {
+              in: userWithBlockedIds.blockedUsers,
+            },
+          },
+          select: {
+            id: true,
+            name: true,
+            profilPicture: true,
+          },
+        })
+
+        return blockedUsersDetails
+      }
+
+      return []
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when retrieving blocked users.')
+    }
+  }
+
+  async findUsersDetailsHided(userId: string) {
+    try {
+      const userWithHidedIds = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { hiddenUsers: true },
+      })
+
+      if (userWithHidedIds && userWithHidedIds.hiddenUsers.length > 0) {
+        const hidedUsersDetails = await this.prismaService.users.findMany({
+          where: {
+            id: {
+              in: userWithHidedIds.hiddenUsers,
+            },
+          },
+          select: {
+            id: true,
+            name: true,
+            profilPicture: true,
+          },
+        })
+
+        return hidedUsersDetails
+      }
+
+      return []
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when retrieving hided users.')
+    }
+  }
 }

@@ -44,18 +44,28 @@ export class BlockingController {
     return await this.blockingService.unhideWord(unhideWordDto)
   }
 
-  // @Get('usersBlocked:id')
-  // async findCommentsOnPost(@Param('id') usersBlocked: string) {
-  //   return await this.blockingService.findCommentsOnPost(postId)
-  // }
+  @Get('numberUsersBlocked/:id')
+  async findUsersBlocked(@Param('id') userId: string) {
+    return await this.blockingService.findUsersBlocked(userId)
+  }
 
-  // @Get('usersHided:id')
-  // async findCommentsOnPost(@Param('id') postId: string) {
-  //   return await this.blockingService.findCommentsOnPost(postId)
-  // }
+  @Get('numberUsersHided/:id')
+  async findUsersHided(@Param('id') userId: string) {
+    return await this.blockingService.findUsersHided(userId)
+  }
 
-  // @Get('wordsHided:id')
-  // async findCommentsOnPost(@Param('id') postId: string) {
-  //   return await this.blockingService.findCommentsOnPost(postId)
-  // }
+  @Get('numberWordsHided/:id')
+  async findWordsHided(@Param('id') userId: string) {
+    return await this.blockingService.findWordsHided(userId)
+  }
+
+  @Get('detailsUsersBlockedList/:id')
+  async findUsersDetailsBlocked(@Param('id') userId: string) {
+    return await this.blockingService.findUsersDetailsBlocked(userId)
+  }
+
+  @Get('detailsUsersHidedList/:id')
+  async findUsersDetailsHided(@Param('id') userId: string) {
+    return await this.blockingService.findUsersDetailsHided(userId)
+  }
 }
