@@ -12,6 +12,7 @@ import { LikeModule } from './like/like.module'
 import { ProfilModule } from './profil/profil.module'
 import { FollowModule } from './follow/follow.module'
 import { RepostModule } from './repost/repost.module'
+import { ReportModule } from './report/report.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
 import { ProductModule } from './product/product.module'
@@ -21,6 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 import { MetricModule } from './metric/metric.module'
+import { CronModule } from './cron/cron.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -32,10 +34,10 @@ const ENV = process.env.NODE_ENV
         ENV === 'production'
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
-            ? 'env-staging/.env.staging'
-            : ENV === 'development'
-              ? 'env-dev/.env.dev'
-              : '',
+          ? 'env-staging/.env.staging'
+          : ENV === 'development'
+          ? 'env-dev/.env.dev'
+          : '',
       expandVariables: true,
       validationSchema: CONFIG_SCHEMA_VALIDATAION,
       validationOptions: {
@@ -53,6 +55,7 @@ const ENV = process.env.NODE_ENV
     ProfilModule,
     FollowModule,
     RepostModule,
+    ReportModule,
     CommentModule,
     ImageUploadModule,
     ProductModule,
@@ -61,8 +64,9 @@ const ENV = process.env.NODE_ENV
     TagsModule,
     TutorialsModule,
     MetricModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

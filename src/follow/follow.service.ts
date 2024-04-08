@@ -15,17 +15,15 @@ export class FollowService {
   async createFollowers(createFollowDto: CreateFollowDto) {
     const follow = await this.prismaService.follows.create({
       data: createFollowDto,
-      include: { follower: true },
     })
     this.eventEmitter.emit(
-      'notifyOnFollow',
-      createFollowDto.followingId,
-      follow.follower.name
+      'notifyUser',
+      3,
+      createFollowDto.followerId,
+      '',
+      createFollowDto.followingId
     )
-    return new FollowEntity({
-      followerId: follow.followerId,
-      followingId: follow.followingId,
-    })
+    return new FollowEntity(follow)
   }
 
   async deleteFollowers(deleteFollowDto: DeleteFollowDto) {
