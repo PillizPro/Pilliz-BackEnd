@@ -195,13 +195,6 @@ export class ChatService {
               reactions: reactions,
               reactedUserIds: userThatReacts,
             },
-            reply_message: {
-              message: 'testmessage',
-              replyBy: 'jsp',
-              replyTo: 'jspnonplus',
-              message_type: 0,
-              id: 1,
-            },
           }
         })
         return messages
