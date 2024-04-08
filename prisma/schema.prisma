@@ -8,45 +8,46 @@ datasource db {
 }
 
 model Users {
-  id                     String           @id @default(uuid())
-  email                  String           @unique @db.VarChar(255)
-  name                   String           @db.VarChar(255)
-  password               String           @db.VarChar(255)
-  role                   UserRoles        @default(user)
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
-  firstConnection        Boolean          @default(true)
-  tutorialFeed           Boolean          @default(false)
-  tutorialMarketplace    Boolean          @default(false)
-  tutorialPro            Boolean          @default(false)
-  banned                 BanningStatus    @default(notBanned)
+  id                     String             @id @default(uuid())
+  email                  String             @unique @db.VarChar(255)
+  name                   String             @db.VarChar(255)
+  password               String             @db.VarChar(255)
+  role                   UserRoles          @default(user)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  firstConnection        Boolean            @default(true)
+  tutorialFeed           Boolean            @default(false)
+  tutorialMarketplace    Boolean            @default(false)
+  tutorialPro            Boolean            @default(false)
+  banned                 BanningStatus      @default(notBanned)
   Post                   Post[]
   Like                   Like[]
   Repost                 Repost[]
   Comment                Comment[]
-  bio                    String           @default("A propos de moi") @db.VarChar(500)
-  followedBy             Follows[]        @relation("follower")
-  following              Follows[]        @relation("following")
+  bio                    String             @default("A propos de moi") @db.VarChar(500)
+  followedBy             Follows[]          @relation("follower")
+  following              Follows[]          @relation("following")
   Conversations          Conversation[]
-  MessagesSend           Message[]        @relation("send")
-  MessagesReceived       Message[]        @relation("received")
-  isConnected            Boolean          @default(false)
-  profilPicture          String           @default("")
-  NotificatifionReceived Notificatifion[] @relation("notified")
-  NotificationSend       Notificatifion[] @relation("hasNotified")
+  MessagesSend           Message[]          @relation("send")
+  MessagesReceived       Message[]          @relation("received")
+  MessageReactions       MessageReactions[]
+  isConnected            Boolean            @default(false)
+  profilPicture          String             @default("")
+  NotificatifionReceived Notificatifion[]   @relation("notified")
+  NotificationSend       Notificatifion[]   @relation("hasNotified")
   Reports                Reports[]
   Documents              Document[]
   // Métriques
-  country                String           @default("")
-  totalAppTime           Int              @default(0)
-  totalFeedTime          Int              @default(0)
-  totalMarketTime        Int              @default(0)
-  totalProTime           Int              @default(0)
-  deviceRelease          String           @default("")
-  deviceVersion          String           @default("")
-  deviceName             String           @default("")
-  deviceWidth            Int              @default(0)
-  deviceHeight           Int              @default(0)
+  country                String             @default("")
+  totalAppTime           Int                @default(0)
+  totalFeedTime          Int                @default(0)
+  totalMarketTime        Int                @default(0)
+  totalProTime           Int                @default(0)
+  deviceRelease          String             @default("")
+  deviceVersion          String             @default("")
+  deviceName             String             @default("")
+  deviceWidth            Int                @default(0)
+  deviceHeight           Int                @default(0)
 }
 
 model Follows {
@@ -136,17 +137,27 @@ model Conversation {
 }
 
 model Message {
-  id             String       @id @default(uuid())
-  authorId       String
-  Author         Users        @relation("send", fields: [authorId], references: [id])
-  receiverId     String
-  Receiver       Users        @relation("received", fields: [receiverId], references: [id])
-  createdAt      DateTime     @default(now())
-  content        String
-  conversationId String
-  Conversation   Conversation @relation(fields: [conversationId], references: [id])
-  status         Int          @default(0)
-  type           Int
+  id               String             @id @default(uuid())
+  authorId         String
+  Author           Users              @relation("send", fields: [authorId], references: [id])
+  receiverId       String
+  Receiver         Users              @relation("received", fields: [receiverId], references: [id])
+  createdAt        DateTime           @default(now())
+  content          String
+  conversationId   String
+  Conversation     Conversation       @relation(fields: [conversationId], references: [id])
+  status           Int                @default(0)
+  type             Int
+  MessageReactions MessageReactions[]
+}
+
+model MessageReactions {
+  id             String  @id @default(uuid())
+  reaction       String
+  messageId      String
+  Message        Message @relation(fields: [messageId], references: [id])
+  userIdReaction String
+  User           Users   @relation(fields: [userIdReaction], references: [id])
 }
 
 model Notificatifion {
