@@ -187,7 +187,7 @@ export class ChatService {
             conversationId: conversation.id,
             id: message.id,
             message: message.content,
-            createdAt: message.createdAt,
+            createdAt: new Date(message.createdAt),
             messageType: message.type,
             status: message.status,
             sendBy: message.authorId,
