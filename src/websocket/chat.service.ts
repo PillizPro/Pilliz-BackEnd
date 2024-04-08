@@ -195,7 +195,7 @@ export class ChatService {
               reactions: reactions,
               reactedUserIds: userThatReacts,
             },
-            replyMessage: null,
+            reply_message: null,
           }
         })
         return messages
