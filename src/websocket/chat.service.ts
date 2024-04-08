@@ -140,16 +140,17 @@ export class ChatService {
         profilePhoto: user.profilPicture,
       }
     })
-    let sortUsersList: object = {}
+    const sortUsersList: Array<object> = []
     let firstUserInList: object = {}
     for (const user of usersList) {
       if (user.id === findAllUsersConv.userId) {
-        firstUserInList = { ...user }
+        firstUserInList = user
       } else {
-        sortUsersList = { ...sortUsersList, ...usersList }
+        sortUsersList.push(user)
       }
     }
-    sortUsersList = { ...firstUserInList, ...sortUsersList }
+    sortUsersList.push(firstUserInList)
+    sortUsersList.reverse()
     return sortUsersList
   }
 
