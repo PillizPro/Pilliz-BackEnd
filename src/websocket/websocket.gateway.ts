@@ -9,12 +9,13 @@ import {
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
-import { FindChatDto } from './dto/find-chat-dto'
+import { FindChatDto } from './dto/find-chat.dto'
 import { UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
+import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -86,6 +87,17 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     this.chatService.updateOneMessageStatus(messageStatusDto.idMessage, 2)
     client.emit('viewMessage')
+  }
+
+  @SubscribeMessage('findAllUsersConv')
+  async findAllUsersConv(
+    @MessageBody() findAllUsersConvDto: FindAllUsersConvDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const allUsersConv =
+      await this.chatService.findAllUsersConv(findAllUsersConvDto)
+    client.emit('allUsersConv', allUsersConv)
+    return allUsersConv
   }
 
   @SubscribeMessage('findAllChat')

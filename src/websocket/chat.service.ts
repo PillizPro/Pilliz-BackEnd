@@ -2,9 +2,17 @@ import { Injectable } from '@nestjs/common'
 import { CreateChatDto } from './dto/create-chat.dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { FindChatDto } from './dto/find-chat-dto'
+import { FindChatDto } from './dto/find-chat.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
+import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
+
+enum MessageStatus {
+  READ,
+  DELIVERED,
+  UNELIVERED,
+  PENDING,
+}
 
 @Injectable()
 export class ChatService {
@@ -13,10 +21,10 @@ export class ChatService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async updateOneMessageStatus(messageId: string, messageStatus: number) {
-    //0 corresponds to a not-sent message
-    //1 corresponds to a not-viewed message
-    //2 corresponds to a viewed message
+  async updateOneMessageStatus(
+    messageId: string,
+    messageStatus: MessageStatus
+  ) {
     try {
       return await this.prismaService.message.update({
         where: {
@@ -32,16 +40,16 @@ export class ChatService {
 
   async updateAllMessagesStatus(
     message: { conversationId: string | undefined; userId: string },
-    messagesStatus: number
+    messagesStatus: MessageStatus
   ) {
-    //0 corresponds to a not-sent message
-    //1 corresponds to a not-viewed message
-    //2 corresponds to a viewed message
     try {
       let statusArray: number[] = []
-      if (messagesStatus === 0) statusArray = [1, 2]
-      if (messagesStatus === 1) statusArray = [0, 2]
-      if (messagesStatus === 2) statusArray = [0]
+      if (messagesStatus === MessageStatus.UNELIVERED)
+        statusArray = [MessageStatus.DELIVERED, MessageStatus.READ]
+      if (messagesStatus === MessageStatus.DELIVERED)
+        statusArray = [MessageStatus.UNELIVERED, MessageStatus.READ]
+      if (messagesStatus === MessageStatus.READ)
+        statusArray = [MessageStatus.UNELIVERED]
       await this.prismaService.message.updateMany({
         where: {
           AND: [
@@ -117,38 +125,79 @@ export class ChatService {
     }
   }
 
+  async findAllUsersConv(findAllUsersConv: FindAllUsersConvDto) {
+    const conversation = await this.prismaService.conversation.findUnique({
+      where: { id: findAllUsersConv.conversationId },
+      include: {
+        Users: true,
+      },
+    })
+    if (!conversation?.Users) return
+    const users = conversation.Users.map((user) => {
+      return {
+        id: user.id,
+        name: user.name,
+        profilePhoto: user.profilPicture,
+      }
+    })
+    function customSort(a: any, b: any): number {
+      if (a === findAllUsersConv.userId && b !== findAllUsersConv.userId) {
+        return -1
+      } else if (
+        a !== findAllUsersConv.userId &&
+        b === findAllUsersConv.userId
+      ) {
+        return 1
+      } else {
+        return 0
+      }
+    }
+
+    users.sort(customSort)
+    return users
+  }
+
   async findAllChat(findChatDto: FindChatDto) {
     try {
       const conversation_ = await this._getOrCreateConversation(findChatDto)
       await this.updateAllMessagesStatus(
         { conversationId: conversation_?.id, userId: findChatDto.userId },
-        2
+        MessageStatus.READ
       )
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversation_?.id },
         include: {
           Messages: {
             orderBy: { createdAt: 'asc' },
+            include: {
+              MessageReactions: true,
+            },
           },
         },
       })
       if (conversation?.Messages) {
-        const messages = await Promise.all(
-          conversation.Messages.map(async (message) => {
-            const user = await this.prismaService.users.findUnique({
-              where: { id: message.authorId },
-            })
-            return {
-              conversationId: conversation.id,
-              idMessage: message.id,
-              text: message.content,
-              name: user?.name,
-              messageType: message.type,
-              messageStatus: message.status,
-              isSender: message.authorId === findChatDto.userId,
-            }
-          })
-        )
+        const messages = conversation.Messages.map((message) => {
+          const reactions = message.MessageReactions.map(
+            (reaction) => reaction.reaction
+          )
+          const userThatReacts = message.MessageReactions.map(
+            (reaction) => reaction.userIdReaction
+          )
+          return {
+            conversationId: conversation.id,
+            id: message.id,
+            message: message.content,
+            createdAt: message.createdAt,
+            messageType: message.type,
+            status: message.status,
+            sendBy: message.authorId,
+            reaction: {
+              reactions: reactions,
+              reactedUserIds: userThatReacts,
+            },
+            replyMessage: null,
+          }
+        })
         return messages
       }
       return { conversationId: conversation?.id }
@@ -166,7 +215,7 @@ export class ChatService {
             AND: [
               { Users: { some: { id: findChatDto.userId } } },
               {
-                Users: { some: { id: findChatDto?.receiverId } },
+                Users: { some: { id: findChatDto.receiverId } },
               },
             ],
           },
