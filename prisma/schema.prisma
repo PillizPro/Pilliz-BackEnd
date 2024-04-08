@@ -47,6 +47,10 @@ model Users {
   deviceName             String           @default("")
   deviceWidth            Int              @default(0)
   deviceHeight           Int              @default(0)
+  // Masquer / Blocker
+  blockedUsers           String[]         @default([])
+  hiddenUsers            String[]         @default([])
+  hiddenWords            String[]         @default([])
 }
 
 model Follows {
