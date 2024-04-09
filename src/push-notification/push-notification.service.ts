@@ -26,7 +26,7 @@ export class PushNotificationService {
     const transformedNotifications = notifications.map((notif) => {
       return {
         notifType: notif.notifType,
-        id: notif.userNotifiedId,
+        id: notif.userThatNotifyId,
         name: notif.userThatNotify.name,
         image: notif.userThatNotify.profilPicture,
         time: 'null',
