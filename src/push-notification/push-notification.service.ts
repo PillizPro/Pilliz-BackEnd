@@ -41,6 +41,8 @@ export class PushNotificationService {
   //  1: a post has been liked
   //  2: a comment has been liked
   //  3: a user has been followed
+  //  4: a user has repost a post
+  //  5: a user has repost a comment
   @OnEvent('notifyUser')
   async notifyOnCreateChat(
     notifType: number,
