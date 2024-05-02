@@ -260,6 +260,7 @@ export class ChatService {
         },
         include: {
           Users: true,
+          InvitationConversation : true,
           Messages: { orderBy: { createdAt: 'desc' } },
         },
       })
@@ -268,6 +269,9 @@ export class ChatService {
         let name: string = ''
         let profilPicture: string = ''
         let isActive: boolean = false
+        let isInvitation: boolean | undefined = conv.InvitationConversation?.invitation
+        let nonefollowerId: string | undefined = conv.InvitationConversation?.nonefollowerId
+
         for (const user of conv.Users) {
           if (user.id !== getConversationsDto.userId) {
             receiverId = user.id
@@ -293,6 +297,8 @@ export class ChatService {
           time: 'null',
           lastMessage,
           messageType,
+          isInvitation,
+          nonefollowerId,
         }
       })
       return transformedConversations

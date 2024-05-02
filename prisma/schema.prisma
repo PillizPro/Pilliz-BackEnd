@@ -24,6 +24,7 @@ model Users {
   Like                   Like[]
   Repost                 Repost[]
   Comment                Comment[]
+  InvitationConversation InvitationConversation?
   bio                    String             @default("A propos de moi") @db.VarChar(500)
   followedBy             Follows[]          @relation("follower")
   following              Follows[]          @relation("following")
@@ -134,6 +135,17 @@ model Conversation {
   id       String    @id @default(uuid())
   Messages Message[]
   Users    Users[]
+  InvitationConversation InvitationConversation?
+}
+
+model InvitationConversation {
+  id              String     @id @default(uuid())
+  conversationId  String     @unique
+  nonefollowerId  String     @unique
+  userId          String
+  invitation      Boolean    @default(true)
+  Conversation    Conversation @relation(fields: [conversationId], references: [id])
+  User            Users        @relation(fields: [nonefollowerId], references: [id])
 }
 
 model Message {
