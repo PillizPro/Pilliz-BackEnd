@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateUserDto } from './dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from './dto/create-user.dto'
 import { FindByEmailDto } from './dto/find-by-email.dto'
 import { DeleteUserDto } from './dto/delete-user.dto'
 import { BanningUserDto } from 'src/admin/dto/banning-user.dto'
@@ -12,6 +12,13 @@ export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
+    const user = await this.prismaService.users.create({
+      data: createUserDto,
+    })
+    return new UserEntity(user)
+  }
+
+  async createProUser(createUserDto: CreateProUserDto) {
     const user = await this.prismaService.users.create({
       data: createUserDto,
     })

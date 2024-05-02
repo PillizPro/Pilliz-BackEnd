@@ -47,6 +47,11 @@ model Users {
   deviceName             String           @default("")
   deviceWidth            Int              @default(0)
   deviceHeight           Int              @default(0)
+  isCompanyAccount       Boolean          @default(false)
+  companyAddress         String           @default("")
+  companyWebsite         String           @default("")
+  activitySector         String           @default("")
+  companySiren           String           @default("")
 }
 
 model Follows {

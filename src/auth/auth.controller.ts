@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
 import { AuthService } from './auth.service'
-import { CreateUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
 import { ApiTags } from '@nestjs/swagger'
 import { ResetPassword } from './dto/reset-password.dto'
 
@@ -13,6 +13,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: CreateUserDto) {
     return await this.authService.register(registerDto)
+  }
+
+  @Post('registerPro')
+  async registerPro(@Body() registerDto: CreateProUserDto) {
+    return await this.authService.registerPro(registerDto)
   }
 
   @Post('login')
