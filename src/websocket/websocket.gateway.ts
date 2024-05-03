@@ -94,10 +94,8 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const receiverSocket = this._connectedUsers.get(newReaction.receiverId)
     client.emit('newReaction', newReaction)
     if (receiverSocket) {
-      receiverSocket.emit('newChat', {
-        ...newReaction.msg,
-        isSender: false,
-      })
+      receiverSocket.emit('newReaction', newReaction.msg)
+      return newReaction.msg
     }
   }
 
