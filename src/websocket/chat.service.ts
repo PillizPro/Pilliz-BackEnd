@@ -149,8 +149,12 @@ export class ChatService {
         where: { id: messageId },
         data: {
           MessageReactions: {
-            connectOrCreate: {
+            upsert: {
               create: {
+                reaction: react,
+                userIdReaction: authorId,
+              },
+              update: {
                 reaction: react,
                 userIdReaction: authorId,
               },
