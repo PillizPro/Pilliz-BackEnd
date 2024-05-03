@@ -62,11 +62,13 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
       ...newChatEntity.chat,
       isSender: true,
     })
+    console.log('1)\n', createChatDto.authorId, '\n', newChatEntity)
     if (receiverSocket) {
       receiverSocket.emit('newChat', {
         ...newChatEntity.chat,
         isSender: false,
       })
+      console.log('2)\n', newChatEntity.receiverId, '\n', newChatEntity)
       return {
         ...newChatEntity.chat,
         isSender: false,
@@ -85,6 +87,8 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() messageStatusDto: MessageStatusDto,
     @ConnectedSocket() client: Socket
   ) {
+    // Remplacer le 2 par un membre de l'enum MessageStatus quand l'enum
+    // sera dans le dossier utils pour les types-interfaces
     this.chatService.updateOneMessageStatus(messageStatusDto.idMessage, 2)
     client.emit('viewMessage')
   }
