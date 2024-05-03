@@ -369,8 +369,15 @@ export class ChatService {
         })
         return conversation
       } else {
-        const conversation = await this.prismaService.conversation.findUnique({
+        const conversation = await this.prismaService.conversation.update({
           where: { id: existingConversation?.id },
+          data: {
+            UsersThatDeleteConv: {
+              disconnect: {
+                id: findChatDto.userId,
+              },
+            },
+          },
         })
         return conversation
       }

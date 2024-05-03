@@ -130,7 +130,13 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const deleteChat = await this.chatService.deleteChat(deleteChatDto)
     const receiverSocket = this._connectedUsers.get(deleteChat.receiverId)
     client.emit('deleteChat', deleteChat.chat)
-    if (receiverSocket) receiverSocket.emit('deleteChat', deleteChat.chat)
+    if (receiverSocket) {
+      receiverSocket.emit('deleteChat', deleteChat.chat)
+      const conversations = await this.chatService.getConversations({
+        userId: deleteChat.receiverId,
+      })
+      receiverSocket.emit('getConversations', conversations)
+    }
     return deleteChat.chat
   }
 
