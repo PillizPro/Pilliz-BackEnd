@@ -18,6 +18,7 @@ import { MessageStatusDto } from './dto/message-status.dto'
 import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 import { CreateReactionDto } from './dto/create-reaction.dto'
 import { DeleteConvDto } from './dto/delete-conv.dto'
+import { DeleteChatDto } from './dto/delete-chat.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -67,7 +68,6 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
         userId: newChatEntity.receiverId,
       })
       receiverSocket.emit('getConversations', conversations)
-      return newChatEntity.chat
     } else {
       this.chatService.emitEventCreateChat(
         createChatDto,
@@ -75,6 +75,7 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
       )
       console.log('The receiver is not connected')
     }
+    return newChatEntity.chat
   }
 
   @SubscribeMessage('createReaction')
@@ -84,11 +85,9 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const newReaction = await this.chatService.createReaction(createReactionDto)
     const receiverSocket = this._connectedUsers.get(newReaction.receiverId)
-    client.emit('newReaction', newReaction.msg)
-    if (receiverSocket) {
-      receiverSocket.emit('newReaction', newReaction.msg)
-      return newReaction.msg
-    }
+    client.emit('newReaction', newReaction.chat)
+    if (receiverSocket) receiverSocket.emit('newReaction', newReaction.chat)
+    return newReaction.chat
   }
 
   @SubscribeMessage('viewMessage')
@@ -121,6 +120,18 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const allChat = await this.chatService.findAllChat(findChatDto)
     client.emit('allChat', allChat)
     return allChat
+  }
+
+  @SubscribeMessage('deleteChat')
+  async deleteChat(
+    @MessageBody() deleteChatDto: DeleteChatDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const deleteChat = await this.chatService.deleteChat(deleteChatDto)
+    const receiverSocket = this._connectedUsers.get(deleteChat.receiverId)
+    client.emit('deleteChat', deleteChat.chat)
+    if (receiverSocket) receiverSocket.emit('deleteChat', deleteChat.chat)
+    return deleteChat.chat
   }
 
   @SubscribeMessage('getConversations')

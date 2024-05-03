@@ -9,6 +9,7 @@ import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 import { DeleteConvDto } from './dto/delete-conv.dto'
 import { CreateReactionDto } from './dto/create-reaction.dto'
 import { Message, MessageReactions } from '@prisma/client'
+import { DeleteChatDto } from './dto/delete-chat.dto'
 
 enum MessageStatus {
   READ,
@@ -144,7 +145,7 @@ export class ChatService {
       const { authorId, reactions, messageId } = createReactionDto
       if (reactions.length === 0)
         return await this._deleteReaction(createReactionDto)
-      const msg = await this.prismaService.message.update({
+      const chat = await this.prismaService.message.update({
         where: { id: messageId },
         data: {
           MessageReactions: {
@@ -170,12 +171,11 @@ export class ChatService {
           MessageReactions: true,
         },
       })
-      if (!msg) throw new Error('An error occured when getting the message')
-      console.log('createReaction: \n', msg)
+      if (!chat) throw new Error('An error occured when getting the message')
       return await this._returnReactedMessage(
         authorId,
-        msg,
-        msg.MessageReactions
+        chat,
+        chat.MessageReactions
       )
     } catch (err) {
       console.error(err)
@@ -186,7 +186,7 @@ export class ChatService {
   async _deleteReaction(createReactionDto: CreateReactionDto) {
     const { authorId, messageId } = createReactionDto
 
-    const msg = await this.prismaService.messageReactions.delete({
+    const chat = await this.prismaService.messageReactions.delete({
       where: {
         msgUserReactId: {
           messageId: messageId,
@@ -201,39 +201,38 @@ export class ChatService {
         },
       },
     })
-    if (!msg)
+    if (!chat)
       throw new Error(
         'An error occured when getting the message reaction to delete it'
       )
-    console.log('deleteReaction: \n', msg)
     return await this._returnReactedMessage(
       authorId,
-      msg.Message,
-      msg.Message.MessageReactions
+      chat.Message,
+      chat.Message.MessageReactions
     )
   }
 
   async _returnReactedMessage(
     authorReactionId: string,
-    msg: Message,
-    msgReactions: MessageReactions[]
+    chat: Message,
+    chatReactions: MessageReactions[]
   ) {
     let receiverId: string
-    if (msg.authorId === authorReactionId) receiverId = msg.receiverId
-    else receiverId = msg.authorId
-    const reacts = msgReactions.map((reaction) => reaction.reaction)
-    const userThatReacts = msgReactions.map(
+    if (chat.authorId === authorReactionId) receiverId = chat.receiverId
+    else receiverId = chat.authorId
+    const reacts = chatReactions.map((reaction) => reaction.reaction)
+    const userThatReacts = chatReactions.map(
       (reaction) => reaction.userIdReaction
     )
     return {
       receiverId,
-      msg: {
-        id: msg.id,
-        message: msg.content,
-        createdAt: new Date(msg.createdAt).toISOString(),
-        message_type: msg.type,
-        sendBy: msg.authorId,
-        status: msg.status,
+      chat: {
+        id: chat.id,
+        message: chat.content,
+        createdAt: new Date(chat.createdAt).toISOString(),
+        message_type: chat.type,
+        sendBy: chat.authorId,
+        status: chat.status,
         reaction: {
           reactions: reacts,
           reactedUserIds: userThatReacts,
@@ -319,6 +318,23 @@ export class ChatService {
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting last messages')
+    }
+  }
+
+  async deleteChat(deleteChatDto: DeleteChatDto) {
+    try {
+      const res = await this.prismaService.message.delete({
+        where: { id: deleteChatDto.messageId },
+      })
+      return {
+        receiverId: res.receiverId,
+        chat: {
+          messageId: res.id,
+        },
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when deleting a message')
     }
   }
 
