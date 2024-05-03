@@ -13,7 +13,10 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.prismaService.users.create({
-      data: createUserDto,
+      data: {
+        nameLowercase: createUserDto.name.toLowerCase(),
+        ...createUserDto,
+      },
     })
     return new UserEntity(user)
   }
@@ -32,25 +35,23 @@ export class UserService {
   }
 
   async getUsersBySearch(queryUsername: string) {
-    // mettre tout en minuscule lors de la recherche et de la mise en base des produits
     try {
       const usernameList = await this.prismaService.users.findMany({
         take: 50,
-        where: { name: { startsWith: queryUsername.toLowerCase() } },
+        where: { nameLowercase: { contains: queryUsername.toLowerCase() } },
       })
       const userNoneFollow = usernameList.map((user) => {
         return {
           id: user.id,
-          name: user.name
+          name: user.name,
         }
-        })
-        return userNoneFollow
+      })
+      return userNoneFollow
     } catch (error) {
       console.error(error)
       throw new Error('An error occured when searching for Usernames list')
     }
   }
-
 
   async deleteUserByID(deleteDto: DeleteUserDto) {
     try {
