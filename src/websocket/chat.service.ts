@@ -141,6 +141,9 @@ export class ChatService {
   async createReaction(createReactionDto: CreateReactionDto) {
     try {
       const { authorId, reactions, messageId } = createReactionDto
+      let react: string | undefined | null
+      if (reactions.length === 0) react = null
+      else react = reactions[0]
 
       const msg = await this.prismaService.message.update({
         where: { id: messageId },
@@ -148,7 +151,7 @@ export class ChatService {
           MessageReactions: {
             connectOrCreate: {
               create: {
-                reaction: reactions[0],
+                reaction: react,
                 userIdReaction: authorId,
               },
               where: {
