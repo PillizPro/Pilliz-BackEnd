@@ -170,7 +170,7 @@ model MessageReactions {
   id             String  @id @default(uuid())
   reaction       String?
   messageId      String
-  Message        Message @relation(fields: [messageId], references: [id])
+  Message        Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   userIdReaction String
   User           Users   @relation(fields: [userIdReaction], references: [id])
 
