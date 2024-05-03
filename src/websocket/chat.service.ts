@@ -170,8 +170,8 @@ export class ChatService {
           MessageReactions: true,
         },
       })
-      console.log('createReaction: \n', msg)
       if (!msg) throw new Error('An error occured when getting the message')
+      console.log('createReaction: \n', msg)
       return await this._returnReactedMessage(
         authorId,
         msg,
