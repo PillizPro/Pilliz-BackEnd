@@ -96,6 +96,16 @@ export class ChatService {
         newMessage.id,
         MessageStatus.DELIVERED
       )
+      await this.prismaService.conversation.update({
+        where: { id: conversation.id },
+        data: {
+          UsersThatDeleteConv: {
+            disconnect: {
+              id: receiverId,
+            },
+          },
+        },
+      })
       return {
         receiverId,
         chat: {
@@ -254,11 +264,22 @@ export class ChatService {
     try {
       const conversations = await this.prismaService.conversation.findMany({
         where: {
-          Users: {
-            some: {
-              id: getConversationsDto.userId,
+          AND: [
+            {
+              Users: {
+                some: {
+                  id: getConversationsDto.userId,
+                },
+              },
             },
-          },
+            {
+              UsersThatDeleteConv: {
+                none: {
+                  id: getConversationsDto.userId,
+                },
+              },
+            },
+          ],
         },
         include: {
           Users: true,
@@ -286,9 +307,13 @@ export class ChatService {
           }
         }
         let lastMessage: string | undefined = ''
+        let lastMessageCreatedAt
         let messageType: number = 0
         if (conv.Messages[0]) {
           lastMessage = conv.Messages[0].content
+          lastMessageCreatedAt = new Date(
+            conv.Messages[0].createdAt
+          ).toISOString()
           messageType = conv.Messages[0].type
         }
         const conversationId = conv.id
@@ -298,7 +323,7 @@ export class ChatService {
           name,
           isActive,
           image: profilPicture,
-          time: 'null',
+          time: lastMessageCreatedAt,
           lastMessage,
           messageType,
           isInvitation,
@@ -314,11 +339,29 @@ export class ChatService {
 
   async deleteConversations(deleteConvDto: DeleteConvDto) {
     try {
+      for (const convId of deleteConvDto.conversationId) {
+        await this.prismaService.conversation.update({
+          where: { id: convId },
+          data: {
+            UsersThatDeleteConv: {
+              connect: { id: deleteConvDto.userId },
+            },
+          },
+        })
+      }
+      const convToPotentiallyDelete =
+        await this.prismaService.conversation.findMany({
+          where: { id: { in: deleteConvDto.conversationId } },
+          include: { Users: true, UsersThatDeleteConv: true },
+        })
+      const idConvToDelete: string[] = []
+      for (const conv of convToPotentiallyDelete) {
+        if (conv.Users.length === conv.UsersThatDeleteConv.length)
+          idConvToDelete.push(conv.id)
+      }
       await this.prismaService.conversation.deleteMany({
         where: {
-          id: {
-            in: deleteConvDto.conversationId,
-          },
+          id: { in: idConvToDelete },
         },
       })
     } catch (err) {

@@ -62,13 +62,15 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
       ...newChatEntity.chat,
       isSender: true,
     })
-    console.log('1)\n', createChatDto.authorId, '\n', newChatEntity)
     if (receiverSocket) {
       receiverSocket.emit('newChat', {
         ...newChatEntity.chat,
         isSender: false,
       })
-      console.log('2)\n', newChatEntity.receiverId, '\n', newChatEntity)
+      const conversations = await this.chatService.getConversations({
+        userId: newChatEntity.receiverId,
+      })
+      receiverSocket.emit('getConversations', conversations)
       return {
         ...newChatEntity.chat,
         isSender: false,

@@ -29,7 +29,8 @@ model Users {
   bio                    String                   @default("A propos de moi") @db.VarChar(500)
   followedBy             Follows[]                @relation("follower")
   following              Follows[]                @relation("following")
-  Conversations          Conversation[]
+  Conversations          Conversation[]           @relation("partOfConv")
+  ConversationsDeleted   Conversation[]           @relation("convDeleted")
   MessagesSend           Message[]                @relation("send")
   MessagesReceived       Message[]                @relation("received")
   MessageReactions       MessageReactions[]
@@ -135,7 +136,8 @@ model Comment {
 model Conversation {
   id                     String                  @id @default(uuid())
   Messages               Message[]
-  Users                  Users[]
+  Users                  Users[]                 @relation("partOfConv")
+  UsersThatDeleteConv    Users[]                 @relation("convDeleted")
   InvitationConversation InvitationConversation?
 }
 
