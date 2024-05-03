@@ -59,23 +59,14 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const newChatEntity = await this.chatService.createChat(createChatDto)
     const receiverSocket = this._connectedUsers.get(newChatEntity.receiverId)
-    client.emit('newChat', {
-      ...newChatEntity.chat,
-      isSender: true,
-    })
+    client.emit('newChat', newChatEntity.chat)
     if (receiverSocket) {
-      receiverSocket.emit('newChat', {
-        ...newChatEntity.chat,
-        isSender: false,
-      })
+      receiverSocket.emit('newChat', newChatEntity.chat)
       const conversations = await this.chatService.getConversations({
         userId: newChatEntity.receiverId,
       })
       receiverSocket.emit('getConversations', conversations)
-      return {
-        ...newChatEntity.chat,
-        isSender: false,
-      }
+      return newChatEntity.chat
     } else {
       this.chatService.emitEventCreateChat(
         createChatDto,
@@ -92,7 +83,7 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const newReaction = await this.chatService.createReaction(createReactionDto)
     const receiverSocket = this._connectedUsers.get(newReaction.receiverId)
-    client.emit('newReaction', newReaction)
+    client.emit('newReaction', newReaction.msg)
     if (receiverSocket) {
       receiverSocket.emit('newReaction', newReaction.msg)
       return newReaction.msg

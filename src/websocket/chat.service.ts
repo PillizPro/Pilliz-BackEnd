@@ -141,30 +141,30 @@ export class ChatService {
   async createReaction(createReactionDto: CreateReactionDto) {
     try {
       const { authorId, reactions, messageId } = createReactionDto
-      this.prismaService.messageReactions.upsert({
-        create: {
-          reaction: reactions[0],
-          messageId: messageId,
-          userIdReaction: authorId,
-        },
-        update: {
-          reaction: reactions[0],
-          messageId: messageId,
-          userIdReaction: authorId,
-        },
-        where: {
-          msgUserReactId: {
-            messageId: messageId,
-            userIdReaction: authorId,
+
+      const msg = await this.prismaService.message.update({
+        where: { id: messageId },
+        data: {
+          MessageReactions: {
+            connectOrCreate: {
+              create: {
+                reaction: reactions[0],
+                userIdReaction: authorId,
+              },
+              where: {
+                msgUserReactId: {
+                  messageId: messageId,
+                  userIdReaction: authorId,
+                },
+              },
+            },
           },
         },
-      })
-      const msg = await this.prismaService.message.findUnique({
-        where: { id: messageId },
         include: {
           MessageReactions: true,
         },
       })
+      console.log('createReaction: ', msg)
       if (!msg) throw new Error('An error occured when getting the message')
       let receiverId: string
       if (msg.authorId === authorId) receiverId = msg.receiverId
