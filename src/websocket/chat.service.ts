@@ -429,7 +429,7 @@ export class ChatService {
           }
         }
         let lastMessage: string | undefined = ''
-        let lastMessageCreatedAt = undefined
+        let lastMessageCreatedAt = ''
         let messageType: number = 0
         if (conv.Messages[0]) {
           lastMessage = conv.Messages[0].content
