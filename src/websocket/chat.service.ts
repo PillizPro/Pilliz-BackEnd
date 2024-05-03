@@ -6,11 +6,12 @@ import { FindChatDto } from './dto/find-chat.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
+import { DeleteConvDto } from './dto/delete-conv.dto'
 
 enum MessageStatus {
   READ,
   DELIVERED,
-  UNELIVERED,
+  UNDELIVERED,
   PENDING,
 }
 
@@ -44,12 +45,12 @@ export class ChatService {
   ) {
     try {
       let statusArray: number[] = []
-      if (messagesStatus === MessageStatus.UNELIVERED)
+      if (messagesStatus === MessageStatus.UNDELIVERED)
         statusArray = [MessageStatus.DELIVERED, MessageStatus.READ]
       if (messagesStatus === MessageStatus.DELIVERED)
-        statusArray = [MessageStatus.UNELIVERED, MessageStatus.READ]
+        statusArray = [MessageStatus.UNDELIVERED, MessageStatus.READ]
       if (messagesStatus === MessageStatus.READ)
-        statusArray = [MessageStatus.UNELIVERED]
+        statusArray = [MessageStatus.UNDELIVERED]
       await this.prismaService.message.updateMany({
         where: {
           AND: [
@@ -96,7 +97,10 @@ export class ChatService {
           type,
         },
       })
-      const updatedMessage = await this.updateOneMessageStatus(newMessage.id, 1)
+      const updatedMessage = await this.updateOneMessageStatus(
+        newMessage.id,
+        MessageStatus.DELIVERED
+      )
       return {
         receiverId,
         chat: {
@@ -200,7 +204,7 @@ export class ChatService {
       return { conversationId: conversation?.id }
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when getting the last messages')
+      throw new Error('An error occured when getting last messages')
     }
   }
 
@@ -307,6 +311,23 @@ export class ChatService {
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting conversations')
+    }
+  }
+
+  async deleteConversations(deleteConvDto: DeleteConvDto) {
+    try {
+      await this.prismaService.conversation.deleteMany({
+        where: {
+          id: {
+            in: deleteConvDto.conversationId,
+          },
+        },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error(
+        'An error occured when deleting one or multiple conversations'
+      )
     }
   }
 
