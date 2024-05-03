@@ -201,6 +201,10 @@ export class ChatService {
         },
       },
     })
+    if (!msg)
+      throw new Error(
+        'An error occured when getting the message reaction to delete it'
+      )
     console.log('deleteReaction: \n', msg)
     return await this._returnReactedMessage(
       authorId,
