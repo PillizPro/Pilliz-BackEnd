@@ -80,13 +80,8 @@ export class ChatService {
       if (!conversation?.Users)
         throw new Error('There is no Users in this conversation')
       let receiverId: string = ''
-      let authorName: string = ''
       for (const user of conversation.Users) {
-        if (user.id !== authorId) {
-          receiverId = user.id
-        } else {
-          authorName = user.name
-        }
+        if (user.id !== authorId) receiverId = user.id
       }
       const newMessage = await this.prismaService.message.create({
         data: {
@@ -104,11 +99,14 @@ export class ChatService {
       return {
         receiverId,
         chat: {
-          idMessage: updatedMessage.id,
-          text: content,
-          name: authorName,
-          messageType: type,
-          messageStatus: updatedMessage.status,
+          id: updatedMessage.id,
+          message: content,
+          createdAt: new Date(updatedMessage.createdAt).toISOString(),
+          message_type: type,
+          sendBy: authorId,
+          status: updatedMessage.status,
+          reaction: null,
+          reply_message: null,
         },
       }
     } catch (err) {

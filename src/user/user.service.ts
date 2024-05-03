@@ -95,6 +95,7 @@ export class UserService {
         where: { id: userId },
         data: { isConnected: connectedStatus },
       })
+      console.log('Update status of user: ', userId)
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when changing connected user status')
