@@ -5,7 +5,7 @@ import { DeleteConvDto } from './dto/delete-conv.dto'
 
 @ApiTags('Chat')
 @Controller('chat')
-export class UserController {
+export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post('deleteConversations')

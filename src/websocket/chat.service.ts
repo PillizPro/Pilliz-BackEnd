@@ -141,7 +141,7 @@ export class ChatService {
   async createReaction(createReactionDto: CreateReactionDto) {
     try {
       const { authorId, reactions, messageId } = createReactionDto
-      const msg = this.prismaService.messageReactions.upsert({
+      this.prismaService.messageReactions.upsert({
         create: {
           reaction: reactions[0],
           messageId: messageId,
@@ -158,32 +158,34 @@ export class ChatService {
             userIdReaction: authorId,
           },
         },
+      })
+      const msg = await this.prismaService.message.findUnique({
+        where: { id: messageId },
         include: {
-          Message: true,
+          MessageReactions: true,
         },
       })
-      const authorMsgId = (await msg.Message()).authorId
+      if (!msg) throw new Error('An error occured when getting the message')
       let receiverId: string
-      if (authorMsgId === authorId)
-        receiverId = (await msg.Message()).receiverId
-      else receiverId = authorMsgId
-      const message = await msg.Message()
-      const messageReactions = await msg.Message().MessageReactions()
-      const reactions_ = messageReactions.map((reaction) => reaction.reaction)
-      const userThatReacts = messageReactions.map(
+      if (msg.authorId === authorId) receiverId = msg.receiverId
+      else receiverId = msg.authorId
+      const msgReactions = msg.MessageReactions.map(
+        (reaction) => reaction.reaction
+      )
+      const userThatReacts = msg.MessageReactions.map(
         (reaction) => reaction.userIdReaction
       )
       return {
         receiverId,
         msg: {
-          id: message.id,
-          message: message.content,
-          createdAt: new Date(message.createdAt).toISOString(),
-          message_type: message.type,
-          sendBy: message.authorId,
-          status: message.status,
+          id: msg.id,
+          message: msg.content,
+          createdAt: new Date(msg.createdAt).toISOString(),
+          message_type: msg.type,
+          sendBy: msg.authorId,
+          status: msg.status,
           reaction: {
-            reactions: reactions_,
+            reactions: msgReactions,
             reactedUserIds: userThatReacts,
           },
           reply_message: null,
