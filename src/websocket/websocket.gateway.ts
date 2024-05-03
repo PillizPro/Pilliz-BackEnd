@@ -17,6 +17,7 @@ import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
 import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 import { CreateReactionDto } from './dto/create-reaction.dto'
+import { DeleteConvDto } from './dto/delete-conv.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -129,6 +130,19 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const conversations =
       await this.chatService.getConversations(getConversationsDto)
+    client.emit('getConversations', conversations)
+    return conversations
+  }
+
+  @SubscribeMessage('deleteConversations')
+  async deleteConversations(
+    @MessageBody() deleteConvDto: DeleteConvDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    await this.chatService.deleteConversations(deleteConvDto)
+    const conversations = await this.chatService.getConversations({
+      userId: deleteConvDto.userId,
+    })
     client.emit('getConversations', conversations)
     return conversations
   }
