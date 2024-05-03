@@ -7,6 +7,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 import { DeleteConvDto } from './dto/delete-conv.dto'
+import { CreateReactionDto } from './dto/create-reaction.dto'
 
 enum MessageStatus {
   READ,
@@ -137,6 +138,63 @@ export class ChatService {
     }
   }
 
+  async createReaction(createReactionDto: CreateReactionDto) {
+    try {
+      const { authorId, reactions, messageId } = createReactionDto
+      const msg = this.prismaService.messageReactions.upsert({
+        create: {
+          reaction: reactions[0],
+          messageId: messageId,
+          userIdReaction: authorId,
+        },
+        update: {
+          reaction: reactions[0],
+          messageId: messageId,
+          userIdReaction: authorId,
+        },
+        where: {
+          msgUserReactId: {
+            messageId: messageId,
+            userIdReaction: authorId,
+          },
+        },
+        include: {
+          Message: true,
+        },
+      })
+      const authorMsgId = (await msg.Message()).authorId
+      let receiverId: string
+      if (authorMsgId === authorId)
+        receiverId = (await msg.Message()).receiverId
+      else receiverId = authorMsgId
+      const message = await msg.Message()
+      const messageReactions = await msg.Message().MessageReactions()
+      const reactions_ = messageReactions.map((reaction) => reaction.reaction)
+      const userThatReacts = messageReactions.map(
+        (reaction) => reaction.userIdReaction
+      )
+      return {
+        receiverId,
+        msg: {
+          id: message.id,
+          message: message.content,
+          createdAt: new Date(message.createdAt).toISOString(),
+          message_type: message.type,
+          sendBy: message.authorId,
+          status: message.status,
+          reaction: {
+            reactions: reactions_,
+            reactedUserIds: userThatReacts,
+          },
+          reply_message: null,
+        },
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when sending a reaction')
+    }
+  }
+
   async findAllUsersConv(findAllUsersConv: FindAllUsersConvDto) {
     const conversation = await this.prismaService.conversation.findUnique({
       where: { id: findAllUsersConv.conversationId },
@@ -152,7 +210,7 @@ export class ChatService {
         profilePhoto: user.profilPicture,
       }
     })
-    const sortUsersList: Array<object> = []
+    const sortUsersList: object[] = []
     let firstUserInList: object = {}
     for (const user of usersList) {
       if (user.id === findAllUsersConv.userId) {
@@ -339,7 +397,7 @@ export class ChatService {
 
   async deleteConversations(deleteConvDto: DeleteConvDto) {
     try {
-      for (const convId of deleteConvDto.conversationId) {
+      for (const convId of deleteConvDto.conversationsId) {
         await this.prismaService.conversation.update({
           where: { id: convId },
           data: {
@@ -351,7 +409,7 @@ export class ChatService {
       }
       const convToPotentiallyDelete =
         await this.prismaService.conversation.findMany({
-          where: { id: { in: deleteConvDto.conversationId } },
+          where: { id: { in: deleteConvDto.conversationsId } },
           include: { Users: true, UsersThatDeleteConv: true },
         })
       const idConvToDelete: string[] = []

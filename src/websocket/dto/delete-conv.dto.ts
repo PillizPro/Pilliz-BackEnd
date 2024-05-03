@@ -6,5 +6,5 @@ export class DeleteConvDto {
 
   @IsArray()
   @IsNotEmpty()
-  readonly conversationId: string[]
+  readonly conversationsId: string[]
 }

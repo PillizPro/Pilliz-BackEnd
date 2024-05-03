@@ -16,6 +16,7 @@ import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
 import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
+import { CreateReactionDto } from './dto/create-reaction.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -81,6 +82,22 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
         newChatEntity.receiverId
       )
       console.log('The receiver is not connected')
+    }
+  }
+
+  @SubscribeMessage('createReaction')
+  async createReaction(
+    @MessageBody() createReactionDto: CreateReactionDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const newReaction = await this.chatService.createReaction(createReactionDto)
+    const receiverSocket = this._connectedUsers.get(newReaction.receiverId)
+    client.emit('newReaction', newReaction)
+    if (receiverSocket) {
+      receiverSocket.emit('newChat', {
+        ...newReaction.msg,
+        isSender: false,
+      })
     }
   }
 

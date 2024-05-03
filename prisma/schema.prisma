@@ -168,11 +168,13 @@ model Message {
 
 model MessageReactions {
   id             String  @id @default(uuid())
-  reaction       String
+  reaction       String?
   messageId      String
   Message        Message @relation(fields: [messageId], references: [id])
   userIdReaction String
   User           Users   @relation(fields: [userIdReaction], references: [id])
+
+  @@unique(name: "msgUserReactId", [messageId, userIdReaction])
 }
 
 model Notificatifion {
