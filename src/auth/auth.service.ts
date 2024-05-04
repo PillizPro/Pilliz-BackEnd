@@ -70,6 +70,7 @@ export class AuthService {
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
       tutorialPro: user.tutorialPro,
+      isCompanyAccount: user.isCompanyAccount,
     }
   }
 

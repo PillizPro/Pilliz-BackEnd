@@ -71,20 +71,27 @@ model Document {
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  content       String    @db.VarChar(1000)
-  imageUrl      String?   @db.VarChar(1000)
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  commentsCount Int       @default(0)
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Users         Users     @relation(fields: [userId], references: [id])
-  Tags          Tags[]
-  Reports       Reports[]
+  id                           String    @id @default(uuid())
+  userId                       String
+  content                      String    @db.VarChar(1000)
+  imageUrl                     String?   @db.VarChar(1000)
+  createdAt                    DateTime  @default(now())
+  likesCount                   Int       @default(0)
+  repostsCount                 Int       @default(0)
+  commentsCount                Int       @default(0)
+  Like                         Like[]
+  Repost                       Repost[]
+  Comment                      Comment[]
+  Users                        Users     @relation(fields: [userId], references: [id])
+  Tags                         Tags[]
+  Reports                      Reports[]
+  isCompanyOffer               Boolean   @default(false)
+  companyOfferTitle            String    @default("")
+  companyOfferDiploma          String    @default("")
+  companyOfferSkills           String    @default("")
+  companyOfferContractType     String    @default("")
+  companyOfferContractDuration String    @default("")
+  companyOfferSalary           String    @default("")
 }
 
 model Tags {

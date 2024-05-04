@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreatePostDto } from './dto/create-post.dto'
+import { CreatePostDto, CreateCompanyPostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
 import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
@@ -29,6 +29,54 @@ export class PostService {
           userId,
           content,
           imageUrl, // Utiliser l'URL de l'image Cloudinary
+        },
+      })
+
+      if (tagsList) {
+        const tags = await Promise.all(
+          tagsList.map((tagName) =>
+            this.prismaService.tags.findUnique({
+              where: { name: tagName },
+            })
+          )
+        )
+
+        if (tags.includes(null)) {
+          throw new Error('One or more tags do not exist')
+        }
+
+        await this.prismaService.post.update({
+          where: { id: newPost.id },
+          data: {
+            Tags: {
+              connect: tagsList.map((tag) => ({
+                name: tag,
+              })),
+            },
+          },
+        })
+      }
+
+      return new PostEntity(newPost)
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when creating a post')
+    }
+  }
+
+  async companyPostByUser(createCompanyPostDto: CreateCompanyPostDto) {
+    try {
+      const { imageBase64, tagsList } = createCompanyPostDto
+
+      let imageUrl = null
+      if (imageBase64) {
+        imageUrl = await this.imageUploadService.uploadBase64Image(imageBase64)
+      }
+
+      const newPost = await this.prismaService.post.create({
+        data: {
+          imageUrl, // Utiliser l'URL de l'image Cloudinary
+          ...createCompanyPostDto,
         },
       })
 
