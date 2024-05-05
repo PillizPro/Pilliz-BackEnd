@@ -56,10 +56,24 @@ export class IdentificationService {
           content: {
             contains: user?.userTag
           }
-        }
+        },
+        include: {
+          Users: true, // Inclure les données de l'utilisateur associé
+        },
       })
 
-      return posts;
+      const transformedPosts = posts.map((post) => ({
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users.name, // Nom de l'utilisateur
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+      }));
+      return transformedPosts;
     }
 
     catch (error) {
