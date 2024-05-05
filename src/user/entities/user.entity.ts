@@ -9,6 +9,7 @@ export class UserEntity implements Users {
   id: string
   email: string
   name: string
+  userTag: string
   @ApiHideProperty()
   @Exclude()
   password: string
@@ -27,6 +28,7 @@ export class UserEntity implements Users {
   profilPicture: string
   // Métriques
   country: string
+  totalIdentifyTime: number
   totalAppTime: number
   totalFeedTime: number
   totalMarketTime: number

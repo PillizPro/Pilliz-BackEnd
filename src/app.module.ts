@@ -21,6 +21,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 import { MetricModule } from './metric/metric.module'
+import { IdentificationModule } from './identification/identification.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -61,6 +62,7 @@ const ENV = process.env.NODE_ENV
     TagsModule,
     TutorialsModule,
     MetricModule,
+    IdentificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

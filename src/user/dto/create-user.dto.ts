@@ -12,4 +12,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(8)
   readonly password: string
+
+  @IsNotEmpty()
+  @IsString()
+  readonly userTag: string
 }
