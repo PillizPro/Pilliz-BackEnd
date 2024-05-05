@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { IdentifyUsersDto } from './dto/identify-users.dto'
 
 // Services
 
@@ -29,7 +30,8 @@ export class IdentificationService {
     return false
   }
 
-  async identifyUsers(usersTag: string[]) {
+  async identifyUsers(identifyUsersDto: IdentifyUsersDto) {
+    const { usersTag } = identifyUsersDto
     if (usersTag.length === 0) {
       return
     }
