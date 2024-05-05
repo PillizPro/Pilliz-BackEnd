@@ -147,7 +147,7 @@ model InvitationConversation {
   nonefollowerId String       @unique
   userId         String
   invitation     Boolean      @default(true)
-  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  Conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   User           Users        @relation(fields: [nonefollowerId], references: [id])
 }
 
