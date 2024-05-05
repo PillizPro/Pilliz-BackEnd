@@ -32,6 +32,12 @@ export class IdentificationService {
 
   async identifyUsers(identifyUsersDto: IdentifyUsersDto) {
     const { usersTag } = identifyUsersDto
+
+    if (!(usersTag instanceof Array)) {
+      // Prevents DoS. (CodeQL)
+      return
+    }
+
     if (usersTag.length === 0) {
       return
     }
