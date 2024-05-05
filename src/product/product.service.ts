@@ -24,11 +24,10 @@ export class ProductService {
   }
 
   async searchProducts(queryProduct: string) {
-    // mettre tout en minuscule lors de la recherche et de la mise en base des produits
     try {
       const products = await this.prismaService.product.findMany({
         take: 50,
-        where: { title: { startsWith: queryProduct.toLowerCase() } },
+        where: { titleLowercase: { contains: queryProduct.toLowerCase() } },
         include: { ProductTags: true },
       })
       const entitiesProducts = products.map((product) => {

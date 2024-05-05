@@ -2,9 +2,21 @@ import { Injectable } from '@nestjs/common'
 import { CreateChatDto } from './dto/create-chat.dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { FindChatDto } from './dto/find-chat-dto'
+import { FindChatDto } from './dto/find-chat.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { GetConversationsDto } from './dto/get-conversations.dto'
+import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
+import { DeleteConvDto } from './dto/delete-conv.dto'
+import { CreateReactionDto } from './dto/create-reaction.dto'
+import { Message, MessageReactions } from '@prisma/client'
+import { DeleteChatDto } from './dto/delete-chat.dto'
+
+enum MessageStatus {
+  READ,
+  DELIVERED,
+  UNDELIVERED,
+  PENDING,
+}
 
 @Injectable()
 export class ChatService {
@@ -13,10 +25,10 @@ export class ChatService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async updateOneMessageStatus(messageId: string, messageStatus: number) {
-    //0 corresponds to a not-sent message
-    //1 corresponds to a not-viewed message
-    //2 corresponds to a viewed message
+  async updateOneMessageStatus(
+    messageId: string,
+    messageStatus: MessageStatus
+  ) {
     try {
       return await this.prismaService.message.update({
         where: {
@@ -32,16 +44,16 @@ export class ChatService {
 
   async updateAllMessagesStatus(
     message: { conversationId: string | undefined; userId: string },
-    messagesStatus: number
+    messagesStatus: MessageStatus
   ) {
-    //0 corresponds to a not-sent message
-    //1 corresponds to a not-viewed message
-    //2 corresponds to a viewed message
     try {
       let statusArray: number[] = []
-      if (messagesStatus === 0) statusArray = [1, 2]
-      if (messagesStatus === 1) statusArray = [0, 2]
-      if (messagesStatus === 2) statusArray = [0]
+      if (messagesStatus === MessageStatus.UNDELIVERED)
+        statusArray = [MessageStatus.DELIVERED, MessageStatus.READ]
+      if (messagesStatus === MessageStatus.DELIVERED)
+        statusArray = [MessageStatus.UNDELIVERED, MessageStatus.READ]
+      if (messagesStatus === MessageStatus.READ)
+        statusArray = [MessageStatus.UNDELIVERED]
       await this.prismaService.message.updateMany({
         where: {
           AND: [
@@ -71,13 +83,8 @@ export class ChatService {
       if (!conversation?.Users)
         throw new Error('There is no Users in this conversation')
       let receiverId: string = ''
-      let authorName: string = ''
       for (const user of conversation.Users) {
-        if (user.id !== authorId) {
-          receiverId = user.id
-        } else {
-          authorName = user.name
-        }
+        if (user.id !== authorId) receiverId = user.id
       }
       const newMessage = await this.prismaService.message.create({
         data: {
@@ -88,15 +95,31 @@ export class ChatService {
           type,
         },
       })
-      const updatedMessage = await this.updateOneMessageStatus(newMessage.id, 1)
+      const updatedMessage = await this.updateOneMessageStatus(
+        newMessage.id,
+        MessageStatus.DELIVERED
+      )
+      await this.prismaService.conversation.update({
+        where: { id: conversation.id },
+        data: {
+          UsersThatDeleteConv: {
+            disconnect: {
+              id: receiverId,
+            },
+          },
+        },
+      })
       return {
         receiverId,
         chat: {
-          idMessage: updatedMessage.id,
-          text: content,
-          name: authorName,
-          messageType: type,
-          messageStatus: updatedMessage.status,
+          id: updatedMessage.id,
+          message: content,
+          createdAt: new Date(updatedMessage.createdAt).toISOString(),
+          message_type: type,
+          sendBy: authorId,
+          status: updatedMessage.status,
+          reaction: null,
+          reply_message: null,
         },
       }
     } catch (err) {
@@ -117,44 +140,201 @@ export class ChatService {
     }
   }
 
+  async createReaction(createReactionDto: CreateReactionDto) {
+    try {
+      const { authorId, reactions, messageId } = createReactionDto
+      if (reactions.length === 0)
+        return await this._deleteReaction(createReactionDto)
+      const chat = await this.prismaService.message.update({
+        where: { id: messageId },
+        data: {
+          MessageReactions: {
+            upsert: {
+              create: {
+                reaction: reactions[0],
+                userIdReaction: authorId,
+              },
+              update: {
+                reaction: reactions[0],
+                userIdReaction: authorId,
+              },
+              where: {
+                msgUserReactId: {
+                  messageId: messageId,
+                  userIdReaction: authorId,
+                },
+              },
+            },
+          },
+        },
+        include: {
+          MessageReactions: true,
+        },
+      })
+      if (!chat) throw new Error('An error occured when getting the message')
+      return await this._returnReactedMessage(
+        authorId,
+        chat,
+        chat.MessageReactions
+      )
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when sending a reaction')
+    }
+  }
+
+  async _deleteReaction(createReactionDto: CreateReactionDto) {
+    const { authorId, messageId } = createReactionDto
+
+    const chat = await this.prismaService.messageReactions.delete({
+      where: {
+        msgUserReactId: {
+          messageId: messageId,
+          userIdReaction: authorId,
+        },
+      },
+      include: {
+        Message: {
+          include: {
+            MessageReactions: true,
+          },
+        },
+      },
+    })
+    if (!chat)
+      throw new Error(
+        'An error occured when getting the message reaction to delete it'
+      )
+    return await this._returnReactedMessage(
+      authorId,
+      chat.Message,
+      chat.Message.MessageReactions
+    )
+  }
+
+  async _returnReactedMessage(
+    authorReactionId: string,
+    chat: Message,
+    chatReactions: MessageReactions[]
+  ) {
+    let receiverId: string
+    if (chat.authorId === authorReactionId) receiverId = chat.receiverId
+    else receiverId = chat.authorId
+    const reacts = chatReactions.map((reaction) => reaction.reaction)
+    const userThatReacts = chatReactions.map(
+      (reaction) => reaction.userIdReaction
+    )
+    return {
+      receiverId,
+      chat: {
+        id: chat.id,
+        message: chat.content,
+        createdAt: new Date(chat.createdAt).toISOString(),
+        message_type: chat.type,
+        sendBy: chat.authorId,
+        status: chat.status,
+        reaction: {
+          reactions: reacts,
+          reactedUserIds: userThatReacts,
+        },
+        reply_message: null,
+      },
+    }
+  }
+
+  async findAllUsersConv(findAllUsersConv: FindAllUsersConvDto) {
+    const conversation = await this.prismaService.conversation.findUnique({
+      where: { id: findAllUsersConv.conversationId },
+      include: {
+        Users: true,
+      },
+    })
+    if (!conversation?.Users) return
+    const usersList = conversation.Users.map((user) => {
+      return {
+        id: user.id,
+        name: user.name,
+        profilePhoto: user.profilPicture,
+      }
+    })
+    const sortUsersList: object[] = []
+    let firstUserInList: object = {}
+    for (const user of usersList) {
+      if (user.id === findAllUsersConv.userId) {
+        firstUserInList = user
+      } else {
+        sortUsersList.push(user)
+      }
+    }
+    sortUsersList.push(firstUserInList)
+    sortUsersList.reverse()
+    return sortUsersList
+  }
+
   async findAllChat(findChatDto: FindChatDto) {
     try {
       const conversation_ = await this._getOrCreateConversation(findChatDto)
       await this.updateAllMessagesStatus(
         { conversationId: conversation_?.id, userId: findChatDto.userId },
-        2
+        MessageStatus.READ
       )
       const conversation = await this.prismaService.conversation.findUnique({
         where: { id: conversation_?.id },
         include: {
           Messages: {
             orderBy: { createdAt: 'asc' },
+            include: {
+              MessageReactions: true,
+            },
           },
         },
       })
       if (conversation?.Messages) {
-        const messages = await Promise.all(
-          conversation.Messages.map(async (message) => {
-            const user = await this.prismaService.users.findUnique({
-              where: { id: message.authorId },
-            })
-            return {
-              conversationId: conversation.id,
-              idMessage: message.id,
-              text: message.content,
-              name: user?.name,
-              messageType: message.type,
-              messageStatus: message.status,
-              isSender: message.authorId === findChatDto.userId,
-            }
-          })
-        )
+        const messages = conversation.Messages.map((message) => {
+          const reactions = message.MessageReactions.map(
+            (reaction) => reaction.reaction
+          )
+          const userThatReacts = message.MessageReactions.map(
+            (reaction) => reaction.userIdReaction
+          )
+          return {
+            conversationId: conversation.id,
+            id: message.id,
+            message: message.content,
+            createdAt: new Date(message.createdAt).toISOString(),
+            message_type: message.type,
+            status: message.status,
+            sendBy: message.authorId,
+            reaction: {
+              reactions: reactions,
+              reactedUserIds: userThatReacts,
+            },
+            reply_message: null,
+          }
+        })
         return messages
       }
       return { conversationId: conversation?.id }
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when getting the last messages')
+      throw new Error('An error occured when getting last messages')
+    }
+  }
+
+  async deleteChat(deleteChatDto: DeleteChatDto) {
+    try {
+      const res = await this.prismaService.message.delete({
+        where: { id: deleteChatDto.messageId },
+      })
+      return {
+        receiverId: res.receiverId,
+        chat: {
+          messageId: res.id,
+        },
+      }
+    } catch (err) {
+      console.error(err)
+      throw new Error('An error occured when deleting a message')
     }
   }
 
@@ -166,7 +346,7 @@ export class ChatService {
             AND: [
               { Users: { some: { id: findChatDto.userId } } },
               {
-                Users: { some: { id: findChatDto?.receiverId } },
+                Users: { some: { id: findChatDto.receiverId } },
               },
             ],
           },
@@ -189,8 +369,15 @@ export class ChatService {
         })
         return conversation
       } else {
-        const conversation = await this.prismaService.conversation.findUnique({
+        const conversation = await this.prismaService.conversation.update({
           where: { id: existingConversation?.id },
+          data: {
+            UsersThatDeleteConv: {
+              disconnect: {
+                id: findChatDto.userId,
+              },
+            },
+          },
         })
         return conversation
       }
@@ -206,14 +393,26 @@ export class ChatService {
     try {
       const conversations = await this.prismaService.conversation.findMany({
         where: {
-          Users: {
-            some: {
-              id: getConversationsDto.userId,
+          AND: [
+            {
+              Users: {
+                some: {
+                  id: getConversationsDto.userId,
+                },
+              },
             },
-          },
+            {
+              UsersThatDeleteConv: {
+                none: {
+                  id: getConversationsDto.userId,
+                },
+              },
+            },
+          ],
         },
         include: {
           Users: true,
+          InvitationConversation: true,
           Messages: { orderBy: { createdAt: 'desc' } },
         },
       })
@@ -222,6 +421,11 @@ export class ChatService {
         let name: string = ''
         let profilPicture: string = ''
         let isActive: boolean = false
+        const isInvitation: boolean | undefined =
+          conv.InvitationConversation?.invitation
+        const nonefollowerId: string | undefined =
+          conv.InvitationConversation?.nonefollowerId
+
         for (const user of conv.Users) {
           if (user.id !== getConversationsDto.userId) {
             receiverId = user.id
@@ -232,9 +436,13 @@ export class ChatService {
           }
         }
         let lastMessage: string | undefined = ''
+        let lastMessageCreatedAt = ''
         let messageType: number = 0
         if (conv.Messages[0]) {
           lastMessage = conv.Messages[0].content
+          lastMessageCreatedAt = new Date(
+            conv.Messages[0].createdAt
+          ).toISOString()
           messageType = conv.Messages[0].type
         }
         const conversationId = conv.id
@@ -244,15 +452,52 @@ export class ChatService {
           name,
           isActive,
           image: profilPicture,
-          time: 'null',
+          time: lastMessageCreatedAt,
           lastMessage,
           messageType,
+          isInvitation,
+          nonefollowerId,
         }
       })
       return transformedConversations
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when getting conversations')
+    }
+  }
+
+  async deleteConversations(deleteConvDto: DeleteConvDto) {
+    try {
+      for (const convId of deleteConvDto.conversationsId) {
+        await this.prismaService.conversation.update({
+          where: { id: convId },
+          data: {
+            UsersThatDeleteConv: {
+              connect: { id: deleteConvDto.userId },
+            },
+          },
+        })
+      }
+      const convToPotentiallyDelete =
+        await this.prismaService.conversation.findMany({
+          where: { id: { in: deleteConvDto.conversationsId } },
+          include: { Users: true, UsersThatDeleteConv: true },
+        })
+      const idConvToDelete: string[] = []
+      for (const conv of convToPotentiallyDelete) {
+        if (conv.Users.length === conv.UsersThatDeleteConv.length)
+          idConvToDelete.push(conv.id)
+      }
+      await this.prismaService.conversation.deleteMany({
+        where: {
+          id: { in: idConvToDelete },
+        },
+      })
+    } catch (err) {
+      console.error(err)
+      throw new Error(
+        'An error occured when deleting one or multiple conversations'
+      )
     }
   }
 
