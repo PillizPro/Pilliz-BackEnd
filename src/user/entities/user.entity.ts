@@ -12,6 +12,9 @@ export class UserEntity implements Users {
   userTag: string
   @ApiHideProperty()
   @Exclude()
+  nameLowercase: string
+  @ApiHideProperty()
+  @Exclude()
   password: string
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
   role: UserRoles

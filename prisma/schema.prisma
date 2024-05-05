@@ -11,7 +11,6 @@ model Users {
   id                  String         @id @default(uuid())
   email               String         @unique @db.VarChar(255)
   name                String         @db.VarChar(255)
-  userTag             String         @unique
   password            String         @db.VarChar(255)
   role                UserRoles      @default(user)
   createdAt           DateTime       @default(now())
@@ -36,7 +35,7 @@ model Users {
   NotificatifionReceived Notificatifion[] @relation("notified")
   NotificationSend       Notificatifion[] @relation("hasNotified")
   Reports                Reports[]
-  Documents           Document[]
+  Documents              Document[]
   // Métriques
   country             String         @default("")
   totalIdentifyTime   Int            @default(0)
@@ -132,23 +131,47 @@ model Comment {
 }
 
 model Conversation {
-  id       String    @id @default(uuid())
-  Messages Message[]
-  Users    Users[]
+  id                     String                  @id @default(uuid())
+  Messages               Message[]
+  Users                  Users[]                 @relation("partOfConv")
+  UsersThatDeleteConv    Users[]                 @relation("convDeleted")
+  InvitationConversation InvitationConversation?
+}
+
+model InvitationConversation {
+  id             String       @id @default(uuid())
+  conversationId String       @unique
+  nonefollowerId String       @unique
+  userId         String
+  invitation     Boolean      @default(true)
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  User           Users        @relation(fields: [nonefollowerId], references: [id])
 }
 
 model Message {
-  id             String       @id @default(uuid())
-  authorId       String
-  Author         Users        @relation("send", fields: [authorId], references: [id])
-  receiverId     String
-  Receiver       Users        @relation("received", fields: [receiverId], references: [id])
-  createdAt      DateTime     @default(now())
-  content        String
-  conversationId String
-  Conversation   Conversation @relation(fields: [conversationId], references: [id])
-  status         Int          @default(0)
-  type           Int
+  id               String             @id @default(uuid())
+  authorId         String
+  Author           Users              @relation("send", fields: [authorId], references: [id])
+  receiverId       String
+  Receiver         Users              @relation("received", fields: [receiverId], references: [id])
+  createdAt        DateTime           @default(now())
+  content          String
+  conversationId   String
+  Conversation     Conversation       @relation(fields: [conversationId], references: [id])
+  status           Int                @default(0)
+  type             Int
+  MessageReactions MessageReactions[]
+}
+
+model MessageReactions {
+  id             String  @id @default(uuid())
+  reaction       String?
+  messageId      String
+  Message        Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userIdReaction String
+  User           Users   @relation(fields: [userIdReaction], references: [id])
+
+  @@unique(name: "msgUserReactId", [messageId, userIdReaction])
 }
 
 model Notificatifion {
@@ -164,14 +187,23 @@ model Notificatifion {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  title       String
-  price       Float
-  description String   @db.VarChar(200)
-  images      String[] @db.VarChar(1000)
-  rating      Float
-  isFavourite Boolean  @default(false)
-  isPopular   Boolean  @default(false)
+  id             String        @id @default(uuid())
+  title          String
+  titleLowercase String
+  price          Float
+  description    String        @db.VarChar(200)
+  images         String[]      @db.VarChar(1000)
+  rating         Float
+  isFavourite    Boolean       @default(false)
+  isPopular      Boolean       @default(false)
+  isAddedToCart  Boolean       @default(false)
+  ProductTags    ProductTags[]
+}
+
+model ProductTags {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  Products Product[]
 }
 
 model Metrics {

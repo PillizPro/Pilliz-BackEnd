@@ -74,7 +74,7 @@ export class AuthService {
   async resetPassword(resetPassDto: ResetPassword) {
     const { email, oldPassword, newPassword } = resetPassDto
 
-    console.log(email, oldPassword, newPassword)
+    // console.log(email, oldPassword, newPassword)
 
     const user = await this.userService.findByEmail({ email })
 
