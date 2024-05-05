@@ -115,7 +115,7 @@ export class ChatService {
         chat: {
           id: updatedMessage.id,
           message: content,
-          createdAt: new Date(updatedMessage.createdAt).toISOString(),
+          createdAt: updatedMessage.createdAt,
           message_type: type,
           sendBy: authorId,
           status: updatedMessage.status,
@@ -230,7 +230,7 @@ export class ChatService {
       chat: {
         id: chat.id,
         message: chat.content,
-        createdAt: new Date(chat.createdAt).toISOString(),
+        createdAt: chat.createdAt,
         message_type: chat.type,
         sendBy: chat.authorId,
         status: chat.status,
