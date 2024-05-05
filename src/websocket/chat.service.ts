@@ -10,6 +10,7 @@ import { DeleteConvDto } from './dto/delete-conv.dto'
 import { CreateReactionDto } from './dto/create-reaction.dto'
 import { Message, MessageReactions } from '@prisma/client'
 import { DeleteChatDto } from './dto/delete-chat.dto'
+import { AcceptConvDto } from './dto/accept-conv.dto'
 
 enum MessageStatus {
   READ,
@@ -114,7 +115,7 @@ export class ChatService {
         chat: {
           id: updatedMessage.id,
           message: content,
-          createdAt: new Date(updatedMessage.createdAt).toISOString(),
+          createdAt: updatedMessage.createdAt,
           message_type: type,
           sendBy: authorId,
           status: updatedMessage.status,
@@ -229,7 +230,7 @@ export class ChatService {
       chat: {
         id: chat.id,
         message: chat.content,
-        createdAt: new Date(chat.createdAt).toISOString(),
+        createdAt: chat.createdAt,
         message_type: chat.type,
         sendBy: chat.authorId,
         status: chat.status,
@@ -352,15 +353,44 @@ export class ChatService {
           },
         })
       if (!findChatDto.conversationId && !existingConversation) {
-        const newConversation = await this.prismaService.conversation.create({
-          data: {
+        let isInvitation: object
+        const isReceiverFollowUser =
+          await this.prismaService.follows.findUnique({
+            where: {
+              followerId_followingId: {
+                followerId: findChatDto.receiverId,
+                followingId: findChatDto.userId,
+              },
+            },
+          })
+        if (!isReceiverFollowUser) {
+          isInvitation = {
             Users: {
               connect: [
                 { id: findChatDto.userId },
                 { id: findChatDto.receiverId },
               ],
             },
-          },
+            InvitationConversation: {
+              create: {
+                nonefollowerId: findChatDto.receiverId,
+                userId: findChatDto.userId,
+                invitation: true,
+              },
+            },
+          }
+        } else {
+          isInvitation = {
+            Users: {
+              connect: [
+                { id: findChatDto.userId },
+                { id: findChatDto.receiverId },
+              ],
+            },
+          }
+        }
+        const newConversation = await this.prismaService.conversation.create({
+          data: isInvitation,
         })
         return newConversation
       } else if (findChatDto.conversationId) {
@@ -468,9 +498,14 @@ export class ChatService {
 
   async deleteConversations(deleteConvDto: DeleteConvDto) {
     try {
-      for (const convId of deleteConvDto.conversationsId) {
+      const { conversationsId, invitations } = deleteConvDto
+      const maxLengthArrayConv: number =
+        conversationsId.length > invitations.length
+          ? conversationsId.length
+          : invitations.length
+      for (let i: number = 0; i < maxLengthArrayConv; i++) {
         await this.prismaService.conversation.update({
-          where: { id: convId },
+          where: { id: conversationsId[i] },
           data: {
             UsersThatDeleteConv: {
               connect: { id: deleteConvDto.userId },
@@ -501,13 +536,14 @@ export class ChatService {
     }
   }
 
-  // update(id: number, updateChatDto: UpdateChatDto) {
-  //   // TO DO
-  //   return `This action updates a #${id} chat`
-  // }
-
-  // remove(id: number) {
-  //   // TO DO
-  //   return `This action removes a #${id} chat`
-  // }
+  async acceptConversation(acceptConversationDto: AcceptConvDto) {
+    await this.prismaService.conversation.update({
+      where: { id: acceptConversationDto.conversationId },
+      data: {
+        InvitationConversation: {
+          delete: true,
+        },
+      },
+    })
+  }
 }

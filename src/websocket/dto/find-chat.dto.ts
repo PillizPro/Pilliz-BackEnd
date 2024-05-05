@@ -1,14 +1,20 @@
-import { IsOptional, IsUUID } from 'class-validator'
+import { IsUUID, ValidateIf } from 'class-validator'
 
 export class FindChatDto {
   @IsUUID()
-  @IsOptional()
-  readonly conversationId?: string
+  @ValidateIf(
+    (object: FindChatDto, value) =>
+      object.receiverId === undefined && value !== undefined
+  )
+  readonly conversationId: string
 
   @IsUUID()
   readonly userId: string
 
   @IsUUID()
-  @IsOptional()
-  readonly receiverId?: string
+  @ValidateIf(
+    (object: FindChatDto, value) =>
+      object.conversationId === undefined && value !== undefined
+  )
+  readonly receiverId: string
 }

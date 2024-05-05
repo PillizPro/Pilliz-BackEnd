@@ -148,10 +148,10 @@ model Conversation {
 model InvitationConversation {
   id             String       @id @default(uuid())
   conversationId String       @unique
-  nonefollowerId String       @unique
+  nonefollowerId String
   userId         String
   invitation     Boolean      @default(true)
-  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  Conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   User           Users        @relation(fields: [nonefollowerId], references: [id])
 }
 

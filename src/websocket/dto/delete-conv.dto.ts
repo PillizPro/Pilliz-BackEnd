@@ -7,4 +7,7 @@ export class DeleteConvDto {
   @IsArray()
   @IsNotEmpty()
   readonly conversationsId: string[]
+
+  @IsArray()
+  readonly invitations: boolean[]
 }
