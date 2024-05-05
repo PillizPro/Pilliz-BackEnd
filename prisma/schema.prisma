@@ -33,6 +33,9 @@ model Users {
   MessagesReceived    Message[]      @relation("received")
   isConnected         Boolean        @default(false)
   profilPicture       String         @default("")
+  NotificatifionReceived Notificatifion[] @relation("notified")
+  NotificationSend       Notificatifion[] @relation("hasNotified")
+  Reports                Reports[]
   Documents           Document[]
   // Métriques
   country             String         @default("")
@@ -78,6 +81,7 @@ model Post {
   Comment       Comment[]
   Users         Users     @relation(fields: [userId], references: [id])
   Tags          Tags[]
+  Reports       Reports[]
 }
 
 model Tags {
@@ -124,6 +128,7 @@ model Comment {
   Users         Users     @relation(fields: [userId], references: [id])
   Like          Like[]
   Repost        Repost[]
+  Reports       Reports[]
 }
 
 model Conversation {
@@ -146,6 +151,18 @@ model Message {
   type           Int
 }
 
+model Notificatifion {
+  id               String   @id @default(uuid())
+  read             Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  notifType        Int
+  userNotifiedId   String
+  userNotified     Users    @relation("notified", fields: [userNotifiedId], references: [id])
+  userThatNotifyId String
+  userThatNotify   Users    @relation("hasNotified", fields: [userThatNotifyId], references: [id])
+  notifContent     String
+}
+
 model Product {
   id          String   @id @default(uuid())
   title       String
@@ -155,6 +172,39 @@ model Product {
   rating      Float
   isFavourite Boolean  @default(false)
   isPopular   Boolean  @default(false)
+}
+
+model Metrics {
+  id               String @id @default(uuid())
+  numberOfUsers    Int    @default(0)
+  numberOfPosts    Int    @default(0)
+  numberOfLikes    Int    @default(0)
+  numberOfReposts  Int    @default(0)
+  numberOfComments Int    @default(0)
+  numberOfReplies  Int    @default(0)
+
+  weeklyNumberOfUsers    Int @default(0)
+  weeklyNumberOfPosts    Int @default(0)
+  weeklyNumberOfLikes    Int @default(0)
+  weeklyNumberOfReposts  Int @default(0)
+  weeklyNumberOfComments Int @default(0)
+  weeklyNumberOfReplies  Int @default(0)
+
+  Date DateTime @default(now())
+}
+
+model Reports {
+  id          String   @id @default(uuid())
+  reportedBy  String
+  postId      String?
+  commentId   String?
+  reportedFor String
+  solved      Boolean  @default(false)
+  mesureTaken String   @default("Pas encore de mesure prise")
+  createdAt   DateTime @default(now())
+  Users       Users    @relation(fields: [reportedBy], references: [id])
+  Post        Post?    @relation(fields: [postId], references: [id])
+  Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
 enum UserRoles {

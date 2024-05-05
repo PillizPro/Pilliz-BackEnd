@@ -2,14 +2,55 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { OnEvent } from '@nestjs/event-emitter'
 import { request } from 'https'
+import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class PushNotificationService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService
+  ) {}
 
-  @OnEvent('notifyOnCreateChat')
-  notifyOnCreateChat(userName: string | undefined, content: string) {
-    console.log(userName, content)
+  async getAllNotifications(userId: string) {
+    const notifications = await this.prismaService.notificatifion.findMany({
+      where: { userNotifiedId: userId },
+      include: {
+        userThatNotify: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+    await this.prismaService.notificatifion.updateMany({
+      where: { userNotifiedId: userId },
+      data: { read: true },
+    })
+    const transformedNotifications = notifications.map((notif) => {
+      return {
+        notifType: notif.notifType,
+        name: notif.userThatNotify.name,
+        image: notif.userThatNotify.profilPicture,
+        time: 'null',
+        content: notif.notifContent,
+      }
+    })
+    return transformedNotifications
+  }
+
+  // notifType:
+  //  0: a message has been sent
+  //  1: a post has been liked
+  //  2: a comment has been liked
+  //  3: a user has been followed
+  @OnEvent('notifyUser')
+  async notifyOnCreateChat(
+    notifType: number,
+    notifUserId: string,
+    content: string,
+    receiverId: string
+  ) {
+    const user = await this.prismaService.users.findUnique({
+      where: { id: notifUserId },
+    })
+    console.log(notifType, notifUserId, content, receiverId, '|', user?.name)
     const message = {
       app_id: this.configService.get('ONESIGNAL_APP_ID'),
       contents: { fr: content },
@@ -20,7 +61,16 @@ export class PushNotificationService {
         PushTitle: 'Custom Notification',
       },
     }
+    await this.prismaService.notificatifion.create({
+      data: {
+        notifType,
+        userNotifiedId: receiverId,
+        userThatNotifyId: notifUserId,
+        notifContent: content,
+      },
+    })
     console.log(message)
+
     // return this.sendNotification(message)
   }
 

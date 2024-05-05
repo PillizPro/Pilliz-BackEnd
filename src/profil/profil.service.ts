@@ -86,7 +86,7 @@ export class ProfilService {
   async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
     const { id, imgBytes } = changeProfilImageDto
 
-    let imageUrl = ""
+    let imageUrl = ''
     if (imgBytes) {
       imageUrl = await this.imageService.uploadBase64Image(imgBytes)
     }
@@ -102,7 +102,7 @@ export class ProfilService {
   async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
     const { userId, docName, docBytes, docType } = uploadFilesDto
 
-    let docUrl = ""
+    let docUrl = ''
     if (docBytes) {
       docUrl = await this.imageService.uploadBase64Files(docBytes, docType)
     }
