@@ -195,13 +195,32 @@ export class PostService {
   async find20LastsPosts(recoverPostDto: RecoverPostDto) {
     const { userId } = recoverPostDto
     try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
       const followeds = await this.prismaService.follows.findMany({
         where: {
           followingId: userId,
+          followerId: {
+            notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+          },
         },
       })
 
-      // Récupérer les reposts des utilisateurs suivis
       const reposts = await this.prismaService.repost.findMany({
         take: 5,
         orderBy: { createdAt: 'desc' },
@@ -211,10 +230,9 @@ export class PostService {
         include: {
           Post: { include: { Users: true, Tags: true } },
           Users: true,
-        }, // Inclure les détails du post
+        },
       })
 
-      // Récupérer les posts originaux associés aux reposts
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
@@ -225,8 +243,11 @@ export class PostService {
       const posts = await this.prismaService.post.findMany({
         take: 20,
         orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+        },
         include: {
-          Users: true, // Inclure les données de l'utilisateur associé
+          Users: true,
           Tags: true,
         },
       })
@@ -239,41 +260,63 @@ export class PostService {
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
-
-      // si un repost est associé à un post original, on ne garde que le repost
       const uniquePosts = combinedPosts.filter(
         (post, index, self) => self.findIndex((p) => p.id === post.id) === index
       )
 
-      const transformedPosts = uniquePosts.map((post) => ({
-        userId: post.userId, // ID du user
-        postId: post.id, // ID du post
-        username: post.Users?.name, // Nom de l'utilisateur
-        content: post.content, // Contenu du post
-        imageUrl: post.imageUrl, // Image? du post
-        likes: post.likesCount, // Nombre de likes
-        reposts: post.repostsCount, // Nombre de reposts
-        comments: post.commentsCount, // Nombre de commentaires
-        createdAt: post.createdAt, // Date de création
-        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
-        isRepost: post.isRepost, // Est ce que c'est un repost ?
-        reposterUsername: post.reposterUsername, // Nom du reposter
-        reposterdId: post.reposterdId, // ID du reposter
+      const filteredPosts = uniquePosts.filter((post) => {
+        return !hiddenWords.some((word) => post.content?.includes(word))
+      })
+
+      const transformedPosts = filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterdId: post.reposterdId,
       }))
 
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting posts')
+      throw new Error('An error occurred when getting posts')
     }
   }
 
   async find20RecentsPosts(recoverDatePostDto: RecoverDatePostDto) {
     const { userId, dateString } = recoverDatePostDto
     try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
       const followeds = await this.prismaService.follows.findMany({
         where: {
           followingId: userId,
+          followerId: {
+            notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+          },
         },
       })
 
@@ -282,9 +325,7 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         where: {
           userId: { in: followeds.map((followed) => followed.followerId) },
-          createdAt: {
-            gt: dateString,
-          },
+          createdAt: { gt: new Date(dateString) },
         },
         include: {
           Post: { include: { Users: true, Tags: true } },
@@ -299,15 +340,13 @@ export class PostService {
         reposterUsername: repost.Users.name,
       }))
 
-      // Récupérer les posts récents originaux
       const posts = await this.prismaService.post.findMany({
         take: 20,
-        where: {
-          createdAt: {
-            gt: dateString,
-          },
-        },
         orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          createdAt: { gt: new Date(dateString) },
+        },
         include: {
           Users: true,
           Tags: true,
@@ -322,25 +361,28 @@ export class PostService {
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
-
       const uniquePosts = combinedPosts.filter(
         (post, index, self) => self.findIndex((p) => p.id === post.id) === index
       )
 
-      const transformedPosts = uniquePosts.map((post) => ({
-        userId: post.userId, // ID du user
-        postId: post.id, // ID du post
-        username: post.Users?.name, // Nom de l'utilisateur
-        content: post.content, // Contenu du post
-        imageUrl: post.imageUrl, // Image? du post
-        likes: post.likesCount, // Nombre de likes
-        reposts: post.repostsCount, // Nombre de reposts
-        comments: post.commentsCount, // Nombre de commentaires
-        createdAt: post.createdAt, // Date de création
-        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
-        isRepost: post.isRepost, // Est ce que c'est un repost ?
-        reposterUsername: post.reposterUsername, // Nom du reposter
-        reposterdId: post.reposterdId, // ID du reposter
+      const filteredPosts = uniquePosts.filter((post) => {
+        return !hiddenWords.some((word) => post.content?.includes(word))
+      })
+
+      const transformedPosts = filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterdId: post.reposterdId,
       }))
 
       return transformedPosts
@@ -353,9 +395,29 @@ export class PostService {
   async find20OlderPosts(recoverDatePostDto: RecoverDatePostDto) {
     const { userId, dateString } = recoverDatePostDto
     try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
       const followeds = await this.prismaService.follows.findMany({
         where: {
           followingId: userId,
+          followerId: {
+            notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+          },
         },
       })
 
@@ -364,9 +426,7 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         where: {
           userId: { in: followeds.map((followed) => followed.followerId) },
-          createdAt: {
-            lt: dateString,
-          },
+          createdAt: { lt: new Date(dateString) },
         },
         include: {
           Post: { include: { Users: true, Tags: true } },
@@ -381,15 +441,13 @@ export class PostService {
         reposterUsername: repost.Users.name,
       }))
 
-      // Récupérer les posts récents originaux
       const posts = await this.prismaService.post.findMany({
         take: 20,
-        where: {
-          createdAt: {
-            lt: dateString,
-          },
-        },
         orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          createdAt: { lt: new Date(dateString) },
+        },
         include: {
           Users: true,
           Tags: true,
@@ -409,20 +467,24 @@ export class PostService {
         (post, index, self) => self.findIndex((p) => p.id === post.id) === index
       )
 
-      const transformedPosts = uniquePosts.map((post) => ({
-        userId: post.userId, // ID du user
-        postId: post.id, // ID du post
-        username: post.Users?.name, // Nom de l'utilisateur
-        content: post.content, // Contenu du post
-        imageUrl: post.imageUrl, // Image? du post
-        likes: post.likesCount, // Nombre de likes
-        reposts: post.repostsCount, // Nombre de reposts
-        comments: post.commentsCount, // Nombre de commentaires
-        createdAt: post.createdAt, // Date de création
-        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
-        isRepost: post.isRepost, // Est ce que c'est un repost ?
-        reposterUsername: post.reposterUsername, // Nom du reposter
-        reposterdId: post.reposterdId, // ID du reposter
+      const filteredPosts = uniquePosts.filter((post) => {
+        return !hiddenWords.some((word) => post.content?.includes(word))
+      })
+
+      const transformedPosts = filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterdId: post.reposterdId,
       }))
 
       return transformedPosts

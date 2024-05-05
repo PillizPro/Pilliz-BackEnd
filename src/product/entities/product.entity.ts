@@ -1,4 +1,6 @@
+import { ApiHideProperty } from '@nestjs/swagger'
 import { Product } from '@prisma/client'
+import { Exclude } from 'class-transformer'
 
 export class ProductEntity implements Product {
   constructor(partial: Partial<ProductEntity>) {
@@ -6,6 +8,9 @@ export class ProductEntity implements Product {
   }
   id: string
   title: string
+  @ApiHideProperty()
+  @Exclude()
+  titleLowercase: string
   price: number
   description: string
   images: string[]
