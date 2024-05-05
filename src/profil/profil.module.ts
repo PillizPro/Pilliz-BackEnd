@@ -8,8 +8,13 @@ import { IdentificationModule } from 'src/identification/identification.module'
 
 // imports: [ImageUploadModule], // Ajoutez ImageUploadModule aux imports
 @Module({
-  imports: [FollowModule, ImageUploadModule, DocumentUploadModule, IdentificationModule],
+  imports: [
+    FollowModule,
+    ImageUploadModule,
+    DocumentUploadModule,
+    IdentificationModule,
+  ],
   controllers: [ProfilController],
   providers: [ProfilService],
 })
-export class ProfilModule { }
+export class ProfilModule {}
