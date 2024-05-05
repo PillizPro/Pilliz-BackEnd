@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class DocumentUploadService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async uploadUserDocument(userId: string, docName: string, docUrl: string) {
     try {
@@ -37,29 +37,27 @@ export class DocumentUploadService {
 
       const docs = await this.prismaService.document.findMany({
         where: {
-          userId: userId
-        }
-      });
+          userId: userId,
+        },
+      })
 
-      return docs;
-    }
-    catch (error) {
+      return docs
+    } catch (error) {
       console.error(error)
       throw new Error('An error occurred when posting users document')
     }
   }
 
-  async getUserDocuments(_userId: string) {
+  async getUserDocuments(userId: string) {
     try {
       const docs = await this.prismaService.document.findMany({
         where: {
-          userId: _userId
-        }
-      });
+          userId: userId,
+        },
+      })
 
-      return docs;
-    }
-    catch (error) {
+      return docs
+    } catch (error) {
       console.error(error)
       throw new Error('An error occurred when getting user documents')
     }

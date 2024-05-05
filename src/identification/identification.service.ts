@@ -1,25 +1,22 @@
 import { Injectable } from '@nestjs/common'
-import { map } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service'
 
 // Services
 
 @Injectable()
 export class IdentificationService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllUserTagWithPattern(pattern: string) {
     const users = await this.prisma.users.findMany({
       where: {
         userTag: {
           startsWith: pattern,
-        }
+        },
       },
     })
 
-    return users;
+    return users
   }
 
   async isUserTagExist(userTag: string) {
@@ -27,29 +24,26 @@ export class IdentificationService {
       where: { userTag: userTag },
     })
 
-    if (user)
-      return true
+    if (user) return true
 
-    return false;
+    return false
   }
 
   async identifyUsers(usersTag: string[]) {
-    if (usersTag.length == 0) {
-      return;
+    if (usersTag.length === 0) {
+      return
     }
 
     for (let idx = 0; idx < usersTag.length; idx++) {
-      const element = usersTag[idx];
-      if (await this.isUserTagExist(element!) == false)
-        continue;
+      const element = usersTag[idx]
+      if ((await this.isUserTagExist(element!)) === false) continue
 
       // Emit Socket afin d'envoyer une notification (j'imagine^^)
 
       this.prisma.users.update({
         where: { userTag: element },
-        data: { totalIdentifyTime: { increment: 1 } }
+        data: { totalIdentifyTime: { increment: 1 } },
       })
     }
   }
-
 }

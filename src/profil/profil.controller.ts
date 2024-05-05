@@ -7,7 +7,6 @@ import { ApiTags } from '@nestjs/swagger'
 // Dto
 import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 import { UploadFilesDto } from './dto/upload-files.dto'
-import { GetFilesDto } from './dto/get-files.dto'
 
 @ApiTags('Profil')
 @Controller('profil')
@@ -51,6 +50,6 @@ export class ProfilController {
 
   @Get('getUserDocuments/:userId')
   async getUserDocuments(@Param('userId') userId: string) {
-    return await this.profilService.getUserDocuments(userId);
+    return await this.profilService.getUserDocuments(userId)
   }
 }

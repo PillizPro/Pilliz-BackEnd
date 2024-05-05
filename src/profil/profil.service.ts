@@ -8,7 +8,6 @@ import { ImageUploadService } from 'src/image/image-upload.service'
 import { DocumentUploadService } from 'src/document/upload-document.service'
 
 // DTO
-import { GetFilesDto } from './dto/get-files.dto'
 import { UploadFilesDto } from './dto/upload-files.dto'
 import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 import { ChangeBioDto } from './dto/change-bio.dto'
@@ -19,9 +18,8 @@ export class ProfilService {
     private readonly prisma: PrismaService,
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
-    private readonly docService: DocumentUploadService,
-  ) { }
-
+    private readonly docService: DocumentUploadService
+  ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
@@ -96,7 +94,7 @@ export class ProfilService {
       data: { profilPicture: imageUrl },
     })
 
-    return imageUrl;
+    return imageUrl
   }
 
   async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
@@ -107,11 +105,11 @@ export class ProfilService {
       docUrl = await this.imageService.uploadBase64Files(docBytes, docType)
     }
 
-    return this.docService.uploadUserDocument(userId, docName, docUrl);
+    return this.docService.uploadUserDocument(userId, docName, docUrl)
   }
 
   async getUserDocuments(userId: string) {
-    return this.docService.getUserDocuments(userId);
+    return this.docService.getUserDocuments(userId)
   }
 
   async getUserProfilImg(userId: string) {
