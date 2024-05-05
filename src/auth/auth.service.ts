@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
-import { CreateUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
 import { ResetPassword } from './dto/reset-password.dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
@@ -20,6 +20,15 @@ export class AuthService {
       password: hashedPassword,
     }
     return await this.userService.createUser(userDtoWithHashedPassword)
+  }
+
+  async registerPro(registerDto: CreateProUserDto) {
+    const hashedPassword = await this._hashPassword(registerDto.password)
+    const userDtoWithHashedPassword = {
+      ...registerDto,
+      password: hashedPassword,
+    }
+    return await this.userService.createProUser(userDtoWithHashedPassword)
   }
 
   private async _hashPassword(password: string): Promise<string> {
@@ -61,6 +70,7 @@ export class AuthService {
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
       tutorialPro: user.tutorialPro,
+      isCompanyAccount: user.isCompanyAccount,
     }
   }
 
