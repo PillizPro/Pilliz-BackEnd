@@ -5,7 +5,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Identification')
 @Controller('identification')
 export class IdentificationController {
-  constructor(private readonly identificationService: IdentificationService) { }
+  constructor(private readonly identificationService: IdentificationService) {}
 
   @Get('getAllUserTagWithPattern/:pattern')
   async getAllUserTagWithPattern(@Param('pattern') pattern: string) {
