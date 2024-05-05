@@ -5,4 +5,4 @@ import { DocumentUploadService } from './upload-document.service'
   providers: [DocumentUploadService],
   exports: [DocumentUploadService],
 })
-export class DocumentUploadModule { }
+export class DocumentUploadModule {}

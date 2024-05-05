@@ -20,8 +20,8 @@ export class ProfilService {
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
     private readonly docService: DocumentUploadService,
-    private readonly identificationService: IdentificationService,
-  ) { }
+    private readonly identificationService: IdentificationService
+  ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
