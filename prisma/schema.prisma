@@ -11,6 +11,7 @@ model Users {
   id                     String                   @id @default(uuid())
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
+  userTag                String                   @unique
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
   role                   UserRoles                @default(user)
@@ -42,6 +43,7 @@ model Users {
   Documents              Document[]
   // Métriques
   country                String                   @default("")
+  totalIdentifyTime      Int                      @default(0)
   totalAppTime           Int                      @default(0)
   totalFeedTime          Int                      @default(0)
   totalMarketTime        Int                      @default(0)
