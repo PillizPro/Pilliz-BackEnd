@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { RepostDto } from './dto/repost.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class RepostService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   async repost(repostDto: RepostDto) {
     // Vérifier si c'est un repost de post ou de commentaire
@@ -22,15 +26,29 @@ export class RepostService {
 
       // Mise à jour du compteur de reposts
       if (repostDto.postId) {
-        await this.prisma.post.update({
+        const post = await this.prisma.post.update({
           where: { id: repostDto.postId },
           data: { repostsCount: { increment: 1 } },
         })
+        this.eventEmitter.emit(
+          'notifyUser',
+          4,
+          repostDto.userId,
+          post.content,
+          post.userId
+        )
       } else if (repostDto.commentId) {
-        await this.prisma.comment.update({
+        const comment = await this.prisma.comment.update({
           where: { id: repostDto.commentId },
           data: { repostsCount: { increment: 1 } },
         })
+        this.eventEmitter.emit(
+          'notifyUser',
+          5,
+          repostDto.userId,
+          comment.content,
+          comment.userId
+        )
       }
     }
   }
