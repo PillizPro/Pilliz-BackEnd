@@ -8,7 +8,6 @@ import {
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
-// import { UpdateChatDto } from './dto/update-chat.dto'
 import { FindChatDto } from './dto/find-chat.dto'
 import { UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
@@ -163,16 +162,4 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('getConversations', conversations)
     return conversations
   }
-
-  // @SubscribeMessage('updateChat')
-  // update(@MessageBody() updateChatDto: UpdateChatDto) {
-  //   // TO DO
-  //   return this.chatService.update(updateChatDto.id, updateChatDto)
-  // }
-
-  // @SubscribeMessage('removeChat')
-  // remove(@MessageBody() id: number) {
-  //   // TO DO
-  //   return this.chatService.remove(id)
-  // }
 }
