@@ -1,11 +1,11 @@
-import { Injectable, Search } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 // Services
 
 @Injectable()
 export class IdentificationService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllUserTagWithPattern(pattern: string) {
     const users = await this.prisma.users.findMany({
@@ -54,8 +54,8 @@ export class IdentificationService {
       const posts = await this.prisma.post.findMany({
         where: {
           content: {
-            contains: user?.userTag
-          }
+            contains: user?.userTag,
+          },
         },
         include: {
           Users: true, // Inclure les données de l'utilisateur associé
@@ -72,11 +72,9 @@ export class IdentificationService {
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
-      }));
-      return transformedPosts;
-    }
-
-    catch (error) {
+      }))
+      return transformedPosts
+    } catch (error) {
       console.error(error)
       throw new Error('An error occured when getting identifying posts')
     }
