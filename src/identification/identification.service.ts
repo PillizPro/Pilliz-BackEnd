@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class IdentificationService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllUserTagWithPattern(pattern: string) {
     const users = await this.prisma.users.findMany({
@@ -49,13 +49,15 @@ export class IdentificationService {
 
   async getIdentifyingPosts(userTag: string) {
     try {
-      const user = await this.prisma.users.findUnique({ where: { userTag: userTag } })
+      const user = await this.prisma.users.findUnique({
+        where: { userTag: userTag },
+      })
 
-      const posts = await this.prisma.post.findMany({ where: { userId: user?.id } })
+      const posts = await this.prisma.post.findMany({
+        where: { userId: user?.id },
+      })
 
-      return posts;
-    } catch (error) {
-
-    }
+      return posts
+    } catch (error) {}
   }
 }
