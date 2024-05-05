@@ -6,6 +6,7 @@ import { UserFetchInfos } from './dto/other-user-infos.dto'
 import { FollowService } from 'src/follow/follow.service'
 import { ImageUploadService } from 'src/image/image-upload.service'
 import { DocumentUploadService } from 'src/document/upload-document.service'
+import { IdentificationService } from 'src/identification/identification.service'
 
 // DTO
 import { UploadFilesDto } from './dto/upload-files.dto'
@@ -18,8 +19,9 @@ export class ProfilService {
     private readonly prisma: PrismaService,
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
-    private readonly docService: DocumentUploadService
-  ) {}
+    private readonly docService: DocumentUploadService,
+    private readonly identificationService: IdentificationService,
+  ) { }
 
   async changeBio(changeBioDto: ChangeBioDto) {
     await this.prisma.users.update({
@@ -119,5 +121,11 @@ export class ProfilService {
       },
     })
     return user?.profilPicture
+  }
+
+  /// Identification
+
+  async getIdentifyingPosts(userId: string) {
+    return await this.identificationService.getIdentifyingPosts(userId)
   }
 }

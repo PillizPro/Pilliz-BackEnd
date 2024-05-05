@@ -11,7 +11,7 @@ import { UploadFilesDto } from './dto/upload-files.dto'
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
-  constructor(private readonly profilService: ProfilService) {}
+  constructor(private readonly profilService: ProfilService) { }
 
   @Post('changebio')
   async changeBio(@Body() changeBioDto: ChangeBioDto) {
@@ -51,5 +51,10 @@ export class ProfilController {
   @Get('getUserDocuments/:userId')
   async getUserDocuments(@Param('userId') userId: string) {
     return await this.profilService.getUserDocuments(userId)
+  }
+
+  @Get('getIdentifyingPosts/:userId')
+  async getIdentifyingPosts(@Param('userId') userId: string) {
+    return await this.profilService.getIdentifyingPosts(userId);
   }
 }

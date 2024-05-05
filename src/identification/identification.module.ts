@@ -6,5 +6,6 @@ import { IdentificationService } from './identification.service'
 @Module({
   controllers: [IdentificationController],
   providers: [IdentificationService],
+  exports: [IdentificationService]
 })
-export class IdentificationModule {}
+export class IdentificationModule { }

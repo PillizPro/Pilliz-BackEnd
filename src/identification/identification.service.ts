@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Search } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 // Services
@@ -40,22 +40,31 @@ export class IdentificationService {
 
       // Emit Socket afin d'envoyer une notification (j'imagine^^)
 
-      this.prisma.users.update({
+      await this.prisma.users.update({
         where: { userTag: element },
         data: { totalIdentifyTime: { increment: 1 } },
       })
     }
   }
 
-  async getIdentifyingPosts(userTag: string) {
+  async getIdentifyingPosts(userId: string) {
     try {
-      const user = await this.prisma.users.findUnique({ where: { userTag: userTag } })
+      const user = await this.prisma.users.findUnique({ where: { id: userId } })
 
-      const posts = await this.prisma.post.findMany({ where: { userId: user?.id } })
+      const posts = await this.prisma.post.findMany({
+        where: {
+          content: {
+            contains: user?.userTag
+          }
+        }
+      })
 
       return posts;
-    } catch (error) {
+    }
 
+    catch (error) {
+      console.error(error)
+      throw new Error('An error occured when getting identifying posts')
     }
   }
 }
