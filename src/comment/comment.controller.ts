@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { ResponseCommentDto } from './dto/response-comment.dto'
-
 import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
+import { FetchCommentDto } from './dto/fetch-comment.dto'
+import { FetchResponsesDto } from './dto/fetch-responses.dto'
 
 import { CommentService } from './comment.service'
 import { ApiTags } from '@nestjs/swagger'
@@ -17,9 +18,9 @@ export class CommentController {
     return await this.commentService.commentOnPost(createCommentDto)
   }
 
-  @Get('findCommentsOnPost:id')
-  async findCommentsOnPost(@Param('id') postId: string) {
-    return await this.commentService.findCommentsOnPost(postId)
+  @Post('findCommentsOnPost')
+  async findCommentsOnPost(@Body() fetchCommentDto: FetchCommentDto) {
+    return await this.commentService.findCommentsOnPost(fetchCommentDto)
   }
 
   @Post('respondingOnComment')
@@ -27,9 +28,9 @@ export class CommentController {
     return await this.commentService.respondOnComment(responseCommentDto)
   }
 
-  @Get('findResponsesOnComment:id')
-  async findReponsesToComment(@Param('id') commentId: string) {
-    return await this.commentService.findReponsesToComment(commentId)
+  @Post('findResponsesOnComment')
+  async findReponsesToComment(@Body() fetchResponsesDto: FetchResponsesDto) {
+    return await this.commentService.findReponsesToComment(fetchResponsesDto)
   }
 
   @Post('deletingCommentOrResponse')
