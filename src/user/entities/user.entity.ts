@@ -39,4 +39,8 @@ export class UserEntity implements Users {
   deviceName: string
   deviceWidth: number
   deviceHeight: number
+  // Blocking / Hiding
+  blockedUsers: string[]
+  hiddenUsers: string[]
+  hiddenWords: string[]
 }

@@ -23,6 +23,7 @@ import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 import { MetricModule } from './metric/metric.module'
 import { CronModule } from './cron/cron.module'
+import { BlockingModule } from './blocking/blocking.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -65,6 +66,7 @@ const ENV = process.env.NODE_ENV
     TutorialsModule,
     MetricModule,
     CronModule,
+    BlockingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
