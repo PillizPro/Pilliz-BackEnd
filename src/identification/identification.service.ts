@@ -59,29 +59,31 @@ export class IdentificationService {
     try {
       const user = await this.prisma.users.findUnique({ where: { id: userId } })
 
-      const posts = await this.prisma.post.findMany({
-        where: {
-          content: {
-            contains: user?.userTag,
+      if (user?.userTag) {
+        const posts = await this.prisma.post.findMany({
+          where: {
+            content: {
+              contains: user?.userTag,
+            },
           },
-        },
-        include: {
-          Users: true, // Inclure les données de l'utilisateur associé
-        },
-      })
+          include: {
+            Users: true, // Inclure les données de l'utilisateur associé
+          },
+        })
 
-      const transformedPosts = posts.map((post) => ({
-        userId: post.userId, // ID du user
-        postId: post.id, // ID du post
-        username: post.Users.name, // Nom de l'utilisateur
-        content: post.content, // Contenu du post
-        imageUrl: post.imageUrl, // Image? du post
-        likes: post.likesCount, // Nombre de likes
-        reposts: post.repostsCount, // Nombre de reposts
-        comments: post.commentsCount, // Nombre de commentaires
-        createdAt: post.createdAt, // Date de création
-      }))
-      return transformedPosts
+        const transformedPosts = posts.map((post) => ({
+          userId: post.userId, // ID du user
+          postId: post.id, // ID du post
+          username: post.Users.name, // Nom de l'utilisateur
+          content: post.content, // Contenu du post
+          imageUrl: post.imageUrl, // Image? du post
+          likes: post.likesCount, // Nombre de likes
+          reposts: post.repostsCount, // Nombre de reposts
+          comments: post.commentsCount, // Nombre de commentaires
+          createdAt: post.createdAt, // Date de création
+        }))
+        return transformedPosts
+      }
     } catch (error) {
       console.error(error)
       throw new Error('An error occured when getting identifying posts')
