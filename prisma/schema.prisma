@@ -190,9 +190,9 @@ model Notificatifion {
   createdAt        DateTime @default(now())
   notifType        Int
   userNotifiedId   String
-  userNotified     Users?   @relation("notified", fields: [userNotifiedId], references: [id])
+  userNotified     Users    @relation("notified", fields: [userNotifiedId], references: [id])
   userThatNotifyId String
-  userThatNotify   Users?   @relation("hasNotified", fields: [userThatNotifyId], references: [id])
+  userThatNotify   Users    @relation("hasNotified", fields: [userThatNotifyId], references: [id])
   notifContent     String
 }
 
@@ -244,7 +244,7 @@ model Reports {
   solved      Boolean  @default(false)
   mesureTaken String   @default("Pas encore de mesure prise")
   createdAt   DateTime @default(now())
-  Users       Users?   @relation(fields: [reportedBy], references: [id])
+  Users       Users    @relation(fields: [reportedBy], references: [id])
   Post        Post?    @relation(fields: [postId], references: [id])
   Comment     Comment? @relation(fields: [commentId], references: [id])
 }
