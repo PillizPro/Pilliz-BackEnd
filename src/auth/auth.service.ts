@@ -73,17 +73,13 @@ export class AuthService {
     if (!user) throw new UnauthorizedException("This user doesn't exists.")
     if (user.role === 'admin')
       return {
-        status: 'success',
         isAdmin: true,
         email: user.email,
-        id: user.id,
       }
     return {
-      status: 'success',
       isAdmin: false,
       username: user.name,
       email: user.email,
-      id: user.id,
       bio: user.bio,
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
