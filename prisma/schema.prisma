@@ -11,7 +11,7 @@ model Users {
   id                     String                   @id @default(uuid())
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
-  userTag                String                   @unique
+  userTag                String?                  @unique
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
   role                   UserRoles                @default(user)
@@ -36,7 +36,7 @@ model Users {
   MessagesReceived       Message[]                @relation("received")
   MessageReactions       MessageReactions[]
   isConnected            Boolean                  @default(false)
-  profilPicture          String           @default("https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png")
+  profilPicture          String                   @default("https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png")
   NotificatifionReceived Notificatifion[]         @relation("notified")
   NotificationSend       Notificatifion[]         @relation("hasNotified")
   Reports                Reports[]
@@ -61,9 +61,9 @@ model Users {
   deviceWidth            Int                      @default(0)
   deviceHeight           Int                      @default(0)
   // Masquer / Blocker
-  blockedUsers           String[]         @default([])
-  hiddenUsers            String[]         @default([])
-  hiddenWords            String[]         @default([])
+  blockedUsers           String[]                 @default([])
+  hiddenUsers            String[]                 @default([])
+  hiddenWords            String[]                 @default([])
 }
 
 model Follows {
