@@ -25,7 +25,7 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async register(registerDto: CreateUserDto): Promise<Tokens> {
+  async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashData(registerDto.password)
     const userDtoWithHashedPassword = {
       ...registerDto,
@@ -33,9 +33,7 @@ export class AuthService {
     }
     const newUser = await this.userService.createUser(userDtoWithHashedPassword)
     if (!newUser) throw new ConflictException('User already exists')
-    const tokens = await this._generateTokens(newUser.id, newUser.email)
-    await this._updateRefreshTokenHash(newUser.id, tokens.refreshToken)
-    return tokens
+    return newUser
   }
 
   async validateUser(loginDto: LoginDto) {
@@ -57,7 +55,6 @@ export class AuthService {
         status: 'success',
         isAdmin: true,
         email: user.email,
-        id: user.id,
       }
 
     return {
@@ -65,7 +62,6 @@ export class AuthService {
       isAdmin: false,
       username: user.name,
       email: user.email,
-      id: user.id,
       bio: user.bio,
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
@@ -73,10 +69,14 @@ export class AuthService {
     }
   }
 
-  async login(user: any): Promise<Tokens> {
+  async login(user: any) {
+    if (!user) return
     const tokens = await this._generateTokens(user.id, user.email)
     await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
-    return tokens
+    return {
+      ...tokens,
+      ...user,
+    }
   }
 
   async logout(userId: string) {
