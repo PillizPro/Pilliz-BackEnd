@@ -37,7 +37,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request) {
+  async login(@Req() req: Request): Promise<Tokens | undefined> {
     return await this.authService.login(req.user)
   }
 

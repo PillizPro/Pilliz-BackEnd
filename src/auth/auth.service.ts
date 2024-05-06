@@ -56,14 +56,11 @@ export class AuthService {
     }
   }
 
-  async login(user: any) {
+  async login(user: any): Promise<Tokens | undefined> {
     if (!user) return
     const tokens = await this._generateTokens(user.id, user.email)
     await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
-    return {
-      ...tokens,
-      ...user,
-    }
+    return tokens
   }
 
   async getUserAuthInfo(userId: string) {
