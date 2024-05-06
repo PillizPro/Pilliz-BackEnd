@@ -14,7 +14,10 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto) {
     try {
       const user = await this.prismaService.users.create({
-        data: createUserDto,
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
       })
       return new UserEntity(user)
     } catch (err) {
@@ -33,6 +36,25 @@ export class UserService {
   async findUsers() {
     const users = await this.prismaService.users.findMany()
     return users.map((user) => new UserEntity(user))
+  }
+
+  async getUsersBySearch(queryUsername: string) {
+    try {
+      const usernameList = await this.prismaService.users.findMany({
+        take: 50,
+        where: { nameLowercase: { contains: queryUsername.toLowerCase() } },
+      })
+      const userNoneFollow = usernameList.map((user) => {
+        return {
+          id: user.id,
+          name: user.name,
+        }
+      })
+      return userNoneFollow
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occured when searching for Usernames list')
+    }
   }
 
   async deleteUserByID(deleteDto: DeleteUserDto) {
@@ -77,6 +99,7 @@ export class UserService {
         where: { id: userId },
         data: { isConnected: connectedStatus },
       })
+      console.log('Update status of user: ', userId, ' to: ', connectedStatus)
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when changing connected user status')

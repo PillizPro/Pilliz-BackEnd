@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
 import { ResponseCommentDto } from './dto/response-comment.dto'
+import { FetchCommentDto } from './dto/fetch-comment.dto'
+import { FetchResponsesDto } from './dto/fetch-responses.dto'
 import { CommentEntity } from './entities/comment.entity'
 
 @Injectable()
@@ -33,24 +35,54 @@ export class CommentService {
     }
   }
 
-  async findCommentsOnPost(postId: string) {
+  async findCommentsOnPost(fetchCommentDto: FetchCommentDto) {
     try {
+      const { postId, userId } = fetchCommentDto
+
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
+      const excludedUserIds = [...blockedUsers, ...hiddenUsers, ...blockerIds]
+
       const comments = await this.prismaService.comment.findMany({
         where: {
           postId: postId,
           parentId: null,
+          userId: { notIn: excludedUserIds },
+          AND: [
+            {
+              content: {
+                not: {
+                  in: hiddenWords,
+                },
+              },
+            },
+          ],
         },
         orderBy: {
           createdAt: 'desc',
         },
         include: {
-          Users: true, // Inclure les données de l'utilisateur associé
+          Users: true,
         },
       })
 
       const transformedComments = await Promise.all(
         comments.map(async (comment) => {
-          // Ca compte le nombre de réponses pour chaque commentaire
           const repliesCount = await this.prismaService.comment.count({
             where: {
               rootCommentId: comment.id,
@@ -59,13 +91,13 @@ export class CommentService {
 
           return {
             userId: comment.userId,
-            commentId: comment.id, // ID du commentaire
-            username: comment.Users.name, // Nom de l'utilisateur
-            content: comment.content, // Contenu du commentaire
-            likes: comment.likesCount, // Nombre de likes
-            reposts: comment.repostsCount, // Nombre de reposts
-            createdAt: comment.createdAt, // Date de création
-            responseNumber: repliesCount, // Nombre de réponses
+            commentId: comment.id, // ID of the comment
+            username: comment.Users.name, // User's name
+            content: comment.content, // Content of the comment
+            likes: comment.likesCount, // Number of likes
+            reposts: comment.repostsCount, // Number of reposts
+            createdAt: comment.createdAt, // Creation date
+            responseNumber: repliesCount, // Number of responses
           }
         })
       )
@@ -73,7 +105,7 @@ export class CommentService {
       return transformedComments
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments ont this post')
+      throw new Error('An error occurred when getting comments on this post')
     }
   }
 
@@ -111,35 +143,65 @@ export class CommentService {
     }
   }
 
-  async findReponsesToComment(commentId: string) {
+  async findReponsesToComment(fetchResponsesDto: FetchResponsesDto) {
     try {
+      const { commentId, userId } = fetchResponsesDto
+
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
+      const excludedUserIds = [...blockedUsers, ...hiddenUsers, ...blockerIds]
+
       const responses = await this.prismaService.comment.findMany({
         where: {
           rootCommentId: commentId,
+          userId: { notIn: excludedUserIds },
+          AND: [
+            {
+              content: {
+                not: {
+                  in: hiddenWords,
+                },
+              },
+            },
+          ],
         },
         orderBy: {
           createdAt: 'asc',
         },
         include: {
-          Users: true, // Inclure les données de l'utilisateur associé
+          Users: true,
         },
       })
 
       const transformedResponses = await Promise.all(
-        responses.map(async (responses) => {
-          // Compter le nombre de réponses pour chaque réponses
+        responses.map(async (response) => {
           const repliesCount = await this.prismaService.comment.count({
             where: {
-              rootCommentId: responses.id,
+              rootCommentId: response.id,
             },
           })
 
           let originalUsername = null
-          if (responses.parentId) {
+          if (response.parentId) {
             const originalComment = await this.prismaService.comment.findUnique(
               {
                 where: {
-                  id: responses.parentId,
+                  id: response.parentId,
                 },
                 include: {
                   Users: true,
@@ -150,17 +212,17 @@ export class CommentService {
           }
 
           return {
-            userId: responses.userId,
-            commentId: responses.id, // ID du commentaire
-            username: responses.Users.name, // Nom de l'utilisateur
+            userId: response.userId,
+            commentId: response.id, // ID of the comment
+            username: response.Users.name, // Name of the user
             respondedToThisUser: originalUsername,
-            content: responses.content, // Contenu du commentaire
-            likes: responses.likesCount, // Nombre de likes
-            reposts: responses.repostsCount, // Nombre de reposts
-            createdAt: responses.createdAt, // Date de création
-            responseNumber: repliesCount, // Nombre de réponses
-            rootId: responses.rootCommentId,
-            parentId: responses.parentId,
+            content: response.content, // Content of the comment
+            likes: response.likesCount, // Number of likes
+            reposts: response.repostsCount, // Number of reposts
+            createdAt: response.createdAt, // Creation date
+            responseNumber: repliesCount, // Number of responses
+            rootId: response.rootCommentId,
+            parentId: response.parentId,
           }
         })
       )
@@ -168,7 +230,7 @@ export class CommentService {
       return transformedResponses
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments ont this post')
+      throw new Error('An error occurred when getting comments on this post')
     }
   }
 

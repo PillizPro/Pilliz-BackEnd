@@ -46,7 +46,7 @@ async function bootstrap() {
     .setDescription('Documentation of the Pilliz API')
     .setContact(
       'Pilliz',
-      'https://github.com/PillizPro/Pilliz-BackEnd',
+      'https://eip.epitech.eu/2025/pilliz',
       'pilliz.pro@gmail.com'
     )
     .setVersion('1')
