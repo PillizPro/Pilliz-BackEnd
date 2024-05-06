@@ -41,6 +41,13 @@ model Users {
   NotificationSend       Notificatifion[]         @relation("hasNotified")
   Reports                Reports[]
   Documents              Document[]
+  // Pro
+  isCompanyAccount       Boolean                  @default(false)
+  companyAddress         String                   @default("")
+  companyWebsite         String                   @default("")
+  activitySector         String                   @default("")
+  companySiren           String                   @default("")
+  CompanyOffer           CompanyOffer[]
   // Métriques
   country                String                   @default("")
   totalIdentifyTime      Int                      @default(0)
@@ -92,10 +99,27 @@ model Post {
   Reports       Reports[]
 }
 
+model CompanyOffer {
+  id                           String   @id @default(uuid())
+  userId                       String
+  content                      String   @db.VarChar(1000)
+  createdAt                    DateTime @default(now())
+  Users                        Users    @relation(fields: [userId], references: [id])
+  Tags                         Tags[]
+  companyOfferTitle            String   @default("")
+  companyOfferDiploma          String   @default("")
+  companyOfferSkills           String   @default("")
+  companyOfferContractType     String   @default("")
+  companyOfferContractDuration String   @default("")
+  companyOfferSalary           String   @default("")
+}
+
 model Tags {
-  id   String @id @default(uuid())
-  name String @unique
-  Post Post[]
+  id             String        @id @default(uuid())
+  name           String        @unique
+  Post           Post[]
+  CompanyOffer   CompanyOffer? @relation(fields: [companyOfferId], references: [id])
+  companyOfferId String?
 }
 
 model Like {
