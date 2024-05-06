@@ -55,6 +55,7 @@ export class AuthService {
         status: 'success',
         isAdmin: true,
         email: user.email,
+        id: user.id,
       }
 
     return {
@@ -62,6 +63,7 @@ export class AuthService {
       isAdmin: false,
       username: user.name,
       email: user.email,
+      id: user.id,
       bio: user.bio,
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
