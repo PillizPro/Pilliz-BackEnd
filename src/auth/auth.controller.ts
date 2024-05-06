@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { Request } from 'express'
 import { JwtRefreshAuthGuard, LocalAuthGuard } from 'src/common/guards'
@@ -40,18 +40,21 @@ export class AuthController {
     return await this.authService.login(req.user)
   }
 
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   async logout(@CurrentUserId() userId: string) {
     return await this.authService.logout(userId)
   }
 
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @Post('resetPassword')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return await this.authService.resetPassword(resetPasswordDto)
   }
 
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Public()
   @UseGuards(JwtRefreshAuthGuard)
