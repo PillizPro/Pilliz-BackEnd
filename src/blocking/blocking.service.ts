@@ -4,16 +4,14 @@ import { BlockUserDto } from './dto/block-user.dto'
 import { UnblockUserDto } from './dto/unblock-user.dto'
 import { HideUserDto } from './dto/hide-user.dto'
 import { UnhideUserDto } from './dto/unhide-user.dto'
-import { HideWordDto } from './dto/hide-word.dto'
-import { UnhideWordDto } from './dto/unhide-word.dto'
 
 @Injectable()
 export class BlockingService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async blockUser(blockUserDto: BlockUserDto) {
+  async blockUser(blockUserDto: BlockUserDto, userId: string) {
     try {
-      const { userId, userToBlock } = blockUserDto
+      const { userToBlock } = blockUserDto
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
         select: { blockedUsers: true },
@@ -35,9 +33,9 @@ export class BlockingService {
     }
   }
 
-  async unblockUser(unblockUserDto: UnblockUserDto) {
+  async unblockUser(unblockUserDto: UnblockUserDto, userId: string) {
     try {
-      const { userId, userToUnblock } = unblockUserDto
+      const { userToUnblock } = unblockUserDto
 
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -60,9 +58,9 @@ export class BlockingService {
     }
   }
 
-  async hideUser(hideUserDto: HideUserDto) {
+  async hideUser(hideUserDto: HideUserDto, userId: string) {
     try {
-      const { userId, userToHide } = hideUserDto
+      const { userToHide } = hideUserDto
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
         select: { hiddenUsers: true },
@@ -84,9 +82,9 @@ export class BlockingService {
     }
   }
 
-  async unhideUser(unhideUserDto: UnhideUserDto) {
+  async unhideUser(unhideUserDto: UnhideUserDto, userId: string) {
     try {
-      const { userId, userToUnhide } = unhideUserDto
+      const { userToUnhide } = unhideUserDto
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
         select: { hiddenUsers: true },
@@ -108,9 +106,8 @@ export class BlockingService {
     }
   }
 
-  async hideWord(hideWordDto: HideWordDto) {
+  async hideWord(wordToHide: string, userId: string) {
     try {
-      const { userId, wordToHide } = hideWordDto
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
         select: { hiddenWords: true },
@@ -132,9 +129,8 @@ export class BlockingService {
     }
   }
 
-  async unhideWord(unhideWordDto: UnhideWordDto) {
+  async unhideWord(wordToUnhide: string, userId: string) {
     try {
-      const { userId, wordToUnhide } = unhideWordDto
       const user = await this.prismaService.users.findUnique({
         where: { id: userId },
         select: { hiddenWords: true },

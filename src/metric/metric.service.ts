@@ -9,29 +9,32 @@ import { AddKeyActivityTimeToUserDto } from './dto/add-key-activity-time-to-user
 export class MetricService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async addCountry(addCountryToUserDto: AddCountryToUserDto) {
+  async addCountry(addCountryToUserDto: AddCountryToUserDto, userId: string) {
     await this.prisma.users.update({
-      where: { id: addCountryToUserDto.userId },
+      where: { id: userId },
       data: { country: addCountryToUserDto.country },
     })
   }
 
-  async addAppTime(addAppTimeToUserDto: AddAppTimeToUserDto) {
+  async addAppTime(addAppTimeToUserDto: AddAppTimeToUserDto, userId: string) {
     const user = await this.prisma.users.findFirst({
-      where: { id: addAppTimeToUserDto.userId },
+      where: { id: userId },
     })
     if (user) {
       const newTime = user?.totalAppTime + addAppTimeToUserDto.appTime
       await this.prisma.users.update({
-        where: { id: addAppTimeToUserDto.userId },
+        where: { id: userId },
         data: { totalAppTime: newTime },
       })
     }
   }
 
-  async addDeviceDetails(addDeviceDetailsdto: AddDeviceDetailsDto) {
+  async addDeviceDetails(
+    addDeviceDetailsdto: AddDeviceDetailsDto,
+    userId: string
+  ) {
     await this.prisma.users.update({
-      where: { id: addDeviceDetailsdto.userId },
+      where: { id: userId },
       data: {
         deviceRelease: addDeviceDetailsdto.deviceRelease,
         deviceVersion: addDeviceDetailsdto.deviceVersion,
@@ -43,48 +46,51 @@ export class MetricService {
   }
 
   async addActivityTimeToFeed(
-    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto,
+    userId: string
   ) {
     const user = await this.prisma.users.findFirst({
-      where: { id: addKeyActivityTimeToUserDto.userId },
+      where: { id: userId },
     })
     if (user) {
       const newTime =
         user?.totalFeedTime + addKeyActivityTimeToUserDto.activityTime
       await this.prisma.users.update({
-        where: { id: addKeyActivityTimeToUserDto.userId },
+        where: { id: userId },
         data: { totalFeedTime: newTime },
       })
     }
   }
 
   async addActivityTimeToMarket(
-    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto,
+    userId: string
   ) {
     const user = await this.prisma.users.findFirst({
-      where: { id: addKeyActivityTimeToUserDto.userId },
+      where: { id: userId },
     })
     if (user) {
       const newTime =
         user?.totalFeedTime + addKeyActivityTimeToUserDto.activityTime
       await this.prisma.users.update({
-        where: { id: addKeyActivityTimeToUserDto.userId },
+        where: { id: userId },
         data: { totalMarketTime: newTime },
       })
     }
   }
 
   async addActivityTimeToPro(
-    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto
+    addKeyActivityTimeToUserDto: AddKeyActivityTimeToUserDto,
+    userId: string
   ) {
     const user = await this.prisma.users.findFirst({
-      where: { id: addKeyActivityTimeToUserDto.userId },
+      where: { id: userId },
     })
     if (user) {
       const newTime =
         user?.totalFeedTime + addKeyActivityTimeToUserDto.activityTime
       await this.prisma.users.update({
-        where: { id: addKeyActivityTimeToUserDto.userId },
+        where: { id: userId },
         data: { totalProTime: newTime },
       })
     }

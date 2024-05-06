@@ -4,13 +4,14 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   ConnectedSocket,
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
 import { FindChatDto } from './dto/find-chat.dto'
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
-import { Socket } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
 import { MessageStatusDto } from './dto/message-status.dto'
@@ -28,13 +29,31 @@ import { WsExceptionFilter } from 'src/exceptions/ws-exception/ws-exception.filt
     origin: '*',
   },
 })
-export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class WSGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   private _connectedUsers: Map<string, Socket> = new Map()
 
   constructor(
     private readonly chatService: ChatService,
     private readonly userService: UserService
   ) {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  afterInit(server: Server) {
+    // server.use((socket: Socket, next) => {
+    //   socket.handshake.headers.authorization
+    //   const [type, token] =
+    //     socket.handshake.headers.authorization?.split(' ') ?? []
+    //   const bearerToken = type === 'Bearer' ? token : undefined
+    //   if (bearerToken) {
+    //     // handle token validation
+    //     next()
+    //   } else {
+    //     next(new Error('Empty Token!'))
+    //   }
+    // })
+  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
