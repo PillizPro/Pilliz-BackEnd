@@ -8,8 +8,8 @@ import {
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
-import { FindChatDto } from './dto/find-chat.dto'
-import { UsePipes, ValidationPipe } from '@nestjs/common'
+import { FindChatDto } from './dto/find-chat-dto'
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
 import { GetConversationsDto } from './dto/get-conversations.dto'
@@ -19,8 +19,10 @@ import { CreateReactionDto } from './dto/create-reaction.dto'
 import { DeleteConvDto } from './dto/delete-conv.dto'
 import { DeleteChatDto } from './dto/delete-chat.dto'
 import { AcceptConvDto } from './dto/accept-conv.dto'
+import { WsExceptionFilter } from 'src/exceptions/ws-exception/ws-exception.filter'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
+@UseFilters(new WsExceptionFilter())
 @WebSocketGateway({
   cors: {
     origin: '*',

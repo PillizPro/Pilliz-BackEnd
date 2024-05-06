@@ -5,8 +5,9 @@ import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
 import { RecoverDatePostDto } from './dto/recover-date-post.dto'
 import { PostService } from './post.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Posting')
 @Controller('post')
 export class PostController {

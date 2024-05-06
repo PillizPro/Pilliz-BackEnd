@@ -14,6 +14,7 @@ model Users {
   userTag                String                   @unique
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
+  hashedRefreshToken     String?
   role                   UserRoles                @default(user)
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
