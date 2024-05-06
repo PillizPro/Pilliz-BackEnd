@@ -50,24 +50,9 @@ export class AuthService {
 
     if (user.banned === 'banned') return { status: 'banned' }
 
-    if (user.role === 'admin')
-      return {
-        status: 'success',
-        isAdmin: true,
-        email: user.email,
-        id: user.id,
-      }
-
     return {
-      status: 'success',
-      isAdmin: false,
-      username: user.name,
       email: user.email,
       id: user.id,
-      bio: user.bio,
-      firstConnection: user.firstConnection,
-      tutorialMarketplace: user.tutorialMarketplace,
-      tutorialPro: user.tutorialPro,
     }
   }
 
@@ -78,6 +63,31 @@ export class AuthService {
     return {
       ...tokens,
       ...user,
+    }
+  }
+
+  async getUserAuthInfo(userId: string) {
+    const user = await this.prismaService.users.findUnique({
+      where: { id: userId },
+    })
+    if (!user) throw new UnauthorizedException("This user doesn't exists.")
+    if (user.role === 'admin')
+      return {
+        status: 'success',
+        isAdmin: true,
+        email: user.email,
+        id: user.id,
+      }
+    return {
+      status: 'success',
+      isAdmin: false,
+      username: user.name,
+      email: user.email,
+      id: user.id,
+      bio: user.bio,
+      firstConnection: user.firstConnection,
+      tutorialMarketplace: user.tutorialMarketplace,
+      tutorialPro: user.tutorialPro,
     }
   }
 

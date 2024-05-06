@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -38,6 +39,12 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request) {
     return await this.authService.login(req.user)
+  }
+
+  @ApiBearerAuth()
+  @Get('userAuthInfo')
+  async getUserAuthInfo(@CurrentUserId() userId: string) {
+    return await this.authService.getUserAuthInfo(userId)
   }
 
   @ApiBearerAuth()
