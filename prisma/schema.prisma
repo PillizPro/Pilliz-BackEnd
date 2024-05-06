@@ -37,7 +37,7 @@ model Users {
   MessagesReceived       Message[]                @relation("received")
   MessageReactions       MessageReactions[]
   isConnected            Boolean                  @default(false)
-  profilPicture          String           @default("https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png")
+  profilPicture          String                   @default("https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png")
   NotificatifionReceived Notificatifion[]         @relation("notified")
   NotificationSend       Notificatifion[]         @relation("hasNotified")
   Reports                Reports[]
@@ -55,9 +55,9 @@ model Users {
   deviceWidth            Int                      @default(0)
   deviceHeight           Int                      @default(0)
   // Masquer / Blocker
-  blockedUsers           String[]         @default([])
-  hiddenUsers            String[]         @default([])
-  hiddenWords            String[]         @default([])
+  blockedUsers           String[]                 @default([])
+  hiddenUsers            String[]                 @default([])
+  hiddenWords            String[]                 @default([])
 }
 
 model Follows {

@@ -19,7 +19,7 @@ import { Tokens } from './auth.controller'
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
@@ -80,7 +80,7 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    await this.prisma.users.updateMany({
+    await this.prismaService.users.updateMany({
       where: {
         id: userId,
         hashedRefreshToken: {
@@ -96,8 +96,6 @@ export class AuthService {
   async resetPassword(resetPassDto: ResetPasswordDto) {
     const { email, oldPassword, newPassword } = resetPassDto
 
-    // console.log(email, oldPassword, newPassword)
-
     const user = await this.userService.findByEmail({ email })
 
     if (!user) throw new UnauthorizedException('Invalid email.')
@@ -112,7 +110,7 @@ export class AuthService {
 
     const hashedPassword = await this._hashData(newPassword)
 
-    const reseting = await this.prisma.users.update({
+    const reseting = await this.prismaService.users.update({
       where: { email: email },
       data: { password: hashedPassword },
     })
@@ -121,7 +119,7 @@ export class AuthService {
   }
 
   async refreshTokens(userId: string, refreshToken: string): Promise<Tokens> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: { id: userId },
     })
     if (!user || !user.hashedRefreshToken || !refreshToken)
@@ -176,7 +174,7 @@ export class AuthService {
 
   private async _updateRefreshTokenHash(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this._hashData(refreshToken)
-    await this.prisma.users.update({
+    await this.prismaService.users.update({
       where: { id: userId },
       data: { hashedRefreshToken: hashedRefreshToken },
     })

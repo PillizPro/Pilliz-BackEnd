@@ -302,7 +302,7 @@ export class ChatService {
             conversationId: conversation.id,
             id: message.id,
             message: message.content,
-            createdAt: new Date(message.createdAt).toISOString(),
+            createdAt: message.createdAt,
             message_type: message.type,
             status: message.status,
             sendBy: message.authorId,
@@ -470,9 +470,7 @@ export class ChatService {
         let messageType: number = 0
         if (conv.Messages[0]) {
           lastMessage = conv.Messages[0].content
-          lastMessageCreatedAt = new Date(
-            conv.Messages[0].createdAt
-          ).toISOString()
+          lastMessageCreatedAt = conv.Messages[0].createdAt.toISOString()
           messageType = conv.Messages[0].type
         }
         const conversationId = conv.id

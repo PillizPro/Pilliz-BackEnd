@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { FindByEmailDto } from './dto/find-by-email.dto'
@@ -9,6 +9,8 @@ import { BanningStatus } from '@prisma/client'
 
 @Injectable()
 export class UserService {
+  private readonly _logger = new Logger(UserService.name)
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
@@ -99,7 +101,12 @@ export class UserService {
         where: { id: userId },
         data: { isConnected: connectedStatus },
       })
-      console.log('Update status of user: ', userId, ' to: ', connectedStatus)
+      this._logger.debug(
+        'Update status of user: ',
+        userId,
+        ' to: ',
+        connectedStatus
+      )
     } catch (err) {
       console.error(err)
       throw new Error('An error occured when changing connected user status')

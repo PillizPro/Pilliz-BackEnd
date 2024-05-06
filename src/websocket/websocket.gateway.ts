@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
 import { CreateChatDto } from './dto/create-chat.dto'
-import { FindChatDto } from './dto/find-chat-dto'
+import { FindChatDto } from './dto/find-chat.dto'
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
 import { Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
