@@ -9,7 +9,7 @@ export class UserEntity implements Users {
   id: string
   email: string
   name: string
-  userTag: string
+  userTag: string | null
   @ApiHideProperty()
   @Exclude()
   nameLowercase: string
@@ -41,6 +41,12 @@ export class UserEntity implements Users {
   deviceName: string
   deviceWidth: number
   deviceHeight: number
+  // Pro
+  isCompanyAccount: boolean
+  companyAddress: string
+  companyWebsite: string
+  activitySector: string
+  companySiren: string
   // Blocking / Hiding
   blockedUsers: string[]
   hiddenUsers: string[]
