@@ -18,6 +18,7 @@ import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
 import { CreateReactionDto } from './dto/create-reaction.dto'
 import { DeleteConvDto } from './dto/delete-conv.dto'
 import { DeleteChatDto } from './dto/delete-chat.dto'
+import { AcceptConvDto } from './dto/accept-conv.dto'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
 @WebSocketGateway({
@@ -161,5 +162,12 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
     client.emit('getConversations', conversations)
     return conversations
+  }
+
+  @SubscribeMessage('acceptConversation')
+  async acceptConversation(
+    @MessageBody() acceptConversationDto: AcceptConvDto
+  ) {
+    await this.chatService.acceptConversation(acceptConversationDto)
   }
 }

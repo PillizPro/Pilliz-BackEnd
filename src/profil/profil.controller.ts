@@ -3,6 +3,8 @@ import { ChangeBioDto } from './dto/change-bio.dto'
 import { UserFetchInfos } from './dto/other-user-infos.dto'
 import { ProfilService } from './profil.service'
 import { ApiTags } from '@nestjs/swagger'
+
+// Dto
 import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 import { UploadFilesDto } from './dto/upload-files.dto'
 
@@ -44,5 +46,15 @@ export class ProfilController {
   @Post('uploadUserDocument')
   async uploadUserDocument(@Body() uploadFilesDto: UploadFilesDto) {
     return await this.profilService.uploadUserDocument(uploadFilesDto)
+  }
+
+  @Get('getUserDocuments/:userId')
+  async getUserDocuments(@Param('userId') userId: string) {
+    return await this.profilService.getUserDocuments(userId)
+  }
+
+  @Get('getIdentifyingPosts/:userId')
+  async getIdentifyingPosts(@Param('userId') userId: string) {
+    return await this.profilService.getIdentifyingPosts(userId)
   }
 }

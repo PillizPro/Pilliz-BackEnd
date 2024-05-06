@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { ChangeBioDto } from './dto/change-bio.dto'
 import { UserFetchInfos } from './dto/other-user-infos.dto'
+
+// Services
 import { FollowService } from 'src/follow/follow.service'
-import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
 import { ImageUploadService } from 'src/image/image-upload.service'
-import { UploadFilesDto } from './dto/upload-files.dto'
 import { DocumentUploadService } from 'src/document/upload-document.service'
+import { IdentificationService } from 'src/identification/identification.service'
+
+// DTO
+import { UploadFilesDto } from './dto/upload-files.dto'
+import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
+import { ChangeBioDto } from './dto/change-bio.dto'
 
 @Injectable()
 export class ProfilService {
@@ -14,7 +19,8 @@ export class ProfilService {
     private readonly prisma: PrismaService,
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
-    private readonly docService: DocumentUploadService
+    private readonly docService: DocumentUploadService,
+    private readonly identificationService: IdentificationService
   ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
@@ -89,6 +95,8 @@ export class ProfilService {
       where: { id: id },
       data: { profilPicture: imageUrl },
     })
+
+    return imageUrl
   }
 
   async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
@@ -98,7 +106,12 @@ export class ProfilService {
     if (docBytes) {
       docUrl = await this.imageService.uploadBase64Files(docBytes, docType)
     }
-    this.docService.uploadUserDocument(userId, docName, docUrl)
+
+    return this.docService.uploadUserDocument(userId, docName, docUrl)
+  }
+
+  async getUserDocuments(userId: string) {
+    return this.docService.getUserDocuments(userId)
   }
 
   async getUserProfilImg(userId: string) {
@@ -108,5 +121,11 @@ export class ProfilService {
       },
     })
     return user?.profilPicture
+  }
+
+  /// Identification
+
+  async getIdentifyingPosts(userId: string) {
+    return await this.identificationService.getIdentifyingPosts(userId)
   }
 }

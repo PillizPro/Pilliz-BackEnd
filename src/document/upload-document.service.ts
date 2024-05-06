@@ -34,10 +34,34 @@ export class DocumentUploadService {
           },
         })
       }
+
+      const docs = await this.prismaService.document.findMany({
+        where: {
+          userId: userId,
+        },
+      })
+
+      return docs
     } catch (error) {
       console.error(error)
       throw new Error('An error occurred when posting users document')
     }
   }
+
+  async getUserDocuments(userId: string) {
+    try {
+      const docs = await this.prismaService.document.findMany({
+        where: {
+          userId: userId,
+        },
+      })
+
+      return docs
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when getting user documents')
+    }
+  }
+
   // End Of Class
 }
