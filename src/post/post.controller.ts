@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { CreatePostDto, CreateCompanyPostDto } from './dto/create-post.dto'
+import { CreatePostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
 import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
@@ -15,11 +15,6 @@ export class PostController {
   @Post('posting')
   async postByUser(@Body() createPostDto: CreatePostDto) {
     return await this.postService.postByUser(createPostDto)
-  }
-
-  @Post('companyPosting')
-  async companyPostByUser(@Body() createCompanyPostDto: CreateCompanyPostDto) {
-    return await this.postService.companyPostByUser(createCompanyPostDto)
   }
 
   @Post('deletingPost')

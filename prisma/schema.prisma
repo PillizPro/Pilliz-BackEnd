@@ -41,22 +41,23 @@ model Users {
   Reports                Reports[]
   Documents              Document[]
   // Pro
-  isCompanyAccount       Boolean          @default(false)
-  companyAddress         String           @default("")
-  companyWebsite         String           @default("")
-  activitySector         String           @default("")
-  companySiren           String           @default("")
+  isCompanyAccount       Boolean                  @default(false)
+  companyAddress         String                   @default("")
+  companyWebsite         String                   @default("")
+  activitySector         String                   @default("")
+  companySiren           String                   @default("")
+  CompanyOffer           CompanyOffer[]
   // Métriques
-  country                String           @default("")
-  totalAppTime           Int              @default(0)
-  totalFeedTime          Int              @default(0)
-  totalMarketTime        Int              @default(0)
-  totalProTime           Int              @default(0)
-  deviceRelease          String           @default("")
-  deviceVersion          String           @default("")
-  deviceName             String           @default("")
-  deviceWidth            Int              @default(0)
-  deviceHeight           Int              @default(0)
+  country                String                   @default("")
+  totalAppTime           Int                      @default(0)
+  totalFeedTime          Int                      @default(0)
+  totalMarketTime        Int                      @default(0)
+  totalProTime           Int                      @default(0)
+  deviceRelease          String                   @default("")
+  deviceVersion          String                   @default("")
+  deviceName             String                   @default("")
+  deviceWidth            Int                      @default(0)
+  deviceHeight           Int                      @default(0)
 }
 
 model Follows {
@@ -76,33 +77,43 @@ model Document {
 }
 
 model Post {
-  id                           String    @id @default(uuid())
+  id            String    @id @default(uuid())
+  userId        String
+  content       String    @db.VarChar(1000)
+  imageUrl      String?   @db.VarChar(1000)
+  createdAt     DateTime  @default(now())
+  likesCount    Int       @default(0)
+  repostsCount  Int       @default(0)
+  commentsCount Int       @default(0)
+  Like          Like[]
+  Repost        Repost[]
+  Comment       Comment[]
+  Users         Users     @relation(fields: [userId], references: [id])
+  Tags          Tags[]
+  Reports       Reports[]
+}
+
+model CompanyOffer {
+  id                           String   @id @default(uuid())
   userId                       String
-  content                      String    @db.VarChar(1000)
-  imageUrl                     String?   @db.VarChar(1000)
-  createdAt                    DateTime  @default(now())
-  likesCount                   Int       @default(0)
-  repostsCount                 Int       @default(0)
-  commentsCount                Int       @default(0)
-  Like                         Like[]
-  Repost                       Repost[]
-  Comment                      Comment[]
-  Users                        Users     @relation(fields: [userId], references: [id])
+  content                      String   @db.VarChar(1000)
+  createdAt                    DateTime @default(now())
+  Users                        Users    @relation(fields: [userId], references: [id])
   Tags                         Tags[]
-  Reports                      Reports[]
-  isCompanyOffer               Boolean   @default(false)
-  companyOfferTitle            String    @default("")
-  companyOfferDiploma          String    @default("")
-  companyOfferSkills           String    @default("")
-  companyOfferContractType     String    @default("")
-  companyOfferContractDuration String    @default("")
-  companyOfferSalary           String    @default("")
+  companyOfferTitle            String   @default("")
+  companyOfferDiploma          String   @default("")
+  companyOfferSkills           String   @default("")
+  companyOfferContractType     String   @default("")
+  companyOfferContractDuration String   @default("")
+  companyOfferSalary           String   @default("")
 }
 
 model Tags {
-  id   String @id @default(uuid())
-  name String @unique
-  Post Post[]
+  id             String        @id @default(uuid())
+  name           String        @unique
+  Post           Post[]
+  CompanyOffer   CompanyOffer? @relation(fields: [companyOfferId], references: [id])
+  companyOfferId String?
 }
 
 model Like {

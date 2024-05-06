@@ -23,7 +23,10 @@ export class UserService {
 
   async createProUser(createUserDto: CreateProUserDto) {
     const user = await this.prismaService.users.create({
-      data: createUserDto,
+      data: {
+        nameLowercase: createUserDto.name.toLowerCase(),
+        ...createUserDto,
+      },
     })
     return new UserEntity(user)
   }
