@@ -16,13 +16,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const message = exception.getResponse()
 
     console.error(exception.stack, '\n')
-    console.error(message.toString(), '\n')
     if (typeof message === 'object') {
+      console.error(JSON.stringify(message), '\n')
       response.status(status).json({
         ...message,
         route: request.url,
       })
     } else {
+      console.log(message)
       response.status(status).json({
         statusCode: status,
         message,
