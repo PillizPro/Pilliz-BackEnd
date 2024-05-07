@@ -34,10 +34,12 @@ export class WsExceptionFilter implements ExceptionFilter {
     ) {
       this._logger.log(exception.stack + '\n')
       const exceptionData = exception.getResponse()
-      this._logger.log(exceptionData)
       if (typeof exceptionData === 'object' && 'error' in exceptionData)
         delete exceptionData.error
       const exceptionMessage = exceptionData ?? exception.name
+      if (typeof exceptionMessage === 'object')
+        this._logger.debug(JSON.stringify(exceptionMessage) + '\n')
+      else this._logger.debug(exceptionMessage + '\n')
       if (exception instanceof BadRequestException)
         wsException = new WsBadRequestException(exceptionMessage)
       else wsException = new WsUnknownException(exceptionMessage)
@@ -72,6 +74,7 @@ export class WsExceptionFilter implements ExceptionFilter {
       return
     }
     this._logger.log(exception.stack + '\n')
+    this._logger.debug(exception.message + '\n')
     wsException = new WsUnknownException(exception.message)
     client.emit('exception', wsException.getError())
   }

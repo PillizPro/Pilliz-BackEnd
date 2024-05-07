@@ -97,15 +97,12 @@ export class UserService {
 
   async updateConnectedStatus(userId: string, connectedStatus: boolean) {
     try {
-      await this.prismaService.users.update({
+      const user = await this.prismaService.users.update({
         where: { id: userId },
         data: { isConnected: connectedStatus },
       })
       this._logger.debug(
-        'Update status of user: ',
-        userId,
-        ' to: ',
-        connectedStatus
+        `Update status of user: ${userId} (${user.name} to: ${connectedStatus}`
       )
     } catch (err) {
       console.error(err)

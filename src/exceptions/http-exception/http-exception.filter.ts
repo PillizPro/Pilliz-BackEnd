@@ -21,11 +21,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     this._logger.log(exception.stack + '\n')
     if (typeof message === 'object') {
       if ('error' in message) delete message.error
+      this._logger.debug(JSON.stringify(message) + '\n')
       response.status(status).json({
         ...message,
         route: request.url,
       })
     } else {
+      this._logger.debug(message + '\n')
       response.status(status).json({
         message,
         statusCode: status,
