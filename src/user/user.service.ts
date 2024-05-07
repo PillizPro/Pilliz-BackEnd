@@ -108,14 +108,19 @@ export class UserService {
       console.log(
         'Update status of user: ',
         userId,
-        ' ',
+        '(',
         user.name,
-        ' to: ',
+        ') to: ',
         connectedStatus
       )
     } catch (err) {
       console.error(err)
-      return null
+      throw new Error(
+        'An error occured when changing connected user status: ' +
+          userId +
+          ' to: ' +
+          connectedStatus
+      )
     }
   }
 }

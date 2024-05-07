@@ -37,10 +37,14 @@ export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
     client.on('authWS', (payload: { userId: string }) => {
-      console.log(this._connectedUsers)
-      if (this.userService.updateConnectedStatus(payload.userId, true) === null)
+      try {
+        this.userService.updateConnectedStatus(payload.userId, true)
+        this._connectedUsers.set(payload.userId, client)
+        console.log(this._connectedUsers)
+      } catch (err) {
         client.disconnect()
-      this._connectedUsers.set(payload.userId, client)
+        console.error(err)
+      }
     })
   }
 
