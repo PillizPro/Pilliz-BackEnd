@@ -7,6 +7,8 @@ import { FollowService } from 'src/follow/follow.service'
 import { ImageUploadService } from 'src/image/image-upload.service'
 import { DocumentUploadService } from 'src/document/upload-document.service'
 import { IdentificationService } from 'src/identification/identification.service'
+import { LikeService } from 'src/like/like.service'
+import { RepostService } from 'src/repost/repost.service'
 
 // DTO
 import { UploadFilesDto } from './dto/upload-files.dto'
@@ -20,7 +22,9 @@ export class ProfilService {
     private readonly followService: FollowService,
     private readonly imageService: ImageUploadService,
     private readonly docService: DocumentUploadService,
-    private readonly identificationService: IdentificationService
+    private readonly identificationService: IdentificationService,
+    private readonly likeService: LikeService,
+    private readonly repostService: RepostService
   ) {}
 
   async changeBio(changeBioDto: ChangeBioDto) {
@@ -127,5 +131,201 @@ export class ProfilService {
 
   async getIdentifyingPosts(userId: string) {
     return await this.identificationService.getIdentifyingPosts(userId)
+  }
+
+  async getPostOnProfil(userId: string) {
+    try {
+      const posts = await this.prisma.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: userId,
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const transformedPosts = posts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+      }))
+      console.log(transformedPosts)
+      return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when getting posts')
+    }
+  }
+
+  async getCommentOnProfile(userId: string) {
+    try {
+      const comments = await this.prisma.comment.findMany({
+        where: {
+          userId: userId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          Users: true,
+        },
+      })
+
+      const transformedComments = await Promise.all(
+        comments.map(async (comment) => {
+          const repliesCount = await this.prisma.comment.count({
+            where: {
+              rootCommentId: comment.id,
+            },
+          })
+
+          return {
+            userId: comment.userId,
+            postId: comment.postId,
+            commentId: comment.id, // ID of the comment
+            username: comment.Users.name, // User's name
+            content: comment.content, // Content of the comment
+            likes: comment.likesCount, // Number of likes
+            reposts: comment.repostsCount, // Number of reposts
+            createdAt: comment.createdAt, // Creation date
+            responseNumber: repliesCount,
+          }
+        })
+      )
+      return transformedComments
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when getting comments on te profil.')
+    }
+  }
+
+  async getLikeOnProfile(userId: string) {
+    try {
+      const likedCommentsIds =
+        await this.likeService.getLikedCommentsByUser(userId)
+      const likedPostsIds = await this.likeService.getLikedPostsByUser(userId)
+
+      const likedPosts = await this.prisma.post.findMany({
+        where: {
+          id: { in: likedPostsIds.map((lp) => lp) },
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const transformedPosts = likedPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags.map((tag) => tag.name),
+        isComment: false,
+      }))
+
+      const likedComments = await this.prisma.comment.findMany({
+        where: {
+          id: { in: likedCommentsIds.map((lc) => lc) },
+        },
+        include: {
+          Users: true,
+          Post: true,
+        },
+      })
+
+      const transformedComments = likedComments.map((comment) => ({
+        userId: comment.userId,
+        postId: comment.postId,
+        commentId: comment.id,
+        username: comment.Users.name,
+        content: comment.content,
+        likes: comment.likesCount,
+        reposts: comment.repostsCount,
+        createdAt: comment.createdAt,
+        originalPostId: comment.Post.id,
+        isComment: true,
+      }))
+
+      return [...transformedPosts, ...transformedComments]
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when getting like on the profil.')
+    }
+  }
+
+  async getRepostOnProfile(userId: string) {
+    try {
+      const repostedCommentsIds =
+        await this.repostService.getRepostedCommentsByUser(userId)
+      const repostedPostsIds =
+        await this.repostService.getRepostedPostsByUser(userId)
+
+      const repostedPosts = await this.prisma.post.findMany({
+        where: {
+          id: { in: repostedPostsIds.map((rp) => rp) },
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const transformedPosts = repostedPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users.name,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags.map((tag) => tag.name),
+        isComment: false,
+      }))
+
+      const repostedComments = await this.prisma.comment.findMany({
+        where: {
+          id: { in: repostedCommentsIds.map((rc) => rc) },
+        },
+        include: {
+          Users: true,
+          Post: true,
+        },
+      })
+
+      const transformedComments = repostedComments.map((comment) => ({
+        userId: comment.userId,
+        postId: comment.postId,
+        commentId: comment.id,
+        username: comment.Users.name,
+        content: comment.content,
+        likes: comment.likesCount,
+        reposts: comment.repostsCount,
+        createdAt: comment.createdAt,
+        originalPostId: comment.Post.id,
+        isComment: true,
+      }))
+
+      return [...transformedPosts, ...transformedComments]
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when getting like on the profil.')
+    }
   }
 }

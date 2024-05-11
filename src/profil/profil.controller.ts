@@ -57,4 +57,24 @@ export class ProfilController {
   async getIdentifyingPosts(@Param('userId') userId: string) {
     return await this.profilService.getIdentifyingPosts(userId)
   }
+
+  @Get('getPostOnProfil/:userId')
+  async getPostOnProfil(@Param('userId') userId: string) {
+    return await this.profilService.getPostOnProfil(userId)
+  }
+
+  @Get('getCommentOnProfil/:userId')
+  async getCommentOnProfile(@Param('userId') userId: string) {
+    return await this.profilService.getCommentOnProfile(userId)
+  }
+
+  @Get('getLikeOnProfil/:userId')
+  async getLikeOnProfile(@Param('userId') userId: string) {
+    return await this.profilService.getLikeOnProfile(userId)
+  }
+
+  @Get('getRepostOnProfil/:userId')
+  async getRepostOnProfile(@Param('userId') userId: string) {
+    return await this.profilService.getRepostOnProfile(userId)
+  }
 }
