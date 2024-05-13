@@ -158,7 +158,6 @@ export class ProfilService {
         comments: post.commentsCount,
         createdAt: post.createdAt,
       }))
-      console.log(transformedPosts)
       return transformedPosts
     } catch (error) {
       console.error(error)
@@ -188,6 +187,15 @@ export class ProfilService {
             },
           })
 
+          const replyUsername = await this.prisma.post.findFirst({
+            where: {
+              id: comment.postId,
+            },
+            include: {
+              Users: true,
+            },
+          })
+
           return {
             userId: comment.userId,
             postId: comment.postId,
@@ -198,6 +206,7 @@ export class ProfilService {
             reposts: comment.repostsCount, // Number of reposts
             createdAt: comment.createdAt, // Creation date
             responseNumber: repliesCount,
+            replyName: replyUsername?.Users.name,
           }
         })
       )
@@ -221,6 +230,9 @@ export class ProfilService {
         include: {
           Users: true,
           Tags: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       })
 
@@ -246,22 +258,51 @@ export class ProfilService {
           Users: true,
           Post: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       })
 
-      const transformedComments = likedComments.map((comment) => ({
-        userId: comment.userId,
-        postId: comment.postId,
-        commentId: comment.id,
-        username: comment.Users.name,
-        content: comment.content,
-        likes: comment.likesCount,
-        reposts: comment.repostsCount,
-        createdAt: comment.createdAt,
-        originalPostId: comment.Post.id,
-        isComment: true,
-      }))
+      const transformedComments = await Promise.all(
+        likedComments.map(async (comment) => {
+          const repliesCount = await this.prisma.comment.count({
+            where: {
+              rootCommentId: comment.id,
+            },
+          })
 
-      return [...transformedPosts, ...transformedComments]
+          const replyUsername = await this.prisma.post.findFirst({
+            where: {
+              id: comment.Post.id,
+            },
+            include: {
+              Users: true,
+            },
+          })
+
+          return {
+            userId: comment.userId,
+            postId: comment.postId,
+            commentId: comment.id,
+            username: comment.Users.name,
+            content: comment.content,
+            likes: comment.likesCount,
+            reposts: comment.repostsCount,
+            createdAt: comment.createdAt,
+            originalPostId: comment.Post.id,
+            responseNumber: repliesCount,
+            replyName: replyUsername?.Users.name,
+            isComment: true,
+          }
+        })
+      )
+
+      const combinedContent = [...transformedPosts, ...transformedComments]
+      combinedContent.sort(
+        (a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
+      )
+
+      return combinedContent
     } catch (error) {
       console.error(error)
       throw new Error('An error occurred when getting like on the profil.')
@@ -282,6 +323,9 @@ export class ProfilService {
         include: {
           Users: true,
           Tags: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       })
 
@@ -307,22 +351,51 @@ export class ProfilService {
           Users: true,
           Post: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       })
 
-      const transformedComments = repostedComments.map((comment) => ({
-        userId: comment.userId,
-        postId: comment.postId,
-        commentId: comment.id,
-        username: comment.Users.name,
-        content: comment.content,
-        likes: comment.likesCount,
-        reposts: comment.repostsCount,
-        createdAt: comment.createdAt,
-        originalPostId: comment.Post.id,
-        isComment: true,
-      }))
+      const transformedComments = await Promise.all(
+        repostedComments.map(async (comment) => {
+          const repliesCount = await this.prisma.comment.count({
+            where: {
+              rootCommentId: comment.id,
+            },
+          })
 
-      return [...transformedPosts, ...transformedComments]
+          const replyUsername = await this.prisma.post.findFirst({
+            where: {
+              id: comment.Post.id,
+            },
+            include: {
+              Users: true,
+            },
+          })
+
+          return {
+            userId: comment.userId,
+            postId: comment.postId,
+            commentId: comment.id,
+            username: comment.Users.name,
+            content: comment.content,
+            likes: comment.likesCount,
+            reposts: comment.repostsCount,
+            createdAt: comment.createdAt,
+            originalPostId: comment.Post.id,
+            responseNumber: repliesCount,
+            replyName: replyUsername?.Users.name,
+            isComment: true,
+          }
+        })
+      )
+
+      const combinedContent = [...transformedPosts, ...transformedComments]
+      combinedContent.sort(
+        (a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
+      )
+
+      return combinedContent
     } catch (error) {
       console.error(error)
       throw new Error('An error occurred when getting like on the profil.')

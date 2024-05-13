@@ -236,7 +236,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -256,7 +256,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -281,7 +281,7 @@ export class PostService {
         tags: post.Tags?.map((tag) => tag.name),
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        reposterId: post.reposterId,
       }))
 
       return transformedPosts
@@ -336,7 +336,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -357,7 +357,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -382,7 +382,7 @@ export class PostService {
         tags: post.Tags?.map((tag) => tag.name),
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        reposterId: post.reposterId,
       }))
 
       return transformedPosts
@@ -437,7 +437,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -458,7 +458,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -484,7 +484,7 @@ export class PostService {
         tags: post.Tags?.map((tag) => tag.name),
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        reposterId: post.reposterId,
       }))
 
       return transformedPosts
