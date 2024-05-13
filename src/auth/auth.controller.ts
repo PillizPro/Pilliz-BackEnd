@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import { LoginDto } from './dto/login.dto'
+import { LoginDto, VerifyDto } from './dto/login.dto'
 import { AuthService } from './auth.service'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { ApiTags } from '@nestjs/swagger'
@@ -23,5 +23,10 @@ export class AuthController {
   @Post('resetPassword')
   async resetPassword(@Body() resetPasswordDto: ResetPassword) {
     return await this.authService.resetPassword(resetPasswordDto)
+  }
+  
+  @Post('verify')
+  async verify(@Body() verifyDto: VerifyDto) {
+    return await this.authService.verify(verifyDto)
   }
 }

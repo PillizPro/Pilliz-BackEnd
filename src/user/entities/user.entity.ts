@@ -24,6 +24,7 @@ export class UserEntity implements Users {
   tutorialPro: boolean
   bio: string
   isConnected: boolean
+  isVerified: boolean
   profilPicture: string
   // Métriques
   country: string
@@ -36,4 +37,5 @@ export class UserEntity implements Users {
   deviceName: string
   deviceWidth: number
   deviceHeight: number
+  codeVerification: number
 }

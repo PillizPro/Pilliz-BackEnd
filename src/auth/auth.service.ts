@@ -1,25 +1,45 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { LoginDto } from './dto/login.dto'
+import { LoginDto, VerifyDto } from './dto/login.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { ResetPassword } from './dto/reset-password.dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { isAcademic } from 'swot-node'
+import { MailerService } from 'src/mailer/mailer.service'
 import * as bcrypt from 'bcrypt'
+import { ValidationEmail } from 'src/mailer/dto/mailer.dto'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly mailerService: MailerService
   ) {}
 
   async register(registerDto: CreateUserDto) {
+    const boolAcademic = await isAcademic(registerDto.email)
+    if (!boolAcademic) {
+      throw new UnauthorizedException('You must use an academic email.')
+    }
     const hashedPassword = await this._hashPassword(registerDto.password)
+    const numberVerification = await this._generateCode()
     const userDtoWithHashedPassword = {
       ...registerDto,
       password: hashedPassword,
+      codeVerification: numberVerification,
     }
+    const email = new ValidationEmail()
+    email.name = registerDto.name
+    email.code = numberVerification
+    this.mailerService.sendMail(registerDto.email, email)
     return await this.userService.createUser(userDtoWithHashedPassword)
+  }
+
+  private async _generateCode() {
+    const min = 100000
+    const max = 999999
+    return Math.floor(Math.random() * (max - min + 1)) + min
   }
 
   private async _hashPassword(password: string): Promise<string> {
@@ -33,6 +53,10 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password.')
+    }
+
+    if (user.isVerified === false) {
+      throw new UnauthorizedException('You must verify your email.')
     }
 
     const isPasswordMatch = await this._verifyPassword(
@@ -62,6 +86,20 @@ export class AuthService {
       tutorialMarketplace: user.tutorialMarketplace,
       tutorialPro: user.tutorialPro,
     }
+  }
+
+  async verify(verifyDto: VerifyDto) {
+    const user = await this.userService.findByEmail({ email: verifyDto.email })
+    if (user) {
+      if (user.codeVerification === parseInt(verifyDto.code)) {
+        this.userService.updateVerifiedStatus(user.id)
+      } else {
+        throw new UnauthorizedException('Invalid code.')
+      }
+    } else {
+      throw new UnauthorizedException('Invalid email.')
+    }
+    return { status: 'success' }
   }
 
   private async _verifyPassword(
