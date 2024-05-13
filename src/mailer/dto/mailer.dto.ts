@@ -2,8 +2,7 @@ import { IsDefined, IsOptional } from 'class-validator'
 
 enum MailerType {
   VALIDATION = 'validation',
-  RESET = 'reset',
-  CONTACT = 'contact',
+  TICKER_SUPPORT = 'ticket_support',
 }
 
 export class MailerDto {
@@ -29,6 +28,14 @@ export class ValidationEmail implements MailerDto {
   template = 'verif'
   name!: string
   code!: number
+}
+
+export class SupportTicketEmaul implements MailerDto {
+  type = MailerType.TICKER_SUPPORT
+  subject = 'Pilliz - Support Ticket'
+  template = 'ticket-support'
+  name!: string
+  response!: string
 }
 
 export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {

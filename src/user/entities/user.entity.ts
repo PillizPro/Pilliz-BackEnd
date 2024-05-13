@@ -27,5 +27,4 @@ export class UserEntity implements Users {
   isVerified: boolean
   profilPicture: string
   codeVerification: number
-  isVerified: boolean
 }
