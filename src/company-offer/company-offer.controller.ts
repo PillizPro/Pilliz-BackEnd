@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Get, Headers } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Headers,
+  Delete,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common'
 import { CreateCompanyOfferDto } from './dto/create-offer.dto'
 import { OfferService } from './offer.service'
 import { ApiTags } from '@nestjs/swagger'
@@ -29,5 +38,14 @@ export class CompanyOfferController {
     @Headers('dateString') dateString: string
   ) {
     return await this.offerService.find20MoreRecentOffers(userId, dateString)
+  }
+
+  @Delete('deleteOffer')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteOffer(
+    @Headers('offerId') offerId: string,
+    @Headers('userId') userId: string
+  ) {
+    return await this.offerService.deleteOffer(offerId, userId)
   }
 }
