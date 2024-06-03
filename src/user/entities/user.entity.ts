@@ -9,7 +9,7 @@ export class UserEntity implements Users {
   id: string
   email: string
   name: string
-  userTag: string
+  userTag: string | null
   @ApiHideProperty()
   @Exclude()
   nameLowercase: string
