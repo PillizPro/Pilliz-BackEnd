@@ -11,7 +11,7 @@ model Users {
   id                     String                   @id @default(uuid())
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
-  userTag                String?                  @unique
+  userTag                String                   @unique
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
   hashedRefreshToken     String?
