@@ -6,6 +6,7 @@ import { MailerDto, mailOptionsMaker } from './dto/mailer.dto'
 @Injectable()
 export class MailerService {
   async sendMail(mail: string, typeMail: MailerDto) {
+    console.log(typeMail)
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
@@ -31,12 +32,12 @@ export class MailerService {
     )
 
     const mailOptions = mailOptionsMaker(mail, typeMail)
-
+    console.log(mailOptions)
     transporter.sendMail(mailOptions, (err) => {
       if (err) {
-        console.log('Error occurs', err)
+        throw new Error('An error occured when sending the email')
       } else {
-        console.log('Email sent!!!')
+        return { message: 'Email successfully sent.' }
       }
     })
   }

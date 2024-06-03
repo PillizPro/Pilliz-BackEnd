@@ -20,6 +20,9 @@ export class MailerDto {
 
   @IsOptional()
   readonly code?: number
+
+  @IsOptional()
+  readonly response?: string
 }
 
 export class ValidationEmail implements MailerDto {
@@ -30,11 +33,10 @@ export class ValidationEmail implements MailerDto {
   code!: number
 }
 
-export class SupportTicketEmaul implements MailerDto {
+export class SupportTicketEmail implements MailerDto {
   type = MailerType.TICKER_SUPPORT
   subject = 'Pilliz - Support Ticket'
   template = 'ticket-support'
-  name!: string
   response!: string
 }
 
@@ -51,6 +53,12 @@ export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {
     mailOptions.context = {
       name: typeMail.name,
       code: typeMail.code,
+    }
+  }
+
+  if (typeMail.type === MailerType.TICKER_SUPPORT) {
+    mailOptions.context = {
+      response: typeMail.response,
     }
   }
   return mailOptions

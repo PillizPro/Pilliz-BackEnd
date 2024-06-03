@@ -23,8 +23,8 @@ import { TagsModule } from './tags/tags.module'
 import { TutorialsModule } from './tutorials/tutorials.module'
 import { MetricModule } from './metric/metric.module'
 import { CronModule } from './cron/cron.module'
-import { TicketController } from './ticket/ticket.controller';
-import { TicketService } from './ticket/ticket.service';
+import { TicketController } from './ticket/ticket.controller'
+import { TicketService } from './ticket/ticket.service'
 import { MailerService } from './mailer/mailer.service'
 
 const ENV = process.env.NODE_ENV

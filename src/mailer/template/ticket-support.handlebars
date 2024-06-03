@@ -43,27 +43,25 @@ button {
     font-size: 40px;
     letter-spacing: 10px;
 }
+.response {
+  padding:10px;
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 1px;
+}
     </style>
   </head>
   <body>
   <div class="main">
     <img src="https://i.ibb.co/wLRG8xX/Pilliz-logo.png" alt="Logo Pilliz"/>
     <p>
-      Bonjour, <span id="name">{{name}}</span>
-    </p>
-    <p class="content">
-      Merci de vous être inscrit sur Pilliz. Pour activer votre compte Pilliz, veuillez vérifier votre adresse e-mail en entrant le code fourni ci-dessous.
+      Bonjour,
     </p>
     <p>
-      Code de vérification :
+      Nous avons le plaisir de vous informer que nous avons répondu à votre demande. Vous trouverez ci-dessous les détails de notre réponse.
     </p>
-    <p class="code">
-      {{code}}
-    </p>
-    <p class="content">
-      Si vous rencontrez des difficultés avec ce processus, n'hésitez pas à nous le faire savoir et nous serons heureux de vous aider davantage.
-    <p class="content">
-      Cordialement,
+    <p class="response"> {{response}} </p> 
+    <p class="content"> Si vous avez des questions ou besoin de plus amples informations, n'hésitez pas à nous contacter. Nous sommes là pour vous aider. </p> 
+    <p class="content"> Cordialement, </p> 
     <p>Pilliz</p>
   </div>
 </body>

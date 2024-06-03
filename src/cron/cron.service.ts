@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Cron } from '@nestjs/schedule'
-// import { CreateCronDto } from './dto/create-cron.dto';
-// import { UpdateCronDto } from './dto/update-cron.dto';
 
 @Injectable()
 export class CronService {
@@ -17,8 +15,6 @@ export class CronService {
   }
 
   oneDay = 24 * 60 * 60 * 1000
-  // const oneWeek = 7 * this.oneDay
-  // const oneMonth = 30 * this.oneDay
 
   async cron() {
     const nbUsers = await this.prismaService.users.count()

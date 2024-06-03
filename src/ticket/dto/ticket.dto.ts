@@ -12,4 +12,7 @@ export class TicketDto {
 
   @IsNotEmpty()
   readonly description: string
+
+  @IsNotEmpty()
+  readonly userId: string
 }

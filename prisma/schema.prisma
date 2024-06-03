@@ -49,6 +49,7 @@ model Users {
   deviceName             String           @default("")
   deviceWidth            Int              @default(0)
   deviceHeight           Int              @default(0)
+  ticket                 Ticket[]
 }
 
 model Follows {
@@ -225,13 +226,24 @@ enum TicketCategory {
 }
 
 model Ticket {
-  id          String         @id @default(uuid())
+  id          String           @id @default(uuid())
+  userId      String
   email       String
   category    TicketCategory
   description String
-  createdAt   DateTime       @default(now())
-  solved      Boolean        @default(false)
+  createdAt   DateTime         @default(now())
+  solved      Boolean          @default(false)
   solvedAt    DateTime?
+  user        Users            @relation(fields: [userId], references: [id])
+  response    TicketResponse[]
+}
+
+model TicketResponse {
+  id        String   @id @default(uuid())
+  ticketId  String
+  response  String
+  createdAt DateTime @default(now())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
 enum UserRoles {
