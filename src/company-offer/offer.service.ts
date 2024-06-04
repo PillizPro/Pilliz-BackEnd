@@ -7,12 +7,16 @@ import { OfferEntity } from './entities/offer.entity'
 export class OfferService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async companyPostByUser(createCompanyOfferDto: CreateCompanyOfferDto) {
+  async companyPostByUser(
+    createCompanyOfferDto: CreateCompanyOfferDto,
+    userId: string
+  ) {
     const { tagsList } = createCompanyOfferDto
 
     try {
       const newOffer = await this.prismaService.companyOffer.create({
         data: {
+          userId,
           ...createCompanyOfferDto,
         },
       })
