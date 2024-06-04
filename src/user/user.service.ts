@@ -116,7 +116,7 @@ export class UserService {
         data: { isConnected: connectedStatus },
       })
       this._logger.debug(
-        `Update status of user: ${userId} (${user.name} to: ${connectedStatus}`
+        `Update status of user: ${userId} [${user.name}] to: ${connectedStatus}`
       )
     } catch (err) {
       console.error(err)
