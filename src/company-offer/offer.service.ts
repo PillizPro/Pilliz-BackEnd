@@ -45,7 +45,7 @@ export class OfferService {
       return new OfferEntity(newOffer)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a post')
+      throw new Error('An error occurred when creating a offer')
     }
   }
 
@@ -76,7 +76,7 @@ export class OfferService {
       return transformedOffers
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting posts')
+      throw new Error('An error occured when getting offers')
     }
   }
 
@@ -153,7 +153,35 @@ export class OfferService {
       return transformedOffers
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting more posts')
+      throw new Error('An error occurred when getting more offers')
+    }
+  }
+
+  async deleteOffer(offerId: string, userId: string) {
+    try {
+      const offer = await this.prismaService.companyOffer.findUnique({
+        where: {
+          id: offerId,
+        },
+      })
+      console.log('offerId', offerId)
+      console.log('userId', userId)
+      console.log('offer userId', offer?.userId)
+
+      if (!offer || offer.userId !== userId) {
+        throw new Error('You are not allowed to delete this offer')
+      }
+
+      await this.prismaService.companyOffer.delete({
+        where: {
+          id: offerId,
+        },
+      })
+
+      return 'Post deleted successfully'
+    } catch (error) {
+      console.error(error)
+      throw new Error('An error occurred when deleting the offer')
     }
   }
 }
