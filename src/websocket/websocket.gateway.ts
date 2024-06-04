@@ -58,9 +58,14 @@ export class WSGateway
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)
     client.on('authWS', (payload: { userId: string }) => {
-      this._connectedUsers.set(payload.userId, client)
-      console.log(this._connectedUsers)
-      this.userService.updateConnectedStatus(payload.userId, true)
+      try {
+        this.userService.updateConnectedStatus(payload.userId, true)
+        this._connectedUsers.set(payload.userId, client)
+        console.log(this._connectedUsers)
+      } catch (err) {
+        client.disconnect()
+        console.error(err)
+      }
     })
   }
 

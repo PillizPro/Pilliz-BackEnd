@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { CreateUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { Request } from 'express'
@@ -31,6 +31,12 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: CreateUserDto) {
     return await this.authService.register(registerDto)
+  }
+
+  @Public()
+  @Post('registerPro')
+  async registerPro(@Body() registerDto: CreateProUserDto) {
+    return await this.authService.registerPro(registerDto)
   }
 
   @HttpCode(HttpStatus.OK)

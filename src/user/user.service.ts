@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateUserDto } from './dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from './dto/create-user.dto'
 import { FindByEmailDto } from './dto/find-by-email.dto'
 import { DeleteUserDto } from './dto/delete-user.dto'
 import { BanningUserDto } from 'src/admin/dto/banning-user.dto'
@@ -14,6 +14,20 @@ export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
+    try {
+      const user = await this.prismaService.users.create({
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
+  }
+
+  async createProUser(createUserDto: CreateProUserDto) {
     try {
       const user = await this.prismaService.users.create({
         data: {
@@ -106,7 +120,12 @@ export class UserService {
       )
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when changing connected user status')
+      throw new Error(
+        'An error occured when changing connected user status: ' +
+          userId +
+          ' to: ' +
+          connectedStatus
+      )
     }
   }
 }

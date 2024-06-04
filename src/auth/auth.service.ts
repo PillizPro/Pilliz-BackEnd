@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { LoginDto } from './dto/login.dto'
-import { CreateUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
@@ -34,6 +34,17 @@ export class AuthService {
     const newUser = await this.userService.createUser(userDtoWithHashedPassword)
     if (!newUser) throw new ConflictException('User already exists')
     return newUser
+  }
+
+  async registerPro(registerDto: CreateProUserDto) {
+    const hashedPassword = await this._hashData(registerDto.password)
+    const userDtoWithHashedPassword = {
+      ...registerDto,
+      password: hashedPassword,
+    }
+    const newProUser = await this.userService.createProUser(userDtoWithHashedPassword)
+    if (!newProUser) throw new ConflictException('Professional User already exists')
+    return newProUser
   }
 
   async validateUser(loginDto: LoginDto) {
@@ -81,6 +92,7 @@ export class AuthService {
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,
       tutorialPro: user.tutorialPro,
+      isCompanyAccount: user.isCompanyAccount,
     }
   }
 
