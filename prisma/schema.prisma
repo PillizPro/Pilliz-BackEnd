@@ -169,6 +169,7 @@ model Conversation {
   Messages               Message[]
   Users                  Users[]                 @relation("partOfConv")
   UsersThatDeleteConv    Users[]                 @relation("convDeleted")
+  isProConv              Boolean
   InvitationConversation InvitationConversation?
 }
 

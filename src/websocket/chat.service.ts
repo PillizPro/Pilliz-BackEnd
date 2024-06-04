@@ -354,6 +354,7 @@ export class ChatService {
         })
       if (!findChatDto.conversationId && !existingConversation) {
         let isInvitation: object
+        let isProConv: boolean = false
         const isReceiverFollowUser =
           await this.prismaService.follows.findUnique({
             where: {
@@ -363,6 +364,14 @@ export class ChatService {
               },
             },
           })
+        const receiver = await this.prismaService.users.findUnique({
+          where: { id: findChatDto.receiverId },
+        })
+        if (receiver) isProConv = receiver.isCompanyAccount
+        const user = await this.prismaService.users.findUnique({
+          where: { id: findChatDto.userId },
+        })
+        if (user) isProConv = user.isCompanyAccount
         if (!isReceiverFollowUser) {
           isInvitation = {
             Users: {
@@ -390,7 +399,7 @@ export class ChatService {
           }
         }
         const newConversation = await this.prismaService.conversation.create({
-          data: isInvitation,
+          data: { ...isInvitation, isProConv },
         })
         return newConversation
       } else if (findChatDto.conversationId) {
@@ -455,6 +464,7 @@ export class ChatService {
           conv.InvitationConversation?.invitation
         const nonefollowerId: string | undefined =
           conv.InvitationConversation?.nonefollowerId
+        const isProConv: boolean = conv.isProConv
 
         for (const user of conv.Users) {
           if (user.id !== getConversationsDto.userId) {
@@ -484,6 +494,7 @@ export class ChatService {
           lastMessage,
           messageType,
           isInvitation,
+          isProConv,
           nonefollowerId,
         }
       })
