@@ -42,8 +42,11 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     }
-    const newProUser = await this.userService.createProUser(userDtoWithHashedPassword)
-    if (!newProUser) throw new ConflictException('Professional User already exists')
+    const newProUser = await this.userService.createProUser(
+      userDtoWithHashedPassword
+    )
+    if (!newProUser)
+      throw new ConflictException('Professional User already exists')
     return newProUser
   }
 
