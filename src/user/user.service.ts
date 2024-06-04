@@ -121,10 +121,8 @@ export class UserService {
     } catch (err) {
       console.error(err)
       throw new Error(
-        'An error occured when changing connected user status: ' +
-          userId +
-          ' to: ' +
-          connectedStatus
+        `An error occured when changing connected user status:
+         ${userId} to: ${connectedStatus}`
       )
     }
   }
