@@ -81,8 +81,22 @@ module.exports = {
       },
       {
         'selector': 'variable',
+        'modifiers': ['const', 'global'],
+        'format': ['PascalCase', 'UPPER_CASE'],
+        'trailingUnderscore': 'allow',
+        'types': ['function']
+      },
+      {
+        'selector': 'variable',
         'modifiers': ['exported'],
         'format': ['UPPER_CASE']
+      },
+      {
+        'selector': 'variable',
+        'modifiers': ['exported'],
+        'format': ['PascalCase', 'UPPER_CASE'],
+        'trailingUnderscore': 'allow',
+        'types': ['function']
       },
     ],
     '@typescript-eslint/explicit-function-return-type': 'off',

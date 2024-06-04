@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { UserFetchInfos } from './dto/other-user-infos.dto'
 
 // Services
 import { FollowService } from 'src/follow/follow.service'
@@ -23,9 +22,9 @@ export class ProfilService {
     private readonly identificationService: IdentificationService
   ) {}
 
-  async changeBio(changeBioDto: ChangeBioDto) {
+  async changeBio(changeBioDto: ChangeBioDto, userId: string) {
     await this.prisma.users.update({
-      where: { id: changeBioDto.id },
+      where: { id: userId },
       data: { bio: changeBioDto.bio },
     })
   }
@@ -48,8 +47,7 @@ export class ProfilService {
     return userPosts.length
   }
 
-  async fetchUserInfos(userFetchInfos: UserFetchInfos) {
-    const { userId } = userFetchInfos
+  async fetchUserInfos(userId: string) {
     try {
       // Récupérer les posts récents originaux
       const userInfos = await this.prisma.users.findMany({
@@ -83,8 +81,11 @@ export class ProfilService {
     }
   }
 
-  async changeProfilImage(changeProfilImageDto: ChangeProfilImgDto) {
-    const { id, imgBytes } = changeProfilImageDto
+  async changeProfilImage(
+    changeProfilImageDto: ChangeProfilImgDto,
+    userId: string
+  ) {
+    const { imgBytes } = changeProfilImageDto
 
     let imageUrl = ''
     if (imgBytes) {
@@ -92,15 +93,15 @@ export class ProfilService {
     }
 
     await this.prisma.users.update({
-      where: { id: id },
+      where: { id: userId },
       data: { profilPicture: imageUrl },
     })
 
     return imageUrl
   }
 
-  async uploadUserDocument(uploadFilesDto: UploadFilesDto) {
-    const { userId, docName, docBytes, docType } = uploadFilesDto
+  async uploadUserDocument(uploadFilesDto: UploadFilesDto, userId: string) {
+    const { docName, docBytes, docType } = uploadFilesDto
 
     let docUrl = ''
     if (docBytes) {

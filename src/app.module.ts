@@ -26,6 +26,8 @@ import { IdentificationModule } from './identification/identification.module'
 import { CronModule } from './cron/cron.module'
 import { OfferModule } from './company-offer/offer.module'
 import { BlockingModule } from './blocking/blocking.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './common/guards'
 
 const ENV = process.env.NODE_ENV
 
@@ -73,6 +75,12 @@ const ENV = process.env.NODE_ENV
     BlockingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

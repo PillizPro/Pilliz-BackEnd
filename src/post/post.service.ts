@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
 import { RecoverDatePostDto } from './dto/recover-date-post.dto'
 import { PostEntity } from './entities/post.entity'
@@ -15,9 +14,9 @@ export class PostService {
     private readonly imageUploadService: ImageUploadService
   ) {}
 
-  async postByUser(createPostDto: CreatePostDto) {
+  async postByUser(createPostDto: CreatePostDto, userId: string) {
     try {
-      const { userId, content, imageBase64, tagsList } = createPostDto
+      const { content, imageBase64, tagsList } = createPostDto
 
       let imageUrl = null
       if (imageBase64) {
@@ -139,8 +138,11 @@ export class PostService {
     }
   }
 
-  async findPostById(recoverDetailsPostDto: RecoverDetailsPostDto) {
-    const { userId, postId } = recoverDetailsPostDto
+  async findPostById(
+    recoverDetailsPostDto: RecoverDetailsPostDto,
+    userId: string
+  ) {
+    const { postId } = recoverDetailsPostDto
     try {
       const post = await this.prismaService.post.findUnique({
         where: { id: postId },
@@ -192,8 +194,7 @@ export class PostService {
     }
   }
 
-  async find20LastsPosts(recoverPostDto: RecoverPostDto) {
-    const { userId } = recoverPostDto
+  async find20LastsPosts(userId: string) {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -291,8 +292,11 @@ export class PostService {
     }
   }
 
-  async find20RecentsPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20RecentsPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -392,8 +396,11 @@ export class PostService {
     }
   }
 
-  async find20OlderPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20OlderPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
