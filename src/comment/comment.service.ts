@@ -81,8 +81,12 @@ export class CommentService {
         },
       })
 
+      const filteredComment = comments.filter((comment) => {
+        return !hiddenWords.some((word) => comment.content?.includes(word))
+      })
+
       const transformedComments = await Promise.all(
-        comments.map(async (comment) => {
+        filteredComment.map(async (comment) => {
           const repliesCount = await this.prismaService.comment.count({
             where: {
               rootCommentId: comment.id,
@@ -194,8 +198,12 @@ export class CommentService {
         },
       })
 
+      const filteredReponse = responses.filter((response) => {
+        return !hiddenWords.some((word) => response.content?.includes(word))
+      })
+
       const transformedResponses = await Promise.all(
-        responses.map(async (response) => {
+        filteredReponse.map(async (response) => {
           const repliesCount = await this.prismaService.comment.count({
             where: {
               rootCommentId: response.id,
