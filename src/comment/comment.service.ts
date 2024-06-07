@@ -96,6 +96,7 @@ export class CommentService {
           return {
             userId: comment.userId,
             commentId: comment.id, // ID of the comment
+            userImgUrl: comment.Users?.profilPicture, // User Profil Picture
             username: comment.Users.name, // User's name
             content: comment.content, // Content of the comment
             likes: comment.likesCount, // Number of likes

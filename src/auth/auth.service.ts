@@ -92,6 +92,7 @@ export class AuthService {
       isAdmin: false,
       username: user.name,
       email: user.email,
+      userImgUrl: user.profilPicture,
       bio: user.bio,
       firstConnection: user.firstConnection,
       tutorialMarketplace: user.tutorialMarketplace,

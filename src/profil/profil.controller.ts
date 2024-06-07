@@ -20,7 +20,7 @@ import { CurrentUserId } from 'src/common/decorators'
 export class ProfilController {
   constructor(private readonly profilService: ProfilService) {}
 
-  @Post('changebio')
+  @Post('changeBio')
   async changeBio(
     @Body() changeBioDto: ChangeBioDto,
     @CurrentUserId() userId: string

@@ -122,6 +122,7 @@ export class PostService {
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
         content: post.content, // Contenu du post
         imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
@@ -177,6 +178,7 @@ export class PostService {
         userId: post.userId,
         postId: post.id,
         username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -270,19 +272,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
@@ -374,19 +377,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
@@ -479,19 +483,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
