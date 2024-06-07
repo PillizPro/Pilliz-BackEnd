@@ -270,7 +270,7 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
-      const transformedPosts = uniquePosts.map((post) => ({
+      const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users?.name, // Nom de l'utilisateur
@@ -372,7 +372,7 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
-      const transformedPosts = uniquePosts.map((post) => ({
+      const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users?.name, // Nom de l'utilisateur
@@ -475,7 +475,7 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
-      const transformedPosts = uniquePosts.map((post) => ({
+      const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users?.name, // Nom de l'utilisateur
