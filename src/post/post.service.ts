@@ -13,7 +13,7 @@ export class PostService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly imageUploadService: ImageUploadService
-  ) { }
+  ) {}
 
   async postByUser(createPostDto: CreatePostDto) {
     try {

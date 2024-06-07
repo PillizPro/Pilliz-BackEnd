@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService
-  ) { }
+  ) {}
 
   async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashPassword(registerDto.password)

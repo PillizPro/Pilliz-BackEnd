@@ -9,7 +9,7 @@ import { CommentEntity } from './entities/comment.entity'
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async commentOnPost(createCommentDto: CreateCommentDto) {
     try {
