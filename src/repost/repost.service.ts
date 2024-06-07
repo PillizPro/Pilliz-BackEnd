@@ -10,11 +10,11 @@ export class RepostService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async repost(repostDto: RepostDto) {
+  async repost(repostDto: RepostDto, userId: string) {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
-      ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId }
+      ? { userId: userId, postId: repostDto.postId }
+      : { userId: userId, commentId: repostDto.commentId }
 
     const existingRepost = await this.prisma.repost.findFirst({
       where: whereClause,
@@ -22,7 +22,7 @@ export class RepostService {
 
     if (!existingRepost) {
       // Créer une nouvelle republication
-      await this.prisma.repost.create({ data: { ...repostDto } })
+      await this.prisma.repost.create({ data: { ...repostDto, userId } })
 
       // Mise à jour du compteur de reposts
       if (repostDto.postId) {
@@ -33,7 +33,7 @@ export class RepostService {
         this.eventEmitter.emit(
           'notifyUser',
           4,
-          repostDto.userId,
+          userId,
           post.content,
           post.userId
         )
@@ -45,7 +45,7 @@ export class RepostService {
         this.eventEmitter.emit(
           'notifyUser',
           5,
-          repostDto.userId,
+          userId,
           comment.content,
           comment.userId
         )
@@ -53,11 +53,11 @@ export class RepostService {
     }
   }
 
-  async unrepost(repostDto: RepostDto) {
+  async unrepost(repostDto: RepostDto, userId: string) {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
-      ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId }
+      ? { userId: userId, postId: repostDto.postId }
+      : { userId: userId, commentId: repostDto.commentId }
 
     const existingRepost = await this.prisma.repost.findFirst({
       where: whereClause,

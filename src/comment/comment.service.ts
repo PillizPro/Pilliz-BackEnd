@@ -11,9 +11,9 @@ import { CommentEntity } from './entities/comment.entity'
 export class CommentService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async commentOnPost(createCommentDto: CreateCommentDto) {
+  async commentOnPost(createCommentDto: CreateCommentDto, userId: string) {
     try {
-      const { postId, userId, content } = createCommentDto
+      const { postId, content } = createCommentDto
       const newComment = await this.prismaService.comment.create({
         data: {
           postId,
@@ -35,9 +35,9 @@ export class CommentService {
     }
   }
 
-  async findCommentsOnPost(fetchCommentDto: FetchCommentDto) {
+  async findCommentsOnPost(fetchCommentDto: FetchCommentDto, userId: string) {
     try {
-      const { postId, userId } = fetchCommentDto
+      const { postId } = fetchCommentDto
 
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -81,8 +81,12 @@ export class CommentService {
         },
       })
 
+      const filteredComment = comments.filter((comment) => {
+        return !hiddenWords.some((word) => comment.content?.includes(word))
+      })
+
       const transformedComments = await Promise.all(
-        comments.map(async (comment) => {
+        filteredComment.map(async (comment) => {
           const repliesCount = await this.prismaService.comment.count({
             where: {
               rootCommentId: comment.id,
@@ -110,9 +114,12 @@ export class CommentService {
     }
   }
 
-  async respondOnComment(responseCommentDto: ResponseCommentDto) {
+  async respondOnComment(
+    responseCommentDto: ResponseCommentDto,
+    userId: string
+  ) {
     try {
-      const { postId, userId, content, parentId } = responseCommentDto
+      const { postId, content, parentId } = responseCommentDto
       let rootCommentId = parentId
 
       // Si c'est une réponse à une autre réponse, on trouve le commentaire racine.
@@ -144,9 +151,12 @@ export class CommentService {
     }
   }
 
-  async findReponsesToComment(fetchResponsesDto: FetchResponsesDto) {
+  async findReponsesToComment(
+    fetchResponsesDto: FetchResponsesDto,
+    userId: string
+  ) {
     try {
-      const { commentId, userId } = fetchResponsesDto
+      const { commentId } = fetchResponsesDto
 
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -189,8 +199,12 @@ export class CommentService {
         },
       })
 
+      const filteredReponse = responses.filter((response) => {
+        return !hiddenWords.some((word) => response.content?.includes(word))
+      })
+
       const transformedResponses = await Promise.all(
-        responses.map(async (response) => {
+        filteredReponse.map(async (response) => {
           const repliesCount = await this.prismaService.comment.count({
             where: {
               rootCommentId: response.id,

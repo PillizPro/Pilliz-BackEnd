@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateUserDto, CreateProUserDto } from './dto/create-user.dto'
 import { FindByEmailDto } from './dto/find-by-email.dto'
@@ -9,26 +9,36 @@ import { BanningStatus } from '@prisma/client'
 
 @Injectable()
 export class UserService {
+  private readonly _logger = new Logger(UserService.name)
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.prismaService.users.create({
-      data: {
-        nameLowercase: createUserDto.name.toLowerCase(),
-        ...createUserDto,
-      },
-    })
-    return new UserEntity(user)
+    try {
+      const user = await this.prismaService.users.create({
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
   }
 
   async createProUser(createUserDto: CreateProUserDto) {
-    const user = await this.prismaService.users.create({
-      data: {
-        nameLowercase: createUserDto.name.toLowerCase(),
-        ...createUserDto,
-      },
-    })
-    return new UserEntity(user)
+    try {
+      const user = await this.prismaService.users.create({
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
   }
 
   async findByEmail(findByEmailDto: FindByEmailDto) {
@@ -105,21 +115,14 @@ export class UserService {
         where: { id: userId },
         data: { isConnected: connectedStatus },
       })
-      console.log(
-        'Update status of user: ',
-        userId,
-        '(',
-        user.name,
-        ') to: ',
-        connectedStatus
+      this._logger.debug(
+        `Update status of user: ${userId} [${user.name}] to: ${connectedStatus}`
       )
     } catch (err) {
       console.error(err)
       throw new Error(
-        'An error occured when changing connected user status: ' +
-          userId +
-          ' to: ' +
-          connectedStatus
+        `An error occured when changing connected user status:
+         ${userId} to: ${connectedStatus}`
       )
     }
   }
