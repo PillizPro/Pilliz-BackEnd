@@ -11,7 +11,7 @@ import { UploadFilesDto } from './dto/upload-files.dto'
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
-  constructor(private readonly profilService: ProfilService) { }
+  constructor(private readonly profilService: ProfilService) {}
 
   @Post('changeBio')
   async changeBio(@Body() changeBioDto: ChangeBioDto) {
