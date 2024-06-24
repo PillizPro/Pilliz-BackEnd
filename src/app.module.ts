@@ -27,7 +27,7 @@ import { TicketController } from './ticket/ticket.controller'
 import { TicketService } from './ticket/ticket.service'
 import { MailerService } from './mailer/mailer.service'
 import { SignalementService } from './signalement/signalement.service'
-import { SignalementController } from './signalement/signalement.controller';
+import { SignalementController } from './signalement/signalement.controller'
 
 const ENV = process.env.NODE_ENV
 

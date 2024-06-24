@@ -24,7 +24,7 @@ export class AuthController {
   async resetPassword(@Body() resetPasswordDto: ResetPassword) {
     return await this.authService.resetPassword(resetPasswordDto)
   }
-  
+
   @Post('verify')
   async verify(@Body() verifyDto: VerifyDto) {
     return await this.authService.verify(verifyDto)
