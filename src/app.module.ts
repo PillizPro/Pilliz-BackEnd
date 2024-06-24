@@ -26,6 +26,8 @@ import { CronModule } from './cron/cron.module'
 import { TicketController } from './ticket/ticket.controller'
 import { TicketService } from './ticket/ticket.service'
 import { MailerService } from './mailer/mailer.service'
+import { SignalementService } from './signalement/signalement.service'
+import { SignalementController } from './signalement/signalement.controller';
 
 const ENV = process.env.NODE_ENV
 
@@ -69,7 +71,7 @@ const ENV = process.env.NODE_ENV
     MetricModule,
     CronModule,
   ],
-  controllers: [AppController, TicketController],
-  providers: [AppService, TicketService, MailerService],
+  controllers: [AppController, TicketController, SignalementController],
+  providers: [AppService, TicketService, MailerService, SignalementService],
 })
 export class AppModule {}
