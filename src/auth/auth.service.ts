@@ -18,10 +18,10 @@ export class AuthService {
   ) {}
 
   async register(registerDto: CreateUserDto) {
-    // const boolAcademic = await isAcademic(registerDto.email)
-    // if (!boolAcademic) {
-    //   throw new UnauthorizedException('You must use an academic email.')
-    // }
+    const boolAcademic = await isAcademic(registerDto.email)
+    if (!boolAcademic) {
+      throw new UnauthorizedException('You must use an academic email.')
+    }
     const hashedPassword = await this._hashPassword(registerDto.password)
     const numberVerification = await this._generateCode()
     const userDtoWithHashedPassword = {

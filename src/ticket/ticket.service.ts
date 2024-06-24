@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { TicketDto } from './dto/ticket.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { TicketCategory } from '@prisma/client'
 import { TicketResponseDto } from './dto/response.dto'
 import { MailerService } from 'src/mailer/mailer.service'
 import { SupportTicketEmail } from 'src/mailer/dto/mailer.dto'

@@ -15,7 +15,7 @@ import {
 import * as express from 'express'
 import * as dotenv from 'dotenv'
 
-declare const module: any;
+declare const MODULE: any
 
 dotenv.config()
 async function bootstrap() {
@@ -53,9 +53,9 @@ async function bootstrap() {
   app.use(express.json({ limit: '50mb' })) // Augmentez selon vos besoins
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
   await app.listen(3000)
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
+  if (MODULE.hot) {
+    MODULE.hot.accept()
+    MODULE.hot.dispose(() => app.close())
   }
 }
 bootstrap()
