@@ -238,7 +238,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -258,7 +258,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -339,7 +339,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -360,7 +360,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -441,7 +441,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -462,7 +462,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
