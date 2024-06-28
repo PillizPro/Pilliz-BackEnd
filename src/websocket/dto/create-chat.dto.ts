@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID } from 'class-validator'
+import { IsIn, IsNotEmpty, IsUUID } from 'class-validator'
 
 export class CreateChatDto {
   @IsUUID()
@@ -11,5 +11,6 @@ export class CreateChatDto {
   readonly content: string
 
   @IsNotEmpty()
+  @IsIn([0, 1, 2, 3, 4])
   readonly type: number
 }

@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common'
+import { Controller, Get } from '@nestjs/common'
 import { PushNotificationService } from './push-notification.service'
 import { ApiTags } from '@nestjs/swagger'
+import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('PushNotification')
 @Controller('pushNotification')
@@ -9,8 +10,8 @@ export class PushNotificationController {
     private readonly pushNotificationService: PushNotificationService
   ) {}
 
-  @Get('allNotifications/:userId')
-  async getAllNotifications(@Param('userId') userId: string) {
+  @Get('allNotifications')
+  async getAllNotifications(@CurrentUserId() userId: string) {
     return await this.pushNotificationService.getAllNotifications(userId)
   }
 }

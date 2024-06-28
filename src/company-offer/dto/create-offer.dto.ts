@@ -3,10 +3,6 @@ import { IsNotEmpty, IsString, IsOptional, IsArray } from 'class-validator'
 export class CreateCompanyOfferDto {
   @IsNotEmpty()
   @IsString()
-  readonly userId: string
-
-  @IsNotEmpty()
-  @IsString()
   readonly content: string
 
   @IsOptional()

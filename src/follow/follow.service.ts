@@ -12,25 +12,25 @@ export class FollowService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async createFollowers(createFollowDto: CreateFollowDto) {
+  async createFollowers(createFollowDto: CreateFollowDto, followerId: string) {
     const follow = await this.prismaService.follows.create({
-      data: createFollowDto,
+      data: { followerId, ...createFollowDto },
     })
     this.eventEmitter.emit(
       'notifyUser',
       3,
-      createFollowDto.followerId,
+      followerId,
       '',
       createFollowDto.followingId
     )
     return new FollowEntity(follow)
   }
 
-  async deleteFollowers(deleteFollowDto: DeleteFollowDto) {
+  async deleteFollowers(deleteFollowDto: DeleteFollowDto, followerId: string) {
     try {
       await this.prismaService.follows.delete({
         where: {
-          followerId_followingId: deleteFollowDto,
+          followerId_followingId: { followerId, ...deleteFollowDto },
         },
       })
       return { message: 'Followers successfully unfollow' }
