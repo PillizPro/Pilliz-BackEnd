@@ -51,9 +51,8 @@ jobs:
             echo "Run Docker Backend Container"
             docker run -p 127.0.0.1:3000:3000 --name env-gha_container -d ${{ steps.metadata.outputs.tags }}
             sleep 10
+            docker logs env-gha_container
+            sleep 10
             curl 127.0.0.1:3000/api/doc
             sleep 10
             curl 127.0.0.1:3000/api/v1
-
-        - name: Logs Docker gha Container output
-          run: docker logs env-gha_container
