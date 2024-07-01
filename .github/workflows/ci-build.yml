@@ -27,7 +27,7 @@ jobs:
           run: |
             sudo apt-get update -y && sudo apt-get upgrade -y
 
-        - name: Extract metadata (tags, labels) for Build
+        - name: Extract metadata (tags, labels) for Docker Build
           id: metadata
           uses: docker/metadata-action@v5
           with:
@@ -35,7 +35,7 @@ jobs:
             tags: |
               type=raw,value=latest
 
-        - name: Build
+        - name: Build Docker gha Image
           uses: docker/build-push-action@v5
           with:
             context: .
@@ -53,3 +53,6 @@ jobs:
             curl 127.0.0.1:3000/api/doc
             sleep 10
             curl 127.0.0.1:3000/api/v1
+
+        - name: Logs docker container output
+          run: docker logs ${{ steps.metadata.outputs.tags }}
