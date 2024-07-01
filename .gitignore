@@ -42,5 +42,7 @@ prisma/migrations
 # ENV
 env-dev/.dbadmin.cred
 env-dev/.env.dev
+env-staging/docker-compose.yaml
 env-staging/.env.staging
+env-prod/docker-compose.yaml
 env-prod/.env.prod

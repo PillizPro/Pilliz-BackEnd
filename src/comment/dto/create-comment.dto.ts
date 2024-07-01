@@ -5,8 +5,5 @@ export class CreateCommentDto {
   readonly postId: string
 
   @IsNotEmpty()
-  readonly userId: string
-
-  @IsNotEmpty()
   readonly content: string
 }

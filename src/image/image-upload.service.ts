@@ -16,4 +16,17 @@ export class ImageUploadService {
       )
     }
   }
+
+  async uploadBase64Files(base64: string, docType: string): Promise<string> {
+    try {
+      const result = await cloudinary.uploader.upload(
+        `data:${docType};base64,${base64}`
+      )
+      return result.url
+    } catch (error) {
+      throw new Error(
+        `Erreur lors du téléchargement du document: ${error.message}`
+      )
+    }
+  }
 }

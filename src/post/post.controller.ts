@@ -1,16 +1,29 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { Body, Controller, Post, Get } from '@nestjs/common'
 import { CreatePostDto } from './dto/create-post.dto'
+import { DeletePostDto } from './dto/delete-post.dto'
+import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
+import { RecoverDatePostDto } from './dto/recover-date-post.dto'
 import { PostService } from './post.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { CurrentUserId } from 'src/common/decorators'
 
+@ApiBearerAuth()
 @ApiTags('Posting')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post('posting')
-  async postByUser(@Body() createPostDto: CreatePostDto) {
-    return await this.postService.postByUser(createPostDto)
+  async postByUser(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.postByUser(createPostDto, userId)
+  }
+
+  @Post('deletingPost')
+  async deletePostById(@Body() deletePostDto: DeletePostDto) {
+    return await this.postService.deletePostById(deletePostDto)
   }
 
   @Get('findallpost')
@@ -19,22 +32,31 @@ export class PostController {
   }
 
   @Get('find20LastsPosts')
-  async find20LastsPosts() {
-    return await this.postService.find20LastsPosts()
+  async find20LastsPosts(@CurrentUserId() userId: string) {
+    return await this.postService.find20LastsPosts(userId)
   }
 
-  @Get('findPostInfo:id')
-  async findPostById(@Param('id') postId: string) {
-    return await this.postService.findPostById(postId)
+  @Post('findPostInfo')
+  async findPostById(
+    @Body() recoverDetailsPostDto: RecoverDetailsPostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.findPostById(recoverDetailsPostDto, userId)
   }
 
-  @Get('find20RecentsPosts:date')
-  async find20RecentsPosts(@Param('date') dateString: Date) {
-    return await this.postService.find20RecentsPosts(dateString)
+  @Post('find20RecentsPosts')
+  async find20RecentsPosts(
+    @Body() recoverDatePostDto: RecoverDatePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.find20RecentsPosts(recoverDatePostDto, userId)
   }
 
-  @Get('find20OlderPosts:date')
-  async find20OlderPosts(@Param('date') dateString: Date) {
-    return await this.postService.find20OlderPosts(dateString)
+  @Post('find20OlderPosts')
+  async find20OlderPosts(
+    @Body() recoverDatePostDto: RecoverDatePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.find20OlderPosts(recoverDatePostDto, userId)
   }
 }

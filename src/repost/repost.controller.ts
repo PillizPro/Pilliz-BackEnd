@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import { Body, Controller, Post, Get } from '@nestjs/common'
 import { RepostDto } from './dto/repost.dto'
 import { RepostService } from './repost.service'
 import { ApiTags } from '@nestjs/swagger'
+import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Reposting')
 @Controller('reposting')
@@ -9,22 +10,25 @@ export class RepostController {
   constructor(private readonly repostService: RepostService) {}
 
   @Post('repost')
-  async repostPost(@Body() repostDto: RepostDto) {
-    return await this.repostService.repost(repostDto)
+  async repost(@Body() repostDto: RepostDto, @CurrentUserId() userId: string) {
+    return await this.repostService.repost(repostDto, userId)
   }
 
   @Post('unrepost')
-  async unrepostPost(@Body() repostDto: RepostDto) {
-    return await this.repostService.unrepost(repostDto)
+  async unrepost(
+    @Body() repostDto: RepostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.repostService.unrepost(repostDto, userId)
   }
 
-  @Get('repostedPosts/:userId')
-  async getRepostedPostsByUser(@Param('userId') userId: string) {
+  @Get('repostedPosts')
+  async getRepostedPostsByUser(@CurrentUserId() userId: string) {
     return await this.repostService.getRepostedPostsByUser(userId)
   }
 
-  @Get('repostedComments/:userId')
-  async getRepostedCommentsByUser(@Param('userId') userId: string) {
+  @Get('repostedComments')
+  async getRepostedCommentsByUser(@CurrentUserId() userId: string) {
     return await this.repostService.getRepostedCommentsByUser(userId)
   }
 }
