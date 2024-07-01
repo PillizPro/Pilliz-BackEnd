@@ -40,7 +40,7 @@ const ENV = process.env.NODE_ENV
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
           ? 'env-staging/.env.staging'
-          : ENV === 'development'
+          : ENV === 'development' || ENV === 'test'
           ? 'env-dev/.env.dev'
           : '',
       expandVariables: true,
