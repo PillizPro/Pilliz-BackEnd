@@ -49,11 +49,11 @@ jobs:
           continue-on-error: true
           run: |
             echo "Run Docker Backend Container"
-            docker run -p 127.0.0.1:3000:3000 -d ${{ steps.metadata.outputs.tags }}
+            docker run -p 127.0.0.1:3000:3000 -d ${{ steps.metadata.outputs.tags }} --name env-gha_container
             sleep 10
             curl 127.0.0.1:3000/api/doc
             sleep 10
             curl 127.0.0.1:3000/api/v1
 
         - name: Logs docker container output
-          run: docker logs ${{ steps.metadata.outputs.tags }}
+          run: docker logs env-gha_container
