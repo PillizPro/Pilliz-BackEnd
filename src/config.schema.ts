@@ -19,11 +19,11 @@ const CONFIG_SCHEMA_VALIDATAION = Joi.object({
         )
       : Joi.string().required(),
   JWT_ACCESS_TOKEN_SECRET:
-    ENV === 'gha' ? Joi.string() : Joi.string().required(),
+    ENV === 'gha' ? Joi.string().default('default') : Joi.string().required(),
   JWT_ACCESS_TOKEN_EXPIRATION_TIME:
     ENV === 'gha' ? Joi.string() : Joi.string().required(),
   JWT_REFRESH_TOKEN_SECRET:
-    ENV === 'gha' ? Joi.string() : Joi.string().required(),
+    ENV === 'gha' ? Joi.string().default('default') : Joi.string().required(),
   JWT_REFRESH_TOKEN_EXPIRATION_TIME:
     ENV === 'gha' ? Joi.string() : Joi.string().required(),
 })
