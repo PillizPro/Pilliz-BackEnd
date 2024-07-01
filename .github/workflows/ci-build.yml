@@ -46,7 +46,6 @@ jobs:
             labels: ${{ steps.metadata.outputs.labels }}
 
         - name: Run Docker gha Container
-          continue-on-error: true
           run: |
             echo "Run Docker Backend Container"
             docker run -p 127.0.0.1:3000:3000 --name env-gha_container -d ${{ steps.metadata.outputs.tags }}
