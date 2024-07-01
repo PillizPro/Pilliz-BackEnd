@@ -15,7 +15,7 @@ const CONFIG_SCHEMA_VALIDATAION = Joi.object({
   DATABASE_URL:
     ENV === 'gha'
       ? Joi.string().default(
-          'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}?schema=${POSTGRES_SCHEMA}'
+          'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}?schema=${POSTGRES_SCHEMA}'
         )
       : Joi.string().required(),
   JWT_ACCESS_TOKEN_SECRET:
