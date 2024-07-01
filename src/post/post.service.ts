@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create-post.dto'
 import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverPostDto } from './dto/recover-post.dto'
 import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
 import { RecoverDatePostDto } from './dto/recover-date-post.dto'
 import { PostEntity } from './entities/post.entity'
@@ -15,9 +14,9 @@ export class PostService {
     private readonly imageUploadService: ImageUploadService
   ) {}
 
-  async postByUser(createPostDto: CreatePostDto) {
+  async postByUser(createPostDto: CreatePostDto, userId: string) {
     try {
-      const { userId, content, imageBase64, tagsList } = createPostDto
+      const { content, imageBase64, tagsList } = createPostDto
 
       let imageUrl = null
       if (imageBase64) {
@@ -123,6 +122,7 @@ export class PostService {
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
         content: post.content, // Contenu du post
         imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
@@ -139,8 +139,11 @@ export class PostService {
     }
   }
 
-  async findPostById(recoverDetailsPostDto: RecoverDetailsPostDto) {
-    const { userId, postId } = recoverDetailsPostDto
+  async findPostById(
+    recoverDetailsPostDto: RecoverDetailsPostDto,
+    userId: string
+  ) {
+    const { postId } = recoverDetailsPostDto
     try {
       const post = await this.prismaService.post.findUnique({
         where: { id: postId },
@@ -175,6 +178,7 @@ export class PostService {
         userId: post.userId,
         postId: post.id,
         username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -192,8 +196,7 @@ export class PostService {
     }
   }
 
-  async find20LastsPosts(recoverPostDto: RecoverPostDto) {
-    const { userId } = recoverPostDto
+  async find20LastsPosts(userId: string) {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -269,19 +272,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
@@ -291,8 +295,11 @@ export class PostService {
     }
   }
 
-  async find20RecentsPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20RecentsPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -370,19 +377,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
@@ -392,8 +400,11 @@ export class PostService {
     }
   }
 
-  async find20OlderPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20OlderPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -472,19 +483,20 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterId: post.reposterId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts

@@ -7,10 +7,12 @@ import { ReportEntity } from './entities/report.entity'
 export class ReportService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async reportPostComment(reportingPostComment: ReportingPostCommentDto) {
+  async reportPostComment(
+    reportingPostComment: ReportingPostCommentDto,
+    reportedBy: string
+  ) {
     try {
-      const { reportedBy, postId, commentId, reportedFor } =
-        reportingPostComment
+      const { postId, commentId, reportedFor } = reportingPostComment
       const newReport = await this.prismaService.reports.create({
         data: {
           reportedBy,

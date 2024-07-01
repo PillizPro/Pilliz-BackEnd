@@ -1,8 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Get, Param } from '@nestjs/common'
 import { TutorialsService } from './tutorials.service'
 import { ApiTags } from '@nestjs/swagger'
-import { TutorialsDto } from './dto/tutorial.dto'
-import { FirstConnectionDto } from './dto/firstConnection.dto'
+import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Tutorials')
 @Controller('tuto')
@@ -10,12 +9,15 @@ export class TutorialsController {
   constructor(private readonly tutorialsService: TutorialsService) {}
 
   @Post('userFirstConnection')
-  async firstConnection(@Body() firstConnection: FirstConnectionDto) {
-    return await this.tutorialsService.firstConnection(firstConnection)
+  async firstConnection(@CurrentUserId() userId: string) {
+    return await this.tutorialsService.firstConnection(userId)
   }
 
-  @Post('userSeenTutorial')
-  async seenTutorial(@Body() tutorialDto: TutorialsDto) {
-    return await this.tutorialsService.seenTutorial(tutorialDto)
+  @Get('userSeenTutorial/:tutorialName')
+  async seenTutorial(
+    @Param('tutorialName') tutorialName: string,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.tutorialsService.seenTutorial(tutorialName, userId)
   }
 }

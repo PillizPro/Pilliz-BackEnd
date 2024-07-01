@@ -1,12 +1,15 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 
-export class ResetPassword {
+export class ResetPasswordDto {
   @IsNotEmpty()
+  @IsEmail()
   readonly email: string
 
   @IsNotEmpty()
+  @IsString()
   readonly oldPassword: string
 
   @IsNotEmpty()
+  @IsString()
   readonly newPassword: string
 }

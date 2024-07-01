@@ -1,9 +1,8 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class ChangeBioDto {
   @IsNotEmpty()
-  readonly id: string
-
-  @IsNotEmpty()
+  @IsOptional()
+  @IsString()
   readonly bio: string
 }
