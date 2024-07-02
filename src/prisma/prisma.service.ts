@@ -56,3 +56,6 @@ export class PrismaService
     })
   }
 }
+
+@Injectable()
+export class PrismaServiceForGHA {}
