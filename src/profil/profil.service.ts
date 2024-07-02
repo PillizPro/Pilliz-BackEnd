@@ -24,7 +24,7 @@ export class ProfilService {
     private readonly identificationService: IdentificationService,
     private readonly likeService: LikeService,
     private readonly repostService: RepostService
-  ) { }
+  ) {}
 
   async changeBio(changeBioDto: ChangeBioDto, userId: string) {
     await this.prisma.users.update({
