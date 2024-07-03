@@ -25,6 +25,7 @@ import { MetricModule } from './metric/metric.module'
 import { IdentificationModule } from './identification/identification.module'
 import { CronModule } from './cron/cron.module'
 import { OfferModule } from './company-offer/offer.module'
+import { ApplicantModule } from './applicants/applicant.module'
 import { BlockingModule } from './blocking/blocking.module'
 
 const ENV = process.env.NODE_ENV
@@ -70,6 +71,7 @@ const ENV = process.env.NODE_ENV
     IdentificationModule,
     CronModule,
     OfferModule,
+    ApplicantModule,
     BlockingModule,
   ],
   controllers: [AppController],

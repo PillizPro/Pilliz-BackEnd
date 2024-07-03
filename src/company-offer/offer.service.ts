@@ -164,9 +164,6 @@ export class OfferService {
           id: offerId,
         },
       })
-      console.log('offerId', offerId)
-      console.log('userId', userId)
-      console.log('offer userId', offer?.userId)
 
       if (!offer || offer.userId !== userId) {
         throw new Error('You are not allowed to delete this offer')
