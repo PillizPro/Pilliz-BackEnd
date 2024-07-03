@@ -11,7 +11,7 @@ import {
 import { AuthService } from './auth.service'
 import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { ResetPasswordDto } from './dto/reset-password.dto'
+import { ResetPasswordDto } from './dto'
 import { Request } from 'express'
 import { JwtRefreshAuthGuard, LocalAuthGuard } from 'src/common/guards'
 import { CurrentUser, CurrentUserId, Public } from 'src/common/decorators'

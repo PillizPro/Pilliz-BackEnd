@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
-import { ResponseCommentDto } from './dto/response-comment.dto'
-import { FetchCommentDto } from './dto/fetch-comment.dto'
-import { FetchResponsesDto } from './dto/fetch-responses.dto'
+import {
+  CreateCommentDto,
+  ResponseCommentDto,
+  DeleteCommentResponseDto,
+  FetchCommentDto,
+  FetchResponsesDto,
+} from './dto'
 import { CommentEntity } from './entities/comment.entity'
 
 @Injectable()
