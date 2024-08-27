@@ -44,10 +44,6 @@ export class UserService {
   }
 
   async findUsers() {
-    console.log(
-      'LMAOOOOOOOOOOOOOOOOOOO: ',
-      this.configService.get('DATABASE_URL')
-    )
     const users = await this.prismaService.users.findMany()
     return users.map((user) => new UserEntity(user))
   }
@@ -67,6 +63,10 @@ export class UserService {
       return userNoneFollow
     } catch (error) {
       console.error(error)
+      console.log(
+        'LMAOOOOOOOOOOOOOOOOOOO: ',
+        this.configService.get('DATABASE_URL')
+      )
       throw new Error('An error occured when searching for Usernames list')
     }
   }
