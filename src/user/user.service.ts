@@ -6,10 +6,14 @@ import { DeleteUserDto } from './dto/delete-user.dto'
 import { BanningUserDto } from 'src/admin/dto/banning-user.dto'
 import { UserEntity } from './entities/user.entity'
 import { BanningStatus } from '@prisma/client'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService
+  ) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.prismaService.users.create({
@@ -40,6 +44,10 @@ export class UserService {
   }
 
   async findUsers() {
+    console.log(
+      'LMAOOOOOOOOOOOOOOOOOOO: ',
+      this.configService.get('DATABASE_URL')
+    )
     const users = await this.prismaService.users.findMany()
     return users.map((user) => new UserEntity(user))
   }
