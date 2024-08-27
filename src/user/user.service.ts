@@ -1,9 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateUserDto, CreateProUserDto } from './dto/create-user.dto'
-import { FindByEmailDto } from './dto/find-by-email.dto'
-import { DeleteUserDto } from './dto/delete-user.dto'
-import { BanningUserDto } from 'src/admin/dto/banning-user.dto'
+import {
+  CreateUserDto,
+  CreateProUserDto,
+  FindByEmailDto,
+  DeleteUserDto,
+} from './dto'
+import { BanningUserDto } from 'src/admin/dto'
 import { UserEntity } from './entities/user.entity'
 import { BanningStatus } from '@prisma/client'
 

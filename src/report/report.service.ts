@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { ReportingPostCommentDto } from './dto/reporting-post-comment.dto'
+import { ReportingPostCommentDto } from './dto'
 import { ReportEntity } from './entities/report.entity'
 
 @Injectable()

@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { ResetPasswordDto } from './dto'
 import { Request } from 'express'

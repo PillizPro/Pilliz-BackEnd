@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { LoginDto, ResetPasswordDto } from './dto'
-import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'

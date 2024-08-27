@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { BlockUserDto } from './dto/block-user.dto'
-import { UnblockUserDto } from './dto/unblock-user.dto'
-import { HideUserDto } from './dto/hide-user.dto'
-import { UnhideUserDto } from './dto/unhide-user.dto'
+import { BlockUserDto, UnblockUserDto, HideUserDto, UnhideUserDto } from './dto'
 
 @Injectable()
 export class BlockingService {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { RepostDto } from './dto/repost.dto'
+import { RepostDto } from './dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()

@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { CreateChatDto } from './dto/create-chat.dto'
+import {
+  CreateChatDto,
+  FindChatDto,
+  GetConversationsDto,
+  FindAllUsersConvDto,
+  DeleteConvDto,
+  CreateReactionDto,
+  DeleteChatDto,
+  AcceptConvDto,
+} from './dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { FindChatDto } from './dto/find-chat.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { GetConversationsDto } from './dto/get-conversations.dto'
-import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
-import { DeleteConvDto } from './dto/delete-conv.dto'
-import { CreateReactionDto } from './dto/create-reaction.dto'
 import { Message, MessageReactions } from '@prisma/client'
-import { DeleteChatDto } from './dto/delete-chat.dto'
-import { AcceptConvDto } from './dto/accept-conv.dto'
 
 enum MessageStatus {
   READ,

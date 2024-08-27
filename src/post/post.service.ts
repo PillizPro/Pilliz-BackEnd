@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreatePostDto } from './dto/create-post.dto'
-import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
-import { RecoverDatePostDto } from './dto/recover-date-post.dto'
+import {
+  CreatePostDto,
+  DeletePostDto,
+  RecoverDetailsPostDto,
+  RecoverDatePostDto,
+} from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
 

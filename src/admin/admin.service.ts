@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { DeleteUserDto } from 'src/user/dto/delete-user.dto'
-import { BanningUserDto } from './dto/banning-user.dto'
+import { DeleteUserDto } from 'src/user/dto'
+import { BanningUserDto } from './dto'
 import { UserService } from 'src/user/user.service'
 
 @Injectable()

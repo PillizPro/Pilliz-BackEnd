@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateFollowDto } from './dto/create-follow.dto'
+import { CreateFollowDto, DeleteFollowDto } from './dto'
 import { FollowEntity } from './entities/follow.entity'
-import { DeleteFollowDto } from './dto/delete-follow.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
+import { UploadFilesDto, ChangeProfilImgDto, ChangeBioDto } from './dto'
+
 // Services
 import { FollowService } from 'src/follow/follow.service'
 import { ImageUploadService } from 'src/image/image-upload.service'
@@ -8,11 +10,6 @@ import { DocumentUploadService } from 'src/document/upload-document.service'
 import { IdentificationService } from 'src/identification/identification.service'
 import { LikeService } from 'src/like/like.service'
 import { RepostService } from 'src/repost/repost.service'
-
-// DTO
-import { UploadFilesDto } from './dto/upload-files.dto'
-import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
-import { ChangeBioDto } from './dto/change-bio.dto'
 
 @Injectable()
 export class ProfilService {

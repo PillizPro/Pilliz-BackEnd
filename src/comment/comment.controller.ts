@@ -6,7 +6,6 @@ import {
   FetchCommentDto,
   FetchResponsesDto,
 } from './dto'
-
 import { CommentService } from './comment.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
