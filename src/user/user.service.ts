@@ -6,14 +6,10 @@ import { DeleteUserDto } from './dto/delete-user.dto'
 import { BanningUserDto } from 'src/admin/dto/banning-user.dto'
 import { UserEntity } from './entities/user.entity'
 import { BanningStatus } from '@prisma/client'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const user = await this.prismaService.users.create({
@@ -63,10 +59,6 @@ export class UserService {
       return userNoneFollow
     } catch (error) {
       console.error(error)
-      console.log(
-        'LMAOOOOOOOOOOOOOOOOOOO: ',
-        this.configService.get('DATABASE_URL')
-      )
       throw new Error('An error occured when searching for Usernames list')
     }
   }
