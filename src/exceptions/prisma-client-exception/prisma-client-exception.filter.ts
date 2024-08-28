@@ -34,6 +34,12 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
           .status(status)
           .json({ message: message, statusCode: status, route: request.url })
         break
+      case PRISMA_CODE.BAD_REQUEST.prismaCode.includes(exception.code):
+        status = PRISMA_CODE.BAD_REQUEST.returnStatusCode
+        response
+          .status(status)
+          .json({ message: message, statusCode: status, route: request.url })
+        break
       default:
         // default 500 error code
         status = HttpStatus.INTERNAL_SERVER_ERROR

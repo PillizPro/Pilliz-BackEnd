@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
-import { ResponseCommentDto } from './dto/response-comment.dto'
-import { FetchCommentDto } from './dto/fetch-comment.dto'
-import { FetchResponsesDto } from './dto/fetch-responses.dto'
+import {
+  CreateCommentDto,
+  ResponseCommentDto,
+  DeleteCommentResponseDto,
+  FetchCommentDto,
+  FetchResponsesDto,
+} from './dto'
 import { CommentEntity } from './entities/comment.entity'
 
 @Injectable()
@@ -31,7 +37,7 @@ export class CommentService {
       return new CommentEntity(newComment)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when creating a comment')
+      throw new BadRequestException('An error occured when creating a comment.')
     }
   }
 
@@ -110,7 +116,9 @@ export class CommentService {
       return transformedComments
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on this post')
+      throw new BadRequestException(
+        'An error occurred when getting comments on this post.'
+      )
     }
   }
 
@@ -147,7 +155,9 @@ export class CommentService {
       return new CommentEntity(newComment)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a response')
+      throw new BadRequestException(
+        'An error occurred when creating a response.'
+      )
     }
   }
 
@@ -245,7 +255,9 @@ export class CommentService {
       return transformedResponses
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on this post')
+      throw new BadRequestException(
+        'An error occurred when getting comments on this post.'
+      )
     }
   }
 
@@ -259,7 +271,7 @@ export class CommentService {
         where: { id: commentId },
       })
 
-      if (!comment) throw new Error('Comment not found')
+      if (!comment) throw new NotFoundException('Comment not found.')
 
       const responses = await this.prismaService.comment.findMany({
         where: {
@@ -316,7 +328,7 @@ export class CommentService {
       return { message: 'Comment and its responses successfully deleted.' }
     } catch (error) {
       console.error(error)
-      throw new Error(
+      throw new BadRequestException(
         'An error occurred when deleting the comment and its responses.'
       )
     }

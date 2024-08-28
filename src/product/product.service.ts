@@ -1,5 +1,5 @@
 import { ProductEntity } from './entities/product.entity'
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
@@ -19,7 +19,7 @@ export class ProductService {
       return entitiesProducts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting products')
+      throw new BadRequestException('An error occured when getting products.')
     }
   }
 
@@ -37,7 +37,9 @@ export class ProductService {
       return entitiesProducts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when searching for products')
+      throw new BadRequestException(
+        'An error occured when searching for products.'
+      )
     }
   }
 

@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { DeleteUserDto } from 'src/user/dto/delete-user.dto'
-import { BanningUserDto } from './dto/banning-user.dto'
+import { DeleteUserDto } from 'src/user/dto'
+import { BanningUserDto } from './dto'
 import { AdminService } from './admin.service'
 import { ApiTags } from '@nestjs/swagger'
 

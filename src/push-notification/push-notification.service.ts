@@ -80,7 +80,7 @@ export class PushNotificationService {
   sendNotification(message: any) {
     this._sendNotification(message, (error: any, results: any) => {
       if (error) {
-        throw Error('An error occured when sending a notification')
+        throw new Error('An error occured when sending a notification.')
       }
       return { message: 'Success', data: results }
     })
