@@ -9,13 +9,49 @@ export class UserEntity implements Users {
   id: string
   email: string
   name: string
+  userTag: string | null
+  @ApiHideProperty()
+  @Exclude()
+  nameLowercase: string
   @ApiHideProperty()
   @Exclude()
   password: string
+  @ApiHideProperty()
+  @Exclude()
+  hashedRefreshToken: string | null
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
-  @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
   role: UserRoles
+  @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
   banned: BanningStatus
   createdAt: Date
   updatedAt: Date
+  firstConnection: boolean
+  tutorialFeed: boolean
+  tutorialMarketplace: boolean
+  tutorialPro: boolean
+  bio: string
+  isConnected: boolean
+  profilPicture: string
+  // Métriques
+  country: string
+  totalIdentifyTime: number
+  totalAppTime: number
+  totalFeedTime: number
+  totalMarketTime: number
+  totalProTime: number
+  deviceRelease: string
+  deviceVersion: string
+  deviceName: string
+  deviceWidth: number
+  deviceHeight: number
+  // Pro
+  isCompanyAccount: boolean
+  companyAddress: string
+  companyWebsite: string
+  activitySector: string
+  companySiren: string
+  // Blocking / Hiding
+  blockedUsers: string[]
+  hiddenUsers: string[]
+  hiddenWords: string[]
 }

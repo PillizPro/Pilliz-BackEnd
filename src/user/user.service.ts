@@ -1,28 +1,54 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateUserDto } from './dto/create-user.dto'
-import { FindByEmailDto } from './dto/find-by-email.dto'
-import { DeleteUserDto } from './dto/delete-user.dto'
-import { BanningDto } from 'src/admin/dto/banning.dto'
+import {
+  CreateUserDto,
+  CreateProUserDto,
+  FindByEmailDto,
+  DeleteUserDto,
+} from './dto'
+import { BanningUserDto } from 'src/admin/dto'
 import { UserEntity } from './entities/user.entity'
 import { BanningStatus } from '@prisma/client'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) { }
+  private readonly _logger = new Logger(UserService.name)
+
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.prismaService.users.create({
-      data: createUserDto,
-    })
-    return new UserEntity(user)
+    try {
+      const user = await this.prismaService.users.create({
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
+  }
+
+  async createProUser(createUserDto: CreateProUserDto) {
+    try {
+      const user = await this.prismaService.users.create({
+        data: {
+          nameLowercase: createUserDto.name.toLowerCase(),
+          ...createUserDto,
+        },
+      })
+      return new UserEntity(user)
+    } catch (err) {
+      return null
+    }
   }
 
   async findByEmail(findByEmailDto: FindByEmailDto) {
     const user = await this.prismaService.users.findUnique({
       where: { email: findByEmailDto.email },
     })
-    if (!user) throw new NotFoundException('User Not Found')
+    if (!user) return null
     return new UserEntity(user)
   }
 
@@ -31,36 +57,56 @@ export class UserService {
     return users.map((user) => new UserEntity(user))
   }
 
+  async getUsersBySearch(queryUsername: string) {
+    const usernameList = await this.prismaService.users.findMany({
+      take: 50,
+      where: { nameLowercase: { contains: queryUsername.toLowerCase() } },
+    })
+    const userNoneFollow = usernameList.map((user) => {
+      return {
+        id: user.id,
+        name: user.name,
+      }
+    })
+    return userNoneFollow
+  }
+
   async deleteUserByID(deleteDto: DeleteUserDto) {
-    try {
-      await this.prismaService.users.delete({ where: { id: deleteDto.id } })
-      return { message: 'User successfully deleted.' }
-    } catch (error) {
-      throw new Error('An error occurred while deleting the user.')
-    }
+    await this.prismaService.users.delete({ where: { id: deleteDto.id } })
+    return { message: 'User successfully deleted.' }
   }
 
-  async banUserByID(banningDto: BanningDto) {
-    try {
-      await this.prismaService.users.update({
-        where: { id: banningDto.id },
-        data: { banned: BanningStatus.banned },
-      });
-      return { message: 'User successfully banned.' };
-    } catch (error) {
-      throw new Error('An error occurred while banning the user.');
-    }
+  async banUserByID(banningUserDto: BanningUserDto) {
+    await this.prismaService.users.update({
+      where: { id: banningUserDto.id },
+      data: { banned: BanningStatus.banned },
+    })
+    return { message: 'User successfully banned.' }
   }
 
-  async unbanUserByID(banningDto: BanningDto) {
+  async unbanUserByID(banningUserDto: BanningUserDto) {
+    await this.prismaService.users.update({
+      where: { id: banningUserDto.id },
+      data: { banned: BanningStatus.notBanned },
+    })
+    return { message: 'User successfully unbanned.' }
+  }
+
+  async updateConnectedStatus(userId: string, connectedStatus: boolean) {
     try {
-      await this.prismaService.users.update({
-        where: { id: banningDto.id },
-        data: { banned: BanningStatus.notBanned },
-      });
-      return { message: 'User successfully unbanned.' };
-    } catch (error) {
-      throw new Error('An error occurred while unbanning the user.');
+      const user = await this.prismaService.users.update({
+        where: { id: userId },
+        data: { isConnected: connectedStatus },
+      })
+      this._logger.debug(
+        `Update status of user: ${userId} [${user.name}] to: ${connectedStatus}`
+      )
+    } catch (err) {
+      console.error(err)
+      throw new BadRequestException(
+        `An error occured when changing connected user status:
+         ${userId} to: ${connectedStatus}`
+      )
     }
   }
 }

@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common'
-import { DeleteDto } from './dto/delete.dto'
-import { BanningDto } from './dto/banning.dto';
+import { DeleteUserDto } from 'src/user/dto'
+import { BanningUserDto } from './dto'
 import { UserService } from 'src/user/user.service'
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
-  async deleteUser(deleteDto: DeleteDto) {
-    return await this.userService.deleteUserByID(deleteDto);
+  async deleteUser(deleteUserDto: DeleteUserDto) {
+    return await this.userService.deleteUserByID(deleteUserDto)
   }
 
-  async banUser(banningDto: BanningDto) {
-    return await this.userService.banUserByID(banningDto);
+  async banUser(banningUserDto: BanningUserDto) {
+    return await this.userService.banUserByID(banningUserDto)
   }
 
-  async unbanUser(banningDto: BanningDto) {
-    return await this.userService.unbanUserByID(banningDto);
+  async unbanUser(banningUserDto: BanningUserDto) {
+    return await this.userService.unbanUserByID(banningUserDto)
   }
 
   async getAllUsers() {
-    return await this.userService.findUsers();
+    return await this.userService.findUsers()
   }
 }

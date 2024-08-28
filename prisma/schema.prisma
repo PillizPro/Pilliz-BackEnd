@@ -8,14 +8,270 @@ datasource db {
 }
 
 model Users {
-  id        String        @id @default(uuid())
-  email     String        @unique @db.VarChar(255)
-  name      String        @db.VarChar(255)
-  password  String        @db.VarChar(255)
-  role      UserRoles     @default(user)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  banned    BanningStatus @default(notBanned)
+  id                     String                   @id @default(uuid())
+  email                  String                   @unique @db.VarChar(255)
+  name                   String                   @db.VarChar(255)
+  userTag                String?                  @unique
+  nameLowercase          String                   @db.VarChar(255)
+  password               String                   @db.VarChar(255)
+  hashedRefreshToken     String?
+  role                   UserRoles                @default(user)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  firstConnection        Boolean                  @default(true)
+  tutorialFeed           Boolean                  @default(false)
+  tutorialMarketplace    Boolean                  @default(false)
+  tutorialPro            Boolean                  @default(false)
+  banned                 BanningStatus            @default(notBanned)
+  Post                   Post[]
+  Like                   Like[]
+  Repost                 Repost[]
+  Comment                Comment[]
+  InvitationConversation InvitationConversation[]
+  bio                    String                   @default("A propos de moi") @db.VarChar(500)
+  followedBy             Follows[]                @relation("follower")
+  following              Follows[]                @relation("following")
+  Conversations          Conversation[]           @relation("partOfConv")
+  ConversationsDeleted   Conversation[]           @relation("convDeleted")
+  MessagesSend           Message[]                @relation("send")
+  MessagesReceived       Message[]                @relation("received")
+  MessageReactions       MessageReactions[]
+  isConnected            Boolean                  @default(false)
+  profilPicture          String                   @default("https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png")
+  NotificatifionReceived Notificatifion[]         @relation("notified")
+  NotificationSend       Notificatifion[]         @relation("hasNotified")
+  Reports                Reports[]
+  Documents              Document[]
+  // Pro
+  isCompanyAccount       Boolean                  @default(false)
+  companyAddress         String                   @default("")
+  companyWebsite         String                   @default("")
+  activitySector         String                   @default("")
+  companySiren           String                   @default("")
+  CompanyOffer           CompanyOffer[]
+  // Métriques
+  country                String                   @default("")
+  totalIdentifyTime      Int                      @default(0)
+  totalAppTime           Int                      @default(0)
+  totalFeedTime          Int                      @default(0)
+  totalMarketTime        Int                      @default(0)
+  totalProTime           Int                      @default(0)
+  deviceRelease          String                   @default("")
+  deviceVersion          String                   @default("")
+  deviceName             String                   @default("")
+  deviceWidth            Int                      @default(0)
+  deviceHeight           Int                      @default(0)
+  // Masquer / Blocker
+  blockedUsers           String[]                 @default([])
+  hiddenUsers            String[]                 @default([])
+  hiddenWords            String[]                 @default([])
+}
+
+model Follows {
+  follower    Users  @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   Users  @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  @@id([followerId, followingId])
+}
+
+model Document {
+  docName String @unique @db.VarChar(255)
+  docUrl  String @db.VarChar(255)
+  userId  String
+  Users   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id            String    @id @default(uuid())
+  userId        String
+  content       String    @db.VarChar(1000)
+  imageUrl      String?   @db.VarChar(1000)
+  createdAt     DateTime  @default(now())
+  likesCount    Int       @default(0)
+  repostsCount  Int       @default(0)
+  commentsCount Int       @default(0)
+  Like          Like[]
+  Repost        Repost[]
+  Comment       Comment[]
+  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tags          Tags[]
+  Reports       Reports[]
+}
+
+model CompanyOffer {
+  id                           String   @id @default(uuid())
+  userId                       String
+  content                      String   @db.VarChar(1000)
+  createdAt                    DateTime @default(now())
+  Users                        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tags                         Tags[]
+  companyOfferTitle            String   @default("")
+  companyOfferDiploma          String   @default("")
+  companyOfferSkills           String   @default("")
+  companyOfferContractType     String   @default("")
+  companyOfferContractDuration String   @default("")
+  companyOfferSalary           String   @default("")
+}
+
+model Tags {
+  id             String        @id @default(uuid())
+  name           String        @unique
+  Post           Post[]
+  CompanyOffer   CompanyOffer? @relation(fields: [companyOfferId], references: [id])
+  companyOfferId String?
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+  Post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Repost {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+  Post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id            String    @id @default(uuid())
+  content       String    @db.VarChar(1000)
+  userId        String
+  postId        String
+  createdAt     DateTime  @default(now())
+  likesCount    Int       @default(0)
+  repostsCount  Int       @default(0)
+  parentId      String?   @db.VarChar(36)
+  rootCommentId String?   @db.VarChar(36)
+  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children      Comment[] @relation("ChildComments")
+  Post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like          Like[]
+  Repost        Repost[]
+  Reports       Reports[]
+}
+
+model Conversation {
+  id                     String                  @id @default(uuid())
+  Messages               Message[]
+  Users                  Users[]                 @relation("partOfConv")
+  UsersThatDeleteConv    Users[]                 @relation("convDeleted")
+  isProConv              Boolean
+  InvitationConversation InvitationConversation?
+}
+
+model InvitationConversation {
+  id             String       @id @default(uuid())
+  conversationId String       @unique
+  nonefollowerId String
+  userId         String
+  invitation     Boolean      @default(true)
+  Conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  User           Users        @relation(fields: [nonefollowerId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id               String             @id @default(uuid())
+  authorId         String
+  Author           Users?             @relation("send", fields: [authorId], references: [id])
+  receiverId       String
+  Receiver         Users?             @relation("received", fields: [receiverId], references: [id])
+  createdAt        DateTime           @default(now())
+  content          String
+  conversationId   String
+  Conversation     Conversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  status           Int                @default(0)
+  type             Int
+  MessageReactions MessageReactions[]
+}
+
+model MessageReactions {
+  id             String  @id @default(uuid())
+  reaction       String?
+  messageId      String
+  Message        Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userIdReaction String
+  User           Users?  @relation(fields: [userIdReaction], references: [id])
+
+  @@unique(name: "msgUserReactId", [messageId, userIdReaction])
+}
+
+model Notificatifion {
+  id               String   @id @default(uuid())
+  read             Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  notifType        Int
+  userNotifiedId   String
+  userNotified     Users    @relation("notified", fields: [userNotifiedId], references: [id])
+  userThatNotifyId String
+  userThatNotify   Users    @relation("hasNotified", fields: [userThatNotifyId], references: [id])
+  notifContent     String
+}
+
+model Product {
+  id             String        @id @default(uuid())
+  title          String
+  titleLowercase String
+  price          Float
+  description    String        @db.VarChar(200)
+  images         String[]      @db.VarChar(1000)
+  rating         Float
+  isFavourite    Boolean       @default(false)
+  isPopular      Boolean       @default(false)
+  isAddedToCart  Boolean       @default(false)
+  ProductTags    ProductTags[]
+}
+
+model ProductTags {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  Products Product[]
+}
+
+model Metrics {
+  id               String @id @default(uuid())
+  numberOfUsers    Int    @default(0)
+  numberOfPosts    Int    @default(0)
+  numberOfLikes    Int    @default(0)
+  numberOfReposts  Int    @default(0)
+  numberOfComments Int    @default(0)
+  numberOfReplies  Int    @default(0)
+
+  weeklyNumberOfUsers    Int @default(0)
+  weeklyNumberOfPosts    Int @default(0)
+  weeklyNumberOfLikes    Int @default(0)
+  weeklyNumberOfReposts  Int @default(0)
+  weeklyNumberOfComments Int @default(0)
+  weeklyNumberOfReplies  Int @default(0)
+
+  Date DateTime @default(now())
+}
+
+model Reports {
+  id          String   @id @default(uuid())
+  reportedBy  String
+  postId      String?
+  commentId   String?
+  reportedFor String
+  solved      Boolean  @default(false)
+  mesureTaken String   @default("Pas encore de mesure prise")
+  createdAt   DateTime @default(now())
+  Users       Users    @relation(fields: [reportedBy], references: [id])
+  Post        Post?    @relation(fields: [postId], references: [id])
+  Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
 enum UserRoles {

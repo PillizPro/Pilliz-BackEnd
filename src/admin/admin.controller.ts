@@ -1,31 +1,31 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { DeleteDto } from './dto/delete.dto'
-import { BanningDto } from './dto/banning.dto'
+import { DeleteUserDto } from 'src/user/dto'
+import { BanningUserDto } from './dto'
 import { AdminService } from './admin.service'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Administration')
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly AdminService: AdminService) { }
+  constructor(private readonly adminService: AdminService) {}
 
   @Post('delete')
-  async deleteUser(@Body() deleteDto: DeleteDto) {
-    return await this.AdminService.deleteUser(deleteDto)
+  async deleteUser(@Body() deleteUserDto: DeleteUserDto) {
+    return await this.adminService.deleteUser(deleteUserDto)
   }
 
   @Post('ban')
-  async banUser(@Body() banningDto: BanningDto) {
-    return await this.AdminService.banUser(banningDto)
+  async banUser(@Body() banningUserDto: BanningUserDto) {
+    return await this.adminService.banUser(banningUserDto)
   }
 
   @Post('unban')
-  async unbanUser(@Body() banningDto: BanningDto) {
-    return await this.AdminService.unbanUser(banningDto)
+  async unbanUser(@Body() banningUserDto: BanningUserDto) {
+    return await this.adminService.unbanUser(banningUserDto)
   }
 
   @Get('usersList')
   async getAllUsers() {
-    return await this.AdminService.getAllUsers();
+    return await this.adminService.getAllUsers()
   }
 }
