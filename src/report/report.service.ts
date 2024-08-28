@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { ReportingPostCommentDto } from './dto'
 import { ReportEntity } from './entities/report.entity'
@@ -25,7 +25,7 @@ export class ReportService {
       return new ReportEntity(newReport)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when reporting')
+      throw new BadRequestException('An error occured when reporting.')
     }
   }
 
@@ -52,7 +52,7 @@ export class ReportService {
       return transformedReports
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting reports')
+      throw new BadRequestException('An error occured when getting reports.')
     }
   }
 }

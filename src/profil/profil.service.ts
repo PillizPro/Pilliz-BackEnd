@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 import { UploadFilesDto, ChangeProfilImgDto, ChangeBioDto } from './dto'
@@ -78,7 +78,9 @@ export class ProfilService {
       return informations
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting user infos')
+      throw new BadRequestException(
+        'An error occurred when getting user infos.'
+      )
     }
   }
 
@@ -159,7 +161,9 @@ export class ProfilService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting posts')
+      throw new BadRequestException(
+        'An error occurred when getting posts on the profil.'
+      )
     }
   }
 
@@ -211,7 +215,9 @@ export class ProfilService {
       return transformedComments
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on te profil.')
+      throw new BadRequestException(
+        'An error occurred when getting comments on the profil.'
+      )
     }
   }
 
@@ -303,7 +309,9 @@ export class ProfilService {
       return combinedContent
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting like on the profil.')
+      throw new BadRequestException(
+        'An error occurred when getting like on the profil.'
+      )
     }
   }
 
@@ -396,7 +404,9 @@ export class ProfilService {
       return combinedContent
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting like on the profil.')
+      throw new BadRequestException(
+        'An error occurred when getting repost on the profil.'
+      )
     }
   }
 }

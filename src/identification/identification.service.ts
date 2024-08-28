@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { IdentifyUsersDto } from './dto'
 
@@ -86,7 +86,9 @@ export class IdentificationService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting identifying posts')
+      throw new BadRequestException(
+        'An error occured when getting identifying posts.'
+      )
     }
   }
 }

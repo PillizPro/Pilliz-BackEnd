@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import {
   CreatePostDto,
@@ -42,9 +46,8 @@ export class PostService {
           )
         )
 
-        if (tags.includes(null)) {
-          throw new Error('One or more tags do not exist')
-        }
+        if (tags.includes(null))
+          throw new NotFoundException('One or more tags do not exist.')
 
         await this.prismaService.post.update({
           where: { id: newPost.id },
@@ -61,7 +64,7 @@ export class PostService {
       return new PostEntity(newPost)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a post')
+      throw new BadRequestException('An error occurred when creating a post.')
     }
   }
 
@@ -107,7 +110,7 @@ export class PostService {
       return { message: 'Post successfully deleted.' }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when deleting the post.')
+      throw new BadRequestException('An error occurred when deleting the post.')
     }
   }
 
@@ -137,7 +140,7 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting posts')
+      throw new BadRequestException('An error occured when getting posts.')
     }
   }
 
@@ -155,9 +158,7 @@ export class PostService {
         },
       })
 
-      if (!post) {
-        throw new Error('Post introuvable')
-      }
+      if (!post) throw new NotFoundException('Post introuvable.')
 
       const followeds = await this.prismaService.follows.findMany({
         where: {
@@ -194,7 +195,7 @@ export class PostService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting the post')
+      throw new BadRequestException('An error occurred when getting the post.')
     }
   }
 
@@ -293,7 +294,7 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting posts')
+      throw new BadRequestException('An error occurred when getting posts.')
     }
   }
 
@@ -398,7 +399,9 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting recents posts')
+      throw new BadRequestException(
+        'An error occurred when getting recents posts.'
+      )
     }
   }
 
@@ -504,7 +507,9 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting more posts')
+      throw new BadRequestException(
+        'An error occurred when getting more posts.'
+      )
     }
   }
 }

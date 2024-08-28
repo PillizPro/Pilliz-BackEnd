@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateFollowDto, DeleteFollowDto } from './dto'
 import { FollowEntity } from './entities/follow.entity'
@@ -35,7 +35,7 @@ export class FollowService {
       return { message: 'Followers successfully unfollow' }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when deleting the user.')
+      throw new BadRequestException('An error occurred when deleting the user.')
     }
   }
 
