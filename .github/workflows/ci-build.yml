@@ -27,7 +27,7 @@ jobs:
           run: |
             sudo apt-get update -y && sudo apt-get upgrade -y
 
-        - name: Extract metadata (tags, labels) for Build
+        - name: Extract metadata (tags, labels) for Docker gha Build
           id: metadata
           uses: docker/metadata-action@v5
           with:
@@ -35,8 +35,8 @@ jobs:
             tags: |
               type=raw,value=latest
 
-        - name: Build
-          uses: docker/build-push-action@v5
+        - name: Build Docker gha Image
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: "Dockerfile.prod"
@@ -45,10 +45,12 @@ jobs:
             tags: ${{ steps.metadata.outputs.tags }}
             labels: ${{ steps.metadata.outputs.labels }}
 
-        - name: Run
+        - name: Run Docker gha Container
           run: |
             echo "Run Docker Backend Container"
-            docker run -p 127.0.0.1:3000:3000 -d ${{ steps.metadata.outputs.tags }}
+            docker run -p 127.0.0.1:3000:3000 --name env-gha_container -d ${{ steps.metadata.outputs.tags }}
+            sleep 10
+            docker logs env-gha_container
             sleep 10
             curl 127.0.0.1:3000/api/doc
             sleep 10

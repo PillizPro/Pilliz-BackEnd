@@ -4,35 +4,58 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   ConnectedSocket,
 } from '@nestjs/websockets'
 import { ChatService } from './chat.service'
-import { CreateChatDto } from './dto/create-chat.dto'
-import { FindChatDto } from './dto/find-chat.dto'
-import { UsePipes, ValidationPipe } from '@nestjs/common'
-import { Socket } from 'socket.io'
+import {
+  CreateChatDto,
+  FindChatDto,
+  GetConversationsDto,
+  FindAllUsersConvDto,
+  DeleteConvDto,
+  CreateReactionDto,
+  DeleteChatDto,
+  AcceptConvDto,
+  MessageStatusDto,
+} from './dto'
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Server, Socket } from 'socket.io'
 import { UserService } from 'src/user/user.service'
-import { GetConversationsDto } from './dto/get-conversations.dto'
-import { MessageStatusDto } from './dto/message-status.dto'
-import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
-import { CreateReactionDto } from './dto/create-reaction.dto'
-import { DeleteConvDto } from './dto/delete-conv.dto'
-import { DeleteChatDto } from './dto/delete-chat.dto'
-import { AcceptConvDto } from './dto/accept-conv.dto'
+import { WsExceptionFilter } from 'src/exceptions/ws-exception/ws-exception.filter'
 
 @UsePipes(new ValidationPipe({ whitelist: true }))
+@UseFilters(new WsExceptionFilter())
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class WSGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class WSGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   private _connectedUsers: Map<string, Socket> = new Map()
 
   constructor(
     private readonly chatService: ChatService,
     private readonly userService: UserService
   ) {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  afterInit(server: Server) {
+    // server.use((socket: Socket, next) => {
+    //   socket.handshake.headers.authorization
+    //   const [type, token] =
+    //     socket.handshake.headers.authorization?.split(' ') ?? []
+    //   const bearerToken = type === 'Bearer' ? token : undefined
+    //   if (bearerToken) {
+    //     // handle token validation
+    //     next()
+    //   } else {
+    //     next(new Error('Empty Token!'))
+    //   }
+    // })
+  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`)

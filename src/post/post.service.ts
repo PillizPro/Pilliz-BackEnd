@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreatePostDto } from './dto/create-post.dto'
-import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverPostDto } from './dto/recover-post.dto'
-import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
-import { RecoverDatePostDto } from './dto/recover-date-post.dto'
+import {
+  CreatePostDto,
+  DeletePostDto,
+  RecoverDetailsPostDto,
+  RecoverDatePostDto,
+} from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
 
@@ -15,9 +20,9 @@ export class PostService {
     private readonly imageUploadService: ImageUploadService
   ) {}
 
-  async postByUser(createPostDto: CreatePostDto) {
+  async postByUser(createPostDto: CreatePostDto, userId: string) {
     try {
-      const { userId, content, imageBase64, tagsList } = createPostDto
+      const { content, imageBase64, tagsList } = createPostDto
 
       let imageUrl = null
       if (imageBase64) {
@@ -41,9 +46,8 @@ export class PostService {
           )
         )
 
-        if (tags.includes(null)) {
-          throw new Error('One or more tags do not exist')
-        }
+        if (tags.includes(null))
+          throw new NotFoundException('One or more tags do not exist.')
 
         await this.prismaService.post.update({
           where: { id: newPost.id },
@@ -60,7 +64,7 @@ export class PostService {
       return new PostEntity(newPost)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a post')
+      throw new BadRequestException('An error occurred when creating a post.')
     }
   }
 
@@ -106,7 +110,7 @@ export class PostService {
       return { message: 'Post successfully deleted.' }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when deleting the post.')
+      throw new BadRequestException('An error occurred when deleting the post.')
     }
   }
 
@@ -123,6 +127,7 @@ export class PostService {
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
         username: post.Users.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
         content: post.content, // Contenu du post
         imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
@@ -135,12 +140,15 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting posts')
+      throw new BadRequestException('An error occured when getting posts.')
     }
   }
 
-  async findPostById(recoverDetailsPostDto: RecoverDetailsPostDto) {
-    const { userId, postId } = recoverDetailsPostDto
+  async findPostById(
+    recoverDetailsPostDto: RecoverDetailsPostDto,
+    userId: string
+  ) {
+    const { postId } = recoverDetailsPostDto
     try {
       const post = await this.prismaService.post.findUnique({
         where: { id: postId },
@@ -150,9 +158,7 @@ export class PostService {
         },
       })
 
-      if (!post) {
-        throw new Error('Post introuvable')
-      }
+      if (!post) throw new NotFoundException('Post introuvable.')
 
       const followeds = await this.prismaService.follows.findMany({
         where: {
@@ -175,6 +181,7 @@ export class PostService {
         userId: post.userId,
         postId: post.id,
         username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -188,12 +195,11 @@ export class PostService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting the post')
+      throw new BadRequestException('An error occurred when getting the post.')
     }
   }
 
-  async find20LastsPosts(recoverPostDto: RecoverPostDto) {
-    const { userId } = recoverPostDto
+  async find20LastsPosts(userId: string) {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -236,7 +242,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -256,7 +262,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -269,30 +275,34 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting posts')
+      throw new BadRequestException('An error occurred when getting posts.')
     }
   }
 
-  async find20RecentsPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20RecentsPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -336,7 +346,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -357,7 +367,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -370,30 +380,36 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting recents posts')
+      throw new BadRequestException(
+        'An error occurred when getting recents posts.'
+      )
     }
   }
 
-  async find20OlderPosts(recoverDatePostDto: RecoverDatePostDto) {
-    const { userId, dateString } = recoverDatePostDto
+  async find20OlderPosts(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
@@ -437,7 +453,7 @@ export class PostService {
       const repostsPosts = reposts.map((repost) => ({
         ...repost.Post,
         isRepost: true,
-        reposterdId: repost.userId,
+        reposterId: repost.userId,
         reposterUsername: repost.Users.name,
       }))
 
@@ -458,7 +474,7 @@ export class PostService {
         ...post,
         isRepost: false,
         reposterUsername: null,
-        reposterdId: null,
+        reposterId: null,
       }))
 
       const combinedPosts = [...repostsPosts, ...postsTransformed]
@@ -472,25 +488,28 @@ export class PostService {
       })
 
       const transformedPosts = filteredPosts.map((post) => ({
-        userId: post.userId,
-        postId: post.id,
-        username: post.Users?.name,
-        content: post.content,
-        imageUrl: post.imageUrl,
-        likes: post.likesCount,
-        reposts: post.repostsCount,
-        comments: post.commentsCount,
-        createdAt: post.createdAt,
-        tags: post.Tags?.map((tag) => tag.name),
-        isRepost: post.isRepost,
-        reposterUsername: post.reposterUsername,
-        reposterdId: post.reposterdId,
+        userId: post.userId, // ID du user
+        postId: post.id, // ID du post
+        username: post.Users?.name, // Nom de l'utilisateur
+        userImgUrl: post.Users?.profilPicture, // Image de profil de l'utilisateur (URL)
+        content: post.content, // Contenu du post
+        imageUrl: post.imageUrl, // Image? du post
+        likes: post.likesCount, // Nombre de likes
+        reposts: post.repostsCount, // Nombre de reposts
+        comments: post.commentsCount, // Nombre de commentaires
+        createdAt: post.createdAt, // Date de création
+        tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
+        isRepost: post.isRepost, // Est ce que c'est un repost ?
+        reposterUsername: post.reposterUsername, // Nom du reposter
+        reposterId: post.reposterId, // ID du reposter
       }))
 
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting more posts')
+      throw new BadRequestException(
+        'An error occurred when getting more posts.'
+      )
     }
   }
 }

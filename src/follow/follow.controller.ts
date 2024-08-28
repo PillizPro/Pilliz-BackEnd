@@ -1,8 +1,15 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common'
 import { FollowService } from './follow.service'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateFollowDto } from './dto/create-follow.dto'
-import { DeleteFollowDto } from './dto/delete-follow.dto'
+import { CreateFollowDto, DeleteFollowDto } from './dto'
+import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Follow')
 @Controller('follow')
@@ -10,34 +17,40 @@ export class FollowController {
   constructor(private readonly followService: FollowService) {}
 
   @Post('followUser')
-  async followUser(@Body() createFollowDto: CreateFollowDto) {
-    return await this.followService.createFollowers(createFollowDto)
+  async followUser(
+    @Body() createFollowDto: CreateFollowDto,
+    @CurrentUserId() followerId: string
+  ) {
+    return await this.followService.createFollowers(createFollowDto, followerId)
   }
 
   @Post('unfollowUser')
-  async unfollowUser(@Body() deleteFollowDto: DeleteFollowDto) {
-    return await this.followService.deleteFollowers(deleteFollowDto)
+  async unfollowUser(
+    @Body() deleteFollowDto: DeleteFollowDto,
+    @CurrentUserId() followerId: string
+  ) {
+    return await this.followService.deleteFollowers(deleteFollowDto, followerId)
   }
 
-  @Get('userNbFollowers/:userId')
-  async getUserNbFollowers(@Param('userId') userId: string) {
+  @Get('userNbFollowers')
+  async getUserNbFollowers(@CurrentUserId() userId: string) {
     return await this.followService.getNbFollowers(userId)
   }
 
-  @Get('userNbFollowing/:userId')
-  async getUserNbFollowing(@Param('userId') userId: string) {
+  @Get('userNbFollowing')
+  async getUserNbFollowing(@CurrentUserId() userId: string) {
     return await this.followService.getNbFollowing(userId)
   }
 
-  @Get('userFollowers/:userId')
-  async getUserFollowers(@Param('userId') userId: string) {
+  @Get('userFollowers')
+  async getUserFollowers(@CurrentUserId() userId: string) {
     return await this.followService.getFollowers(userId)
   }
 
-  @Get('isUserFollowedBy/:followerUid/:followingUid')
+  @Get('isUserFollowedBy/:followingUid')
   async isUserFollowedBy(
-    @Param('followerUid') followerUid: string,
-    @Param('followingUid') followingUid: string
+    @Param('followingUid', new ParseUUIDPipe()) followingUid: string,
+    @CurrentUserId() followerUid: string
   ) {
     return await this.followService.isUserFollowBy(followerUid, followingUid)
   }
