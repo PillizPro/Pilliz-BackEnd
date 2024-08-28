@@ -13,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.validateUser({ email, password })
     if (!user)
       throw new UnauthorizedException(
-        "L'adresse mail ou le mot de passe est incorrect"
+        "L'adresse mail ou le mot de passe est incorrect."
       )
     if (user?.status === 'banned')
       throw new UnauthorizedException(

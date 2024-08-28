@@ -1,5 +1,5 @@
 // image-upload.service.ts
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import cloudinary from './cloudinary.config'
 
 @Injectable()
@@ -11,8 +11,9 @@ export class ImageUploadService {
       )
       return result.url
     } catch (error) {
-      throw new Error(
-        `Erreur lors du téléchargement de l'image: ${error.message}`
+      console.error(error)
+      throw new InternalServerErrorException(
+        `Erreur lors du téléchargement de l'image: ${error.message}.`
       )
     }
   }
@@ -24,8 +25,9 @@ export class ImageUploadService {
       )
       return result.url
     } catch (error) {
-      throw new Error(
-        `Erreur lors du téléchargement du document: ${error.message}`
+      console.error(error)
+      throw new InternalServerErrorException(
+        `Erreur lors du téléchargement du document: ${error.message}.`
       )
     }
   }

@@ -1,16 +1,23 @@
-import { Injectable } from '@nestjs/common'
-import { CreateChatDto } from './dto/create-chat.dto'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
+import {
+  CreateChatDto,
+  FindChatDto,
+  GetConversationsDto,
+  FindAllUsersConvDto,
+  DeleteConvDto,
+  CreateReactionDto,
+  DeleteChatDto,
+  AcceptConvDto,
+} from './dto'
 // import { UpdateChatDto } from './dto/update-chat.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { FindChatDto } from './dto/find-chat.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { GetConversationsDto } from './dto/get-conversations.dto'
-import { FindAllUsersConvDto } from './dto/find-users-conv.dto'
-import { DeleteConvDto } from './dto/delete-conv.dto'
-import { CreateReactionDto } from './dto/create-reaction.dto'
 import { Message, MessageReactions } from '@prisma/client'
-import { DeleteChatDto } from './dto/delete-chat.dto'
-import { AcceptConvDto } from './dto/accept-conv.dto'
 
 enum MessageStatus {
   READ,
@@ -39,7 +46,9 @@ export class ChatService {
       })
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when updating a message status')
+      throw new InternalServerErrorException(
+        'An error occured when updating a message status.'
+      )
     }
   }
 
@@ -67,7 +76,9 @@ export class ChatService {
       })
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when updating multiple messages status')
+      throw new InternalServerErrorException(
+        'An error occured when updating multiple messages status.'
+      )
     }
   }
 
@@ -82,7 +93,7 @@ export class ChatService {
         },
       })
       if (!conversation?.Users)
-        throw new Error('There is no Users in this conversation')
+        throw new NotFoundException('There is no Users in this conversation')
       let receiverId: string = ''
       for (const user of conversation.Users) {
         if (user.id !== authorId) receiverId = user.id
@@ -125,7 +136,7 @@ export class ChatService {
       }
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when sending a message')
+      throw new BadRequestException('An error occured when sending a message.')
     }
   }
 
@@ -135,8 +146,8 @@ export class ChatService {
       this.eventEmitter.emit('notifyUser', 0, authorId, content, receiverId)
     } catch (err) {
       console.error(err)
-      throw new Error(
-        'An error occured when emitting an event for creating chat'
+      throw new InternalServerErrorException(
+        'An error occured when emitting an event for creating a chat.'
       )
     }
   }
@@ -172,7 +183,10 @@ export class ChatService {
           MessageReactions: true,
         },
       })
-      if (!chat) throw new Error('An error occured when getting the message')
+      if (!chat)
+        throw new BadRequestException(
+          'An error occured when getting the message.'
+        )
       return await this._returnReactedMessage(
         authorId,
         chat,
@@ -180,7 +194,7 @@ export class ChatService {
       )
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when sending a reaction')
+      throw new BadRequestException('An error occured when sending a reaction.')
     }
   }
 
@@ -203,8 +217,8 @@ export class ChatService {
       },
     })
     if (!chat)
-      throw new Error(
-        'An error occured when getting the message reaction to delete it'
+      throw new BadRequestException(
+        'An error occured when getting the message reaction to delete it.'
       )
     return await this._returnReactedMessage(
       authorId,
@@ -318,7 +332,9 @@ export class ChatService {
       return { conversationId: conversation?.id }
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when getting last messages')
+      throw new BadRequestException(
+        'An error occured when getting last messages.'
+      )
     }
   }
 
@@ -335,7 +351,7 @@ export class ChatService {
       }
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when deleting a message')
+      throw new BadRequestException('An error occured when deleting a message.')
     }
   }
 
@@ -422,8 +438,8 @@ export class ChatService {
       }
     } catch (err) {
       console.error(err)
-      throw new Error(
-        'An error occured when getting or creating a conversation'
+      throw new BadRequestException(
+        'An error occured when getting or creating a conversation.'
       )
     }
   }
@@ -501,7 +517,9 @@ export class ChatService {
       return transformedConversations
     } catch (err) {
       console.error(err)
-      throw new Error('An error occured when getting conversations')
+      throw new BadRequestException(
+        'An error occured when getting conversations.'
+      )
     }
   }
 
@@ -539,8 +557,8 @@ export class ChatService {
       })
     } catch (err) {
       console.error(err)
-      throw new Error(
-        'An error occured when deleting one or multiple conversations'
+      throw new BadRequestException(
+        'An error occured when deleting one or multiple conversations.'
       )
     }
   }

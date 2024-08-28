@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { LikePostDto } from './dto/like-post.dto'
+import { LikePostDto } from './dto'
 import { LikeService } from './like.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'

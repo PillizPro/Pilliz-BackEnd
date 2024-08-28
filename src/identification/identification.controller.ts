@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { IdentificationService } from './identification.service'
 import { ApiTags } from '@nestjs/swagger'
-import { IdentifyUsersDto } from './dto/identify-users.dto'
+import { IdentifyUsersDto } from './dto'
 
 @ApiTags('Identification')
 @Controller('identification')

@@ -8,7 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common'
-import { CreateCompanyOfferDto } from './dto/create-offer.dto'
+import { CreateCompanyOfferDto } from './dto'
 import { OfferService } from './offer.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'

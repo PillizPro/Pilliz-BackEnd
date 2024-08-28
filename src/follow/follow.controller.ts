@@ -8,8 +8,7 @@ import {
 } from '@nestjs/common'
 import { FollowService } from './follow.service'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateFollowDto } from './dto/create-follow.dto'
-import { DeleteFollowDto } from './dto/delete-follow.dto'
+import { CreateFollowDto, DeleteFollowDto } from './dto'
 import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Follow')

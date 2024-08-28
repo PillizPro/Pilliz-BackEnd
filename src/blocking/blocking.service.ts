@@ -1,9 +1,6 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { BlockUserDto } from './dto/block-user.dto'
-import { UnblockUserDto } from './dto/unblock-user.dto'
-import { HideUserDto } from './dto/hide-user.dto'
-import { UnhideUserDto } from './dto/unhide-user.dto'
+import { BlockUserDto, UnblockUserDto, HideUserDto, UnhideUserDto } from './dto'
 
 @Injectable()
 export class BlockingService {
@@ -29,7 +26,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when blocking a user.')
+      throw new BadRequestException('An error occurred when blocking a user.')
     }
   }
 
@@ -54,7 +51,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when unblocking a user.')
+      throw new BadRequestException('An error occurred when unblocking a user.')
     }
   }
 
@@ -78,7 +75,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when hiding a user.')
+      throw new BadRequestException('An error occurred when hiding a user.')
     }
   }
 
@@ -102,7 +99,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when unhiding a user.')
+      throw new BadRequestException('An error occurred when unhiding a user.')
     }
   }
 
@@ -125,7 +122,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when hiding a word.')
+      throw new BadRequestException('An error occurred when hiding a word.')
     }
   }
 
@@ -148,7 +145,7 @@ export class BlockingService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when unhiding a word.')
+      throw new BadRequestException('An error occurred when unhiding a word.')
     }
   }
 
@@ -160,7 +157,9 @@ export class BlockingService {
       })
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when retrieving blocked users.')
+      throw new BadRequestException(
+        'An error occurred when retrieving blocked users.'
+      )
     }
   }
 
@@ -172,7 +171,9 @@ export class BlockingService {
       })
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when retrieving hidden users.')
+      throw new BadRequestException(
+        'An error occurred when retrieving hidden users.'
+      )
     }
   }
 
@@ -184,7 +185,9 @@ export class BlockingService {
       })
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when retrieving hidden words.')
+      throw new BadRequestException(
+        'An error occurred when retrieving hidden words.'
+      )
     }
   }
 
@@ -215,7 +218,9 @@ export class BlockingService {
       return []
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when retrieving blocked users.')
+      throw new BadRequestException(
+        'An error occurred when retrieving blocked users.'
+      )
     }
   }
 
@@ -246,7 +251,9 @@ export class BlockingService {
       return []
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when retrieving hided users.')
+      throw new BadRequestException(
+        'An error occurred when retrieving hided users.'
+      )
     }
   }
 }

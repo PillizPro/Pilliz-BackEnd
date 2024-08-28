@@ -1,5 +1,5 @@
 // image-upload.service.ts
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
@@ -44,7 +44,9 @@ export class DocumentUploadService {
       return docs
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when posting users document')
+      throw new BadRequestException(
+        "An error occurred when posting user's document."
+      )
     }
   }
 
@@ -59,7 +61,9 @@ export class DocumentUploadService {
       return docs
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting user documents')
+      throw new BadRequestException(
+        'An error occurred when getting user documents.'
+      )
     }
   }
 

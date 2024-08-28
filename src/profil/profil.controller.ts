@@ -6,14 +6,10 @@ import {
   Param,
   ParseUUIDPipe,
 } from '@nestjs/common'
-import { ChangeBioDto } from './dto/change-bio.dto'
+import { ChangeBioDto, ChangeProfilImgDto, UploadFilesDto } from './dto'
+import { CurrentUserId } from 'src/common/decorators'
 import { ProfilService } from './profil.service'
 import { ApiTags } from '@nestjs/swagger'
-
-// Dto
-import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
-import { UploadFilesDto } from './dto/upload-files.dto'
-import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Profil')
 @Controller('profil')

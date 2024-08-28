@@ -1,10 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { MetricService } from './metric.service'
-import { AddCountryToUserDto } from './dto/add-country-to-user.dto'
-import { AddAppTimeToUserDto } from './dto/add-apptime-to-user.dto'
-import { AddDeviceDetailsDto } from './dto/add-device-details-to-user.dto'
-import { AddKeyActivityTimeToUserDto } from './dto/add-key-activity-time-to-user.dto'
+import {
+  AddCountryToUserDto,
+  AddAppTimeToUserDto,
+  AddDeviceDetailsDto,
+  AddKeyActivityTimeToUserDto,
+} from './dto'
 import { CurrentUserId } from 'src/common/decorators'
 
 @ApiTags('Metric')
