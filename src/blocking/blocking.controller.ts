@@ -42,13 +42,16 @@ export class BlockingController {
   }
 
   @Get('hideWord/:wordToHide')
-  async hideWord(@Param() wordToHide: string, @CurrentUserId() userId: string) {
+  async hideWord(
+    @Param('wordToHide') wordToHide: string,
+    @CurrentUserId() userId: string
+  ) {
     return await this.blockingService.hideWord(wordToHide, userId)
   }
 
   @Get('unhideWord/:wordToUnhide')
   async unhideWord(
-    @Param() wordToUnhide: string,
+    @Param('wordToUnhide') wordToUnhide: string,
     @CurrentUserId() userId: string
   ) {
     return await this.blockingService.unhideWord(wordToUnhide, userId)
