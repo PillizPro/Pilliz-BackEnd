@@ -6,7 +6,12 @@ import {
   Param,
   ParseUUIDPipe,
 } from '@nestjs/common'
-import { ChangeBioDto, ChangeProfilImgDto, UploadFilesDto } from './dto'
+import {
+  ChangeBioDto,
+  ChangeProfilImgDto,
+  UploadFilesDto,
+  OtherUserProfilIdDto,
+} from './dto'
 import { CurrentUserId } from 'src/common/decorators'
 import { ProfilService } from './profil.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -76,24 +81,48 @@ export class ProfilController {
     return await this.profilService.getIdentifyingPosts(userId)
   }
 
-  @Get('getPostOnProfil')
-  async getPostOnProfil(@CurrentUserId() userId: string) {
-    return await this.profilService.getPostOnProfil(userId)
+  @Post('getPostOnProfil')
+  async getPostOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPostOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
   }
 
-  @Get('getCommentOnProfil')
-  async getCommentOnProfile(@CurrentUserId() userId: string) {
-    return await this.profilService.getCommentOnProfile(userId)
+  @Post('getCommentOnProfil')
+  async getCommentOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getCommentOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
   }
 
-  @Get('getLikeOnProfil')
-  async getLikeOnProfile(@CurrentUserId() userId: string) {
-    return await this.profilService.getLikeOnProfile(userId)
+  @Post('getLikeOnProfil')
+  async getLikeOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getLikeOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
   }
 
-  @Get('getRepostOnProfil')
-  async getRepostOnProfile(@CurrentUserId() userId: string) {
-    return await this.profilService.getRepostOnProfile(userId)
+  @Post('getRepostOnProfil')
+  async getRepostOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getRepostOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
   }
 
   @Get('changeAccountType')
