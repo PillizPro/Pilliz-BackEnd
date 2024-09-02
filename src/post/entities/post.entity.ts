@@ -13,5 +13,6 @@ export class PostEntity implements Post {
   likesCount: number
   repostsCount: number
   commentsCount: number
+  totalInteractions: number
   user: UserEntity
 }

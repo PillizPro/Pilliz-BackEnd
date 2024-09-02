@@ -4,6 +4,7 @@ import {
   DeletePostDto,
   RecoverDetailsPostDto,
   RecoverDatePostDto,
+  ViewInterractPostDto,
 } from './dto'
 import { PostService } from './post.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -60,5 +61,16 @@ export class PostController {
     @CurrentUserId() userId: string
   ) {
     return await this.postService.find20OlderPosts(recoverDatePostDto, userId)
+  }
+
+  @Post('interractViewPost')
+  async interractViewPost(
+    @Body() viewInterractPostDto: ViewInterractPostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.interractViewPost(
+      viewInterractPostDto,
+      userId
+    )
   }
 }
