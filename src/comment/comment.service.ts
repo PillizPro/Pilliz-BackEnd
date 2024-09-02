@@ -12,6 +12,7 @@ import {
   FetchResponsesDto,
 } from './dto'
 import { CommentEntity } from './entities/comment.entity'
+import { containsForbiddenWord } from 'src/post/miscellanous/forbidenWords'
 
 @Injectable()
 export class CommentService {
@@ -20,6 +21,11 @@ export class CommentService {
   async commentOnPost(createCommentDto: CreateCommentDto, userId: string) {
     try {
       const { postId, content } = createCommentDto
+
+      if (containsForbiddenWord(content)) {
+        throw new Error('Content contains forbidden words')
+      }
+
       const newComment = await this.prismaService.comment.create({
         data: {
           postId,
@@ -32,6 +38,11 @@ export class CommentService {
       await this.prismaService.post.update({
         where: { id: createCommentDto.postId },
         data: { commentsCount: { increment: 1 } },
+      })
+
+      await this.prismaService.post.update({
+        where: { id: postId },
+        data: { totalInteractions: { increment: 1 } },
       })
 
       return new CommentEntity(newComment)
@@ -130,6 +141,10 @@ export class CommentService {
       const { postId, content, parentId } = responseCommentDto
       let rootCommentId = parentId
 
+      if (containsForbiddenWord(content)) {
+        throw new Error('Content contains forbidden words')
+      }
+
       // Si c'est une réponse à une autre réponse, on trouve le commentaire racine.
       if (parentId) {
         const parentComment = await this.prismaService.comment.findUnique({
@@ -150,6 +165,11 @@ export class CommentService {
           parentId,
           rootCommentId,
         },
+      })
+
+      await this.prismaService.post.update({
+        where: { id: postId },
+        data: { totalInteractions: { increment: 1 } },
       })
 
       return new CommentEntity(newComment)
@@ -240,6 +260,7 @@ export class CommentService {
             userId: response.userId,
             commentId: response.id, // ID of the comment
             username: response.Users.name, // Name of the user
+            userImgUrl: response.Users.profilPicture, // User Profil Picture
             respondedToThisUser: originalUsername,
             content: response.content, // Content of the comment
             likes: response.likesCount, // Number of likes

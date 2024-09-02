@@ -9,8 +9,9 @@ import {
 import { ChangeBioDto, ChangeProfilImgDto, UploadFilesDto } from './dto'
 import { CurrentUserId } from 'src/common/decorators'
 import { ProfilService } from './profil.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
+@ApiBearerAuth()
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
@@ -93,5 +94,10 @@ export class ProfilController {
   @Get('getRepostOnProfil')
   async getRepostOnProfile(@CurrentUserId() userId: string) {
     return await this.profilService.getRepostOnProfile(userId)
+  }
+
+  @Get('changeAccountType')
+  async changeAccountType(@CurrentUserId() userId: string) {
+    return await this.profilService.changeAccountType(userId)
   }
 }

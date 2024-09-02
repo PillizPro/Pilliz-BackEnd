@@ -409,4 +409,26 @@ export class ProfilService {
       )
     }
   }
+
+  async changeAccountType(userId: string) {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+
+    if (user?.accountType === 'public') {
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { accountType: 'private' },
+      })
+      return 'private'
+    } else {
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { accountType: 'public' },
+      })
+      return 'public'
+    }
+  }
 }

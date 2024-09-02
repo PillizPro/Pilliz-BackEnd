@@ -7,9 +7,9 @@ import {
   FetchResponsesDto,
 } from './dto'
 import { CommentService } from './comment.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
-
+@ApiBearerAuth()
 @ApiTags('Commenting')
 @Controller('comment')
 export class CommentController {
