@@ -12,6 +12,7 @@ model Users {
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
   userTag                String?                  @unique
+  accountType            String                   @default("public")
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
   hashedRefreshToken     String?
@@ -84,20 +85,21 @@ model Document {
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  content       String    @db.VarChar(1000)
-  imageUrl      String?   @db.VarChar(1000)
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  commentsCount Int       @default(0)
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Tags          Tags[]
-  Reports       Reports[]
+  id                String    @id @default(uuid())
+  userId            String
+  content           String    @db.VarChar(1000)
+  imageUrl          String?   @db.VarChar(1000)
+  createdAt         DateTime  @default(now())
+  likesCount        Int       @default(0)
+  repostsCount      Int       @default(0)
+  commentsCount     Int       @default(0)
+  totalInteractions Int       @default(0)
+  Like              Like[]
+  Repost            Repost[]
+  Comment           Comment[]
+  Users             Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tags              Tags[]
+  Reports           Reports[]
 }
 
 model CompanyOffer {

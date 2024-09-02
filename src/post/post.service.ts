@@ -9,9 +9,11 @@ import {
   DeletePostDto,
   RecoverDetailsPostDto,
   RecoverDatePostDto,
+  ViewInterractPostDto,
 } from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
+import { containsForbiddenWord } from 'src/post/miscellanous/forbidenWords'
 
 @Injectable()
 export class PostService {
@@ -23,6 +25,10 @@ export class PostService {
   async postByUser(createPostDto: CreatePostDto, userId: string) {
     try {
       const { content, imageBase64, tagsList } = createPostDto
+
+      if (containsForbiddenWord(content)) {
+        throw new BadRequestException('Content contains forbidden words')
+      }
 
       let imageUrl = null
       if (imageBase64) {
@@ -187,6 +193,7 @@ export class PostService {
         likes: post.likesCount,
         reposts: post.repostsCount,
         comments: post.commentsCount,
+        interractions: post.totalInteractions,
         createdAt: post.createdAt,
         tags: post.Tags.map((tag) => tag.name),
         isRepost: reposters ? true : false,
@@ -284,6 +291,7 @@ export class PostService {
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
+        interractions: post.totalInteractions,
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
         isRepost: post.isRepost, // Est ce que c'est un repost ?
@@ -389,6 +397,7 @@ export class PostService {
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
+        interractions: post.totalInteractions,
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
         isRepost: post.isRepost, // Est ce que c'est un repost ?
@@ -496,6 +505,7 @@ export class PostService {
         imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        interractions: post.totalInteractions,
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
@@ -509,6 +519,24 @@ export class PostService {
       console.error(error)
       throw new BadRequestException(
         'An error occurred when getting more posts.'
+      )
+    }
+  }
+
+  async interractViewPost(
+    viewInterractPostDto: ViewInterractPostDto,
+    userId: string
+  ) {
+    void userId
+    try {
+      await this.prismaService.post.update({
+        where: { id: viewInterractPostDto.postId },
+        data: { totalInteractions: { increment: 1 } },
+      })
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when interracting with the post'
       )
     }
   }

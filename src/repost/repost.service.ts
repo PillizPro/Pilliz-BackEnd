@@ -28,7 +28,10 @@ export class RepostService {
       if (repostDto.postId) {
         const post = await this.prisma.post.update({
           where: { id: repostDto.postId },
-          data: { repostsCount: { increment: 1 } },
+          data: {
+            repostsCount: { increment: 1 },
+            totalInteractions: { increment: 1 },
+          },
         })
         this.eventEmitter.emit(
           'notifyUser',
@@ -49,6 +52,16 @@ export class RepostService {
           comment.content,
           comment.userId
         )
+
+        const findOriginalPost = await this.prisma.comment.findFirst({
+          where: { id: repostDto.commentId },
+          select: { postId: true },
+        })
+
+        await this.prisma.post.update({
+          where: { id: findOriginalPost?.postId },
+          data: { totalInteractions: { increment: 1 } },
+        })
       }
     }
   }
