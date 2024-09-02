@@ -23,7 +23,7 @@ export class CommentService {
       const { postId, content } = createCommentDto
 
       if (containsForbiddenWord(content)) {
-        throw new Error('Content contains forbidden words')
+        throw new BadRequestException('Content contains forbidden words')
       }
 
       const newComment = await this.prismaService.comment.create({
@@ -142,7 +142,7 @@ export class CommentService {
       let rootCommentId = parentId
 
       if (containsForbiddenWord(content)) {
-        throw new Error('Content contains forbidden words')
+        throw new BadRequestException('Content contains forbidden words')
       }
 
       // Si c'est une réponse à une autre réponse, on trouve le commentaire racine.

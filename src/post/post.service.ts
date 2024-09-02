@@ -27,7 +27,7 @@ export class PostService {
       const { content, imageBase64, tagsList } = createPostDto
 
       if (containsForbiddenWord(content)) {
-        throw new Error('Content contains forbidden words')
+        throw new BadRequestException('Content contains forbidden words')
       }
 
       let imageUrl = null
@@ -527,6 +527,7 @@ export class PostService {
     viewInterractPostDto: ViewInterractPostDto,
     userId: string
   ) {
+    void userId
     try {
       await this.prismaService.post.update({
         where: { id: viewInterractPostDto.postId },
@@ -534,7 +535,9 @@ export class PostService {
       })
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when interracting with the post')
+      throw new BadRequestException(
+        'An error occurred when interracting with the post'
+      )
     }
   }
 }
