@@ -125,6 +125,17 @@ export class ProfilController {
     )
   }
 
+  @Post('getPostMediaOnProfil')
+  async getPostMediaOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPostMediaOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
   @Get('changeAccountType')
   async changeAccountType(@CurrentUserId() userId: string) {
     return await this.profilService.changeAccountType(userId)

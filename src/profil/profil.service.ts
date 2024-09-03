@@ -449,6 +449,50 @@ export class ProfilService {
     }
   }
 
+  async getPostMediaOnProfil(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
+    try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
+      const posts = await this.prisma.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: userId,
+          imageUrl: {
+            not: null,
+          },
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const transformedPosts = posts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+      }))
+      return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting posts on the profil.'
+      )
+    }
+  }
+
   async changeAccountType(userId: string) {
     const user = await this.prisma.users.findFirst({
       where: {
