@@ -10,6 +10,7 @@ import {
   RecoverDetailsPostDto,
   RecoverDatePostDto,
   ViewInterractPostDto,
+  PostOrCommentTypeDto,
 } from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
@@ -81,6 +82,7 @@ export class PostService {
         where: { postId: deletePostDto.postId },
         select: { id: true },
       })
+
       const commentIds = comments.map((comment) => comment.id)
 
       // Supprimer les likes des commentaires
@@ -241,7 +243,10 @@ export class PostService {
           userId: { in: followeds.map((followed) => followed.followerId) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -258,6 +263,7 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -346,7 +352,10 @@ export class PostService {
           createdAt: { gt: new Date(dateString) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -364,6 +373,7 @@ export class PostService {
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
           createdAt: { gt: new Date(dateString) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -454,7 +464,10 @@ export class PostService {
           createdAt: { lt: new Date(dateString) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -472,6 +485,7 @@ export class PostService {
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
           createdAt: { lt: new Date(dateString) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -519,6 +533,56 @@ export class PostService {
       console.error(error)
       throw new BadRequestException(
         'An error occurred when getting more posts.'
+      )
+    }
+  }
+
+  async changePostOrCommentType(
+    postOrCommentType: PostOrCommentTypeDto,
+    userId: string
+  ) {
+    try {
+      const post = await this.prismaService.post.findUnique({
+        where: { id: postOrCommentType.postId },
+        select: { confidentiality: true },
+      })
+
+      if (post !== null) {
+        const newConfidentiality =
+          post?.confidentiality === 'public' ? 'private' : 'public'
+
+        await this.prismaService.post.update({
+          where: { id: postOrCommentType.postId },
+          data: { confidentiality: newConfidentiality },
+        })
+
+        return {
+          message: 'Post type successfully updated.',
+          type: newConfidentiality,
+        }
+      } else {
+        const comment = await this.prismaService.comment.findUnique({
+          where: { id: postOrCommentType.postId },
+          select: { confidentiality: true },
+        })
+
+        const newConfidentiality =
+          comment?.confidentiality === 'public' ? 'private' : 'public'
+
+        await this.prismaService.comment.update({
+          where: { id: postOrCommentType.postId },
+          data: { confidentiality: newConfidentiality },
+        })
+
+        return {
+          message: 'Comment type successfully updated.',
+          type: newConfidentiality,
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when updating the post or comment type.'
       )
     }
   }

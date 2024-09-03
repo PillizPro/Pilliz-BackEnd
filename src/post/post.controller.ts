@@ -4,6 +4,7 @@ import {
   DeletePostDto,
   RecoverDetailsPostDto,
   RecoverDatePostDto,
+  PostOrCommentTypeDto,
   ViewInterractPostDto,
 } from './dto'
 import { PostService } from './post.service'
@@ -61,6 +62,17 @@ export class PostController {
     @CurrentUserId() userId: string
   ) {
     return await this.postService.find20OlderPosts(recoverDatePostDto, userId)
+  }
+
+  @Post('changePostOrCommentType')
+  async changePostOrCommentType(
+    @Body() postOrCommentTypeDto: PostOrCommentTypeDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.changePostOrCommentType(
+      postOrCommentTypeDto,
+      userId
+    )
   }
 
   @Post('interractViewPost')

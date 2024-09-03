@@ -141,6 +141,17 @@ export class ProfilController {
     )
   }
 
+  @Post('getPrivateOnProfil')
+  async getPrivateOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPrivateOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
   @Get('changeAccountType')
   async changeAccountType(@CurrentUserId() userId: string) {
     return await this.profilService.changeAccountType(userId)

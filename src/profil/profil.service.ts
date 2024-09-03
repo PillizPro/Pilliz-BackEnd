@@ -176,6 +176,7 @@ export class ProfilService {
         orderBy: { createdAt: 'desc' },
         where: {
           userId: userId,
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -215,12 +216,21 @@ export class ProfilService {
       const comments = await this.prisma.comment.findMany({
         where: {
           userId: userId,
+          confidentiality: 'public',
+          AND: [
+            {
+              Post: {
+                confidentiality: 'public',
+              },
+            },
+          ],
         },
         orderBy: {
           createdAt: 'desc',
         },
         include: {
           Users: true,
+          Post: true,
         },
       })
 
@@ -281,6 +291,7 @@ export class ProfilService {
       const likedPosts = await this.prisma.post.findMany({
         where: {
           id: { in: likedPostsIds.map((lp) => lp) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -309,6 +320,14 @@ export class ProfilService {
       const likedComments = await this.prisma.comment.findMany({
         where: {
           id: { in: likedCommentsIds.map((lc) => lc) },
+          confidentiality: 'public',
+          AND: [
+            {
+              Post: {
+                confidentiality: 'public',
+              },
+            },
+          ],
         },
         include: {
           Users: true,
@@ -385,6 +404,7 @@ export class ProfilService {
       const repostedPosts = await this.prisma.post.findMany({
         where: {
           id: { in: repostedPostsIds.map((rp) => rp) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -414,6 +434,14 @@ export class ProfilService {
       const repostedComments = await this.prisma.comment.findMany({
         where: {
           id: { in: repostedCommentsIds.map((rc) => rc) },
+          confidentiality: 'public',
+          AND: [
+            {
+              Post: {
+                confidentiality: 'public',
+              },
+            },
+          ],
         },
         include: {
           Users: true,
@@ -486,6 +514,7 @@ export class ProfilService {
         take: 20,
         orderBy: { createdAt: 'desc' },
         where: {
+          confidentiality: 'public',
           userId: userId,
           imageUrl: {
             not: null,
@@ -514,6 +543,109 @@ export class ProfilService {
       console.error(error)
       throw new BadRequestException(
         'An error occurred when getting posts on the profil.'
+      )
+    }
+  }
+
+  async getPrivateOnProfil(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
+    try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
+
+      const privatePosts = await this.prisma.post.findMany({
+        where: {
+          userId: userId,
+          confidentiality: 'private',
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+
+      const transformedPosts = privatePosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        confidentiality: post.confidentiality,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags.map((tag) => tag.name),
+        isComment: false,
+      }))
+
+      const privateComments = await this.prisma.comment.findMany({
+        where: {
+          userId: userId,
+          confidentiality: 'private',
+        },
+        include: {
+          Users: true,
+          Post: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+
+      const transformedComments = await Promise.all(
+        privateComments.map(async (comment) => {
+          const repliesCount = await this.prisma.comment.count({
+            where: {
+              rootCommentId: comment.id,
+            },
+          })
+
+          const replyUsername = await this.prisma.post.findFirst({
+            where: {
+              id: comment.Post.id,
+            },
+            include: {
+              Users: true,
+            },
+          })
+
+          return {
+            userId: comment.userId,
+            postId: comment.postId,
+            commentId: comment.id,
+            userImgUrl: comment.Users?.profilPicture,
+            confidentiality: comment.confidentiality,
+            username: comment.Users.name,
+            content: comment.content,
+            likes: comment.likesCount,
+            reposts: comment.repostsCount,
+            createdAt: comment.createdAt,
+            originalPostId: comment.Post.id,
+            responseNumber: repliesCount,
+            replyName: replyUsername?.Users.name,
+            isComment: true,
+          }
+        })
+      )
+
+      const combinedContent = [...transformedPosts, ...transformedComments]
+      combinedContent.sort(
+        (a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
+      )
+
+      return combinedContent
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting private post / comment on the profil.'
       )
     }
   }

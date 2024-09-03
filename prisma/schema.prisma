@@ -94,6 +94,7 @@ model Post {
   repostsCount      Int       @default(0)
   commentsCount     Int       @default(0)
   totalInteractions Int       @default(0)
+  confidentiality   String    @default("public")
   Like              Like[]
   Repost            Repost[]
   Comment           Comment[]
@@ -148,22 +149,23 @@ model Repost {
 }
 
 model Comment {
-  id            String    @id @default(uuid())
-  content       String    @db.VarChar(1000)
-  userId        String
-  postId        String
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  parentId      String?   @db.VarChar(36)
-  rootCommentId String?   @db.VarChar(36)
-  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
-  children      Comment[] @relation("ChildComments")
-  Post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Like          Like[]
-  Repost        Repost[]
-  Reports       Reports[]
+  id              String    @id @default(uuid())
+  content         String    @db.VarChar(1000)
+  userId          String
+  postId          String
+  createdAt       DateTime  @default(now())
+  likesCount      Int       @default(0)
+  repostsCount    Int       @default(0)
+  parentId        String?   @db.VarChar(36)
+  rootCommentId   String?   @db.VarChar(36)
+  confidentiality String    @default("public")
+  parent          Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children        Comment[] @relation("ChildComments")
+  Post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Users           Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like            Like[]
+  Repost          Repost[]
+  Reports         Reports[]
 }
 
 model Conversation {
