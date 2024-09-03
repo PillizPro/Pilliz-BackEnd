@@ -53,6 +53,29 @@ export class ProfilService {
     return userPosts.length
   }
 
+  async getNbInterractions(userId: string) {
+    try {
+      const userInterractions = await this.prisma.post.findMany({
+        where: {
+          userId: userId,
+        },
+      })
+
+      let cumulatedInterractions = 0
+
+      for (const post of userInterractions) {
+        cumulatedInterractions += post.totalInteractions
+      }
+
+      return cumulatedInterractions
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting posts on the profil.'
+      )
+    }
+  }
+
   async fetchUserInfos(userId: string) {
     try {
       // Récupérer les posts récents originaux
@@ -68,6 +91,7 @@ export class ProfilService {
 
       const userBio = await this.getBio(userId)
       const userNbPosts = await this.getNbPost(userId)
+      const userNbInterractions = await this.getNbInterractions(userId)
       const userNbFollowers = await this.followService.getNbFollowers(userId)
       const userNbFollowings = await this.followService.getNbFollowing(userId)
 
@@ -78,6 +102,7 @@ export class ProfilService {
         nbPosts: userNbPosts,
         nbFollowers: userNbFollowings,
         nbFollowings: userNbFollowers,
+        nbInterractions: userNbInterractions,
       }
 
       return informations
@@ -485,6 +510,36 @@ export class ProfilService {
         createdAt: post.createdAt,
       }))
       return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting posts on the profil.'
+      )
+    }
+  }
+
+  async getInterractionsOnProfil(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
+    try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
+
+      const userInterractions = await this.prisma.post.findMany({
+        where: {
+          userId: userId,
+        },
+      })
+
+      let cumulatedInterractions = 0
+
+      for (const post of userInterractions) {
+        cumulatedInterractions += post.totalInteractions
+      }
+
+      return cumulatedInterractions
     } catch (error) {
       console.error(error)
       throw new BadRequestException(

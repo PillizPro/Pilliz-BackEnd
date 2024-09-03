@@ -40,6 +40,11 @@ export class ProfilController {
     return await this.profilService.getNbPost(userId)
   }
 
+  @Get('userNbInterractions')
+  async getUserNbInterractions(@CurrentUserId() userId: string) {
+    return await this.profilService.getNbInterractions(userId)
+  }
+
   @Get('otherUsersInfos/:userId')
   async fetchUserInfos(@Param('userId', new ParseUUIDPipe()) userId: string) {
     return await this.profilService.fetchUserInfos(userId)
