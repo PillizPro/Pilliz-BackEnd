@@ -66,6 +66,7 @@ model Users {
   blockedUsers           String[]                 @default([])
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
+  Applicants             Applicants[]
 }
 
 model Follows {
@@ -103,18 +104,28 @@ model Post {
 }
 
 model CompanyOffer {
-  id                           String   @id @default(uuid())
+  id                           String       @id @default(uuid())
   userId                       String
-  content                      String   @db.VarChar(1000)
-  createdAt                    DateTime @default(now())
-  Users                        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content                      String       @db.VarChar(1000)
+  createdAt                    DateTime     @default(now())
+  Users                        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Tags                         Tags[]
-  companyOfferTitle            String   @default("")
-  companyOfferDiploma          String   @default("")
-  companyOfferSkills           String   @default("")
-  companyOfferContractType     String   @default("")
-  companyOfferContractDuration String   @default("")
-  companyOfferSalary           String   @default("")
+  companyOfferTitle            String       @default("")
+  companyOfferDiploma          String       @default("")
+  companyOfferSkills           String       @default("")
+  companyOfferContractType     String       @default("")
+  companyOfferContractDuration String       @default("")
+  companyOfferSalary           String       @default("")
+  Applicants                   Applicants[]
+}
+
+model Applicants {
+  id           String       @id @default(uuid())
+  userId       String
+  offerId      String
+  Users        Users        @relation(fields: [userId], references: [id])
+  CompanyOffer CompanyOffer @relation(fields: [offerId], references: [id])
+  createdAt    DateTime     @default(now())
 }
 
 model Tags {
