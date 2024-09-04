@@ -66,6 +66,7 @@ model Users {
   blockedUsers           String[]                 @default([])
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
+  Achievements           Achievements[]
 }
 
 model Follows {
@@ -276,6 +277,14 @@ model Reports {
   Users       Users    @relation(fields: [reportedBy], references: [id])
   Post        Post?    @relation(fields: [postId], references: [id])
   Comment     Comment? @relation(fields: [commentId], references: [id])
+}
+
+model Achievements {
+  id           String   @id @default(uuid())
+  userId       String
+  achievements String
+  achievedAt   DateTime @default(now())
+  Users        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRoles {
