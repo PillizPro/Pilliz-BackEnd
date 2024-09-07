@@ -12,8 +12,10 @@ model Users {
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
   userTag                String?                  @unique
+  accountType            String                   @default("public")
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
+  hashedRefreshToken     String?
   role                   UserRoles                @default(user)
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
@@ -68,9 +70,9 @@ model Users {
 }
 
 model Follows {
-  follower    Users  @relation("follower", fields: [followerId], references: [id])
+  follower    Users  @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  String
-  following   Users  @relation("following", fields: [followingId], references: [id])
+  following   Users  @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId String
 
   @@id([followerId, followingId])
@@ -80,24 +82,25 @@ model Document {
   docName String @unique @db.VarChar(255)
   docUrl  String @db.VarChar(255)
   userId  String
-  Users   Users  @relation(fields: [userId], references: [id])
+  Users   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  content       String    @db.VarChar(1000)
-  imageUrl      String?   @db.VarChar(1000)
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  commentsCount Int       @default(0)
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Users         Users     @relation(fields: [userId], references: [id])
-  Tags          Tags[]
-  Reports       Reports[]
+  id                String    @id @default(uuid())
+  userId            String
+  content           String    @db.VarChar(1000)
+  imageUrl          String?   @db.VarChar(1000)
+  createdAt         DateTime  @default(now())
+  likesCount        Int       @default(0)
+  repostsCount      Int       @default(0)
+  commentsCount     Int       @default(0)
+  totalInteractions Int       @default(0)
+  Like              Like[]
+  Repost            Repost[]
+  Comment           Comment[]
+  Users             Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tags              Tags[]
+  Reports           Reports[]
 }
 
 model CompanyOffer {
@@ -105,7 +108,7 @@ model CompanyOffer {
   userId                       String
   content                      String       @db.VarChar(1000)
   createdAt                    DateTime     @default(now())
-  Users                        Users        @relation(fields: [userId], references: [id])
+  Users                        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Tags                         Tags[]
   companyOfferTitle            String       @default("")
   companyOfferDiploma          String       @default("")
@@ -139,9 +142,9 @@ model Like {
   postId    String?
   commentId String?
   createdAt DateTime @default(now())
-  Post      Post?    @relation(fields: [postId], references: [id])
-  Comment   Comment? @relation(fields: [commentId], references: [id])
-  Users     Users    @relation(fields: [userId], references: [id])
+  Post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Repost {
@@ -150,9 +153,9 @@ model Repost {
   postId    String?
   commentId String?
   createdAt DateTime @default(now())
-  Post      Post?    @relation(fields: [postId], references: [id])
-  Comment   Comment? @relation(fields: [commentId], references: [id])
-  Users     Users    @relation(fields: [userId], references: [id])
+  Post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -167,8 +170,8 @@ model Comment {
   rootCommentId String?   @db.VarChar(36)
   parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
   children      Comment[] @relation("ChildComments")
-  Post          Post      @relation(fields: [postId], references: [id])
-  Users         Users     @relation(fields: [userId], references: [id])
+  Post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
   Like          Like[]
   Repost        Repost[]
   Reports       Reports[]
@@ -179,6 +182,7 @@ model Conversation {
   Messages               Message[]
   Users                  Users[]                 @relation("partOfConv")
   UsersThatDeleteConv    Users[]                 @relation("convDeleted")
+  isProConv              Boolean
   InvitationConversation InvitationConversation?
 }
 
@@ -189,15 +193,15 @@ model InvitationConversation {
   userId         String
   invitation     Boolean      @default(true)
   Conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  User           Users        @relation(fields: [nonefollowerId], references: [id])
+  User           Users        @relation(fields: [nonefollowerId], references: [id], onDelete: Cascade)
 }
 
 model Message {
   id               String             @id @default(uuid())
   authorId         String
-  Author           Users              @relation("send", fields: [authorId], references: [id])
+  Author           Users?             @relation("send", fields: [authorId], references: [id])
   receiverId       String
-  Receiver         Users              @relation("received", fields: [receiverId], references: [id])
+  Receiver         Users?             @relation("received", fields: [receiverId], references: [id])
   createdAt        DateTime           @default(now())
   content          String
   conversationId   String
@@ -213,7 +217,7 @@ model MessageReactions {
   messageId      String
   Message        Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   userIdReaction String
-  User           Users   @relation(fields: [userIdReaction], references: [id])
+  User           Users?  @relation(fields: [userIdReaction], references: [id])
 
   @@unique(name: "msgUserReactId", [messageId, userIdReaction])
 }

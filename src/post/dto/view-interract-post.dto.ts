@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator'
 
-export class RecoverPostDto {
+export class ViewInterractPostDto {
   @IsNotEmpty()
-  readonly userId: string
+  readonly postId: string
 }

@@ -1,60 +1,132 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common'
-import { ChangeBioDto } from './dto/change-bio.dto'
-import { UserFetchInfos } from './dto/other-user-infos.dto'
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common'
+import {
+  ChangeBioDto,
+  ChangeProfilImgDto,
+  UploadFilesDto,
+  OtherUserProfilIdDto,
+} from './dto'
+import { CurrentUserId } from 'src/common/decorators'
 import { ProfilService } from './profil.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
-// Dto
-import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
-import { UploadFilesDto } from './dto/upload-files.dto'
-
+@ApiBearerAuth()
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
   constructor(private readonly profilService: ProfilService) {}
 
-  @Post('changebio')
-  async changeBio(@Body() changeBioDto: ChangeBioDto) {
-    return await this.profilService.changeBio(changeBioDto)
+  @Post('changeBio')
+  async changeBio(
+    @Body() changeBioDto: ChangeBioDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.changeBio(changeBioDto, userId)
   }
 
-  @Get('userBio/:userId')
-  async getUserBio(@Param('userId') userId: string) {
+  @Get('userBio')
+  async getUserBio(@CurrentUserId() userId: string) {
     return await this.profilService.getBio(userId)
   }
 
-  @Get('userNbPost/:userId')
-  async getUserNumbersOfPost(@Param('userId') userId: string) {
+  @Get('userNbPost')
+  async getUserNumbersOfPost(@CurrentUserId() userId: string) {
     return await this.profilService.getNbPost(userId)
   }
 
-  @Post('otherUsersInfos')
-  async fetchUserInfos(@Body() userFetchInfos: UserFetchInfos) {
-    return await this.profilService.fetchUserInfos(userFetchInfos)
+  @Get('otherUsersInfos/:userId')
+  async fetchUserInfos(@Param('userId', new ParseUUIDPipe()) userId: string) {
+    return await this.profilService.fetchUserInfos(userId)
   }
 
   @Post('changeProfilImg')
-  async changeProfilImg(@Body() changeProfilImgDto: ChangeProfilImgDto) {
-    return await this.profilService.changeProfilImage(changeProfilImgDto)
+  async changeProfilImg(
+    @Body() changeProfilImgDto: ChangeProfilImgDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.changeProfilImage(
+      changeProfilImgDto,
+      userId
+    )
   }
 
-  @Get('userProfilImg/:userId')
-  async getUserProfilImg(@Param('userId') userId: string) {
+  @Get('userProfilImg')
+  async getUserProfilImg(@CurrentUserId() userId: string) {
     return await this.profilService.getUserProfilImg(userId)
   }
 
   @Post('uploadUserDocument')
-  async uploadUserDocument(@Body() uploadFilesDto: UploadFilesDto) {
-    return await this.profilService.uploadUserDocument(uploadFilesDto)
+  async uploadUserDocument(
+    @Body() uploadFilesDto: UploadFilesDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.uploadUserDocument(uploadFilesDto, userId)
   }
 
-  @Get('getUserDocuments/:userId')
-  async getUserDocuments(@Param('userId') userId: string) {
+  @Get('getUserDocuments')
+  async getUserDocuments(@CurrentUserId() userId: string) {
     return await this.profilService.getUserDocuments(userId)
   }
 
   @Get('getIdentifyingPosts/:userId')
-  async getIdentifyingPosts(@Param('userId') userId: string) {
+  async getIdentifyingPosts(
+    @Param('userId', new ParseUUIDPipe()) userId: string
+  ) {
     return await this.profilService.getIdentifyingPosts(userId)
+  }
+
+  @Post('getPostOnProfil')
+  async getPostOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPostOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getCommentOnProfil')
+  async getCommentOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getCommentOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getLikeOnProfil')
+  async getLikeOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getLikeOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getRepostOnProfil')
+  async getRepostOnProfile(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getRepostOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Get('changeAccountType')
+  async changeAccountType(@CurrentUserId() userId: string) {
+    return await this.profilService.changeAccountType(userId)
   }
 }

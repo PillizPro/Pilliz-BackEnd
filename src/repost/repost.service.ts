@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { RepostDto } from './dto/repost.dto'
+import { RepostDto } from './dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
@@ -10,11 +10,11 @@ export class RepostService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async repost(repostDto: RepostDto) {
+  async repost(repostDto: RepostDto, userId: string) {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
-      ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId }
+      ? { userId: userId, postId: repostDto.postId }
+      : { userId: userId, commentId: repostDto.commentId }
 
     const existingRepost = await this.prisma.repost.findFirst({
       where: whereClause,
@@ -22,18 +22,21 @@ export class RepostService {
 
     if (!existingRepost) {
       // Créer une nouvelle republication
-      await this.prisma.repost.create({ data: { ...repostDto } })
+      await this.prisma.repost.create({ data: { ...repostDto, userId } })
 
       // Mise à jour du compteur de reposts
       if (repostDto.postId) {
         const post = await this.prisma.post.update({
           where: { id: repostDto.postId },
-          data: { repostsCount: { increment: 1 } },
+          data: {
+            repostsCount: { increment: 1 },
+            totalInteractions: { increment: 1 },
+          },
         })
         this.eventEmitter.emit(
           'notifyUser',
           4,
-          repostDto.userId,
+          userId,
           post.content,
           post.userId
         )
@@ -45,19 +48,29 @@ export class RepostService {
         this.eventEmitter.emit(
           'notifyUser',
           5,
-          repostDto.userId,
+          userId,
           comment.content,
           comment.userId
         )
+
+        const findOriginalPost = await this.prisma.comment.findFirst({
+          where: { id: repostDto.commentId },
+          select: { postId: true },
+        })
+
+        await this.prisma.post.update({
+          where: { id: findOriginalPost?.postId },
+          data: { totalInteractions: { increment: 1 } },
+        })
       }
     }
   }
 
-  async unrepost(repostDto: RepostDto) {
+  async unrepost(repostDto: RepostDto, userId: string) {
     // Vérifier si c'est un repost de post ou de commentaire
     const whereClause = repostDto.postId
-      ? { userId: repostDto.userId, postId: repostDto.postId }
-      : { userId: repostDto.userId, commentId: repostDto.commentId }
+      ? { userId: userId, postId: repostDto.postId }
+      : { userId: userId, commentId: repostDto.commentId }
 
     const existingRepost = await this.prisma.repost.findFirst({
       where: whereClause,

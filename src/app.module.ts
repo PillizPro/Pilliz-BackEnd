@@ -27,6 +27,8 @@ import { CronModule } from './cron/cron.module'
 import { OfferModule } from './company-offer/offer.module'
 import { ApplicantModule } from './applicants/applicant.module'
 import { BlockingModule } from './blocking/blocking.module'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from './common/guards'
 
 const ENV = process.env.NODE_ENV
 
@@ -39,7 +41,7 @@ const ENV = process.env.NODE_ENV
           ? 'env-prod/.env.prod'
           : ENV === 'staging'
           ? 'env-staging/.env.staging'
-          : ENV === 'development'
+          : ENV === 'development' || ENV === 'test'
           ? 'env-dev/.env.dev'
           : '',
       expandVariables: true,
@@ -75,6 +77,12 @@ const ENV = process.env.NODE_ENV
     BlockingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

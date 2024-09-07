@@ -10,12 +10,16 @@ export class UserEntity implements Users {
   email: string
   name: string
   userTag: string | null
+  accountType: string
   @ApiHideProperty()
   @Exclude()
   nameLowercase: string
   @ApiHideProperty()
   @Exclude()
   password: string
+  @ApiHideProperty()
+  @Exclude()
+  hashedRefreshToken: string | null
   @ApiProperty({ enum: UserRoles, enumName: 'UserRoles' })
   role: UserRoles
   @ApiProperty({ enum: BanningStatus, enumName: 'BanningStatus' })
