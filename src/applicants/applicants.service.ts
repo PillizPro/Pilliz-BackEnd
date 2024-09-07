@@ -1,7 +1,6 @@
 import { Injectable, ConflictException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { ApplyToOfferDto } from './dto/apply-to-offer.dto'
-import { GetApplicantsByOffer } from './dto/get-applicants-by-offer.dto'
+import { ApplyToOfferDto, GetApplicantsByOffer } from './dto'
 import { ApplicantEntity } from './entity/applicant.entity'
 
 @Injectable()

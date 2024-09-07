@@ -1,6 +1,5 @@
 import { Body, Controller, Post, Get, Headers } from '@nestjs/common'
-import { ApplyToOfferDto } from './dto/apply-to-offer.dto'
-import { GetApplicantsByOffer } from './dto/get-applicants-by-offer.dto'
+import { ApplyToOfferDto, GetApplicantsByOffer } from './dto'
 import { ApplicantService } from './applicants.service'
 import { ApiTags } from '@nestjs/swagger'
 
