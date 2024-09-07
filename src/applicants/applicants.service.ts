@@ -7,8 +7,8 @@ import { ApplicantEntity } from './entity/applicant.entity'
 export class ApplicantService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async applyToOffer(applyToOfferDto: ApplyToOfferDto) {
-    const { offerId, userId } = applyToOfferDto
+  async applyToOffer(applyToOfferDto: ApplyToOfferDto, userId: string) {
+    const { offerId } = applyToOfferDto
     const existingApplication = await this.prismaService.applicants.findFirst({
       where: { offerId, userId },
     })
@@ -20,6 +20,7 @@ export class ApplicantService {
     const newApplicant = await this.prismaService.applicants.create({
       data: {
         ...applyToOfferDto,
+        userId,
       },
     })
 
