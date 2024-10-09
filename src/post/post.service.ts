@@ -925,7 +925,9 @@ export class PostService {
       })
     } catch (error) {
       console.error(error)
-      throw new BadRequestException('An error occurred when interracting with the post')
+      throw new BadRequestException(
+        'An error occurred when interracting with the post'
+      )
     }
   }
 }
