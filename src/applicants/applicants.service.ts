@@ -1,15 +1,14 @@
 import { Injectable, ConflictException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { ApplyToOfferDto } from './dto/apply-to-offer.dto'
-import { GetApplicantsByOffer } from './dto/get-applicants-by-offer.dto'
+import { ApplyToOfferDto, GetApplicantsByOffer } from './dto'
 import { ApplicantEntity } from './entity/applicant.entity'
 
 @Injectable()
 export class ApplicantService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async applyToOffer(applyToOfferDto: ApplyToOfferDto) {
-    const { offerId, userId } = applyToOfferDto
+  async applyToOffer(applyToOfferDto: ApplyToOfferDto, userId: string) {
+    const { offerId } = applyToOfferDto
     const existingApplication = await this.prismaService.applicants.findFirst({
       where: { offerId, userId },
     })
@@ -21,6 +20,7 @@ export class ApplicantService {
     const newApplicant = await this.prismaService.applicants.create({
       data: {
         ...applyToOfferDto,
+        userId,
       },
     })
 
