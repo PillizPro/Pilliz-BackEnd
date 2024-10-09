@@ -66,6 +66,7 @@ model Users {
   blockedUsers           String[]                 @default([])
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
+  Achievements           Achievements[]
   Applicants             Applicants[]
 }
 
@@ -95,6 +96,7 @@ model Post {
   repostsCount      Int       @default(0)
   commentsCount     Int       @default(0)
   totalInteractions Int       @default(0)
+  confidentiality   String    @default("public")
   Like              Like[]
   Repost            Repost[]
   Comment           Comment[]
@@ -159,22 +161,23 @@ model Repost {
 }
 
 model Comment {
-  id            String    @id @default(uuid())
-  content       String    @db.VarChar(1000)
-  userId        String
-  postId        String
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  parentId      String?   @db.VarChar(36)
-  rootCommentId String?   @db.VarChar(36)
-  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
-  children      Comment[] @relation("ChildComments")
-  Post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Like          Like[]
-  Repost        Repost[]
-  Reports       Reports[]
+  id              String    @id @default(uuid())
+  content         String    @db.VarChar(1000)
+  userId          String
+  postId          String
+  createdAt       DateTime  @default(now())
+  likesCount      Int       @default(0)
+  repostsCount    Int       @default(0)
+  parentId        String?   @db.VarChar(36)
+  rootCommentId   String?   @db.VarChar(36)
+  confidentiality String    @default("public")
+  parent          Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children        Comment[] @relation("ChildComments")
+  Post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Users           Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like            Like[]
+  Repost          Repost[]
+  Reports         Reports[]
 }
 
 model Conversation {
@@ -285,6 +288,14 @@ model Reports {
   Users       Users    @relation(fields: [reportedBy], references: [id])
   Post        Post?    @relation(fields: [postId], references: [id])
   Comment     Comment? @relation(fields: [commentId], references: [id])
+}
+
+model Achievements {
+  id           String   @id @default(uuid())
+  userId       String
+  achievements String
+  achievedAt   DateTime @default(now())
+  Users        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRoles {

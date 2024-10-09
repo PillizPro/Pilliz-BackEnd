@@ -27,6 +27,7 @@ import { CronModule } from './cron/cron.module'
 import { OfferModule } from './company-offer/offer.module'
 import { ApplicantModule } from './applicants/applicant.module'
 import { BlockingModule } from './blocking/blocking.module'
+import { AchievementsModule } from './achievements/achievements.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/guards'
 
@@ -75,6 +76,7 @@ const ENV = process.env.NODE_ENV
     OfferModule,
     ApplicantModule,
     BlockingModule,
+    AchievementsModule,
   ],
   controllers: [AppController],
   providers: [
