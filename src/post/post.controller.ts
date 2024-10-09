@@ -92,24 +92,12 @@ export class PostController {
   }
 
   @Post('changePostOrCommentType')
-  async changePostOrCommentType(
-    @Body() postOrCommentTypeDto: PostOrCommentTypeDto,
-    @CurrentUserId() userId: string
-  ) {
-    return await this.postService.changePostOrCommentType(
-      postOrCommentTypeDto,
-      userId
-    )
+  async changePostOrCommentType(@Body() postOrCommentTypeDto: PostOrCommentTypeDto) {
+    return await this.postService.changePostOrCommentType(postOrCommentTypeDto)
   }
 
   @Post('interractViewPost')
-  async interractViewPost(
-    @Body() viewInterractPostDto: ViewInterractPostDto,
-    @CurrentUserId() userId: string
-  ) {
-    return await this.postService.interractViewPost(
-      viewInterractPostDto,
-      userId
-    )
+  async interractViewPost(@Body() viewInterractPostDto: ViewInterractPostDto) {
+    return await this.postService.interractViewPost(viewInterractPostDto)
   }
 }
