@@ -28,7 +28,7 @@ export class PostService {
       const { content, imageBase64, tagsList } = createPostDto
 
       if (containsForbiddenWord(content)) {
-        throw new Error('Content contains forbidden words')
+        throw new BadRequestException('Content contains forbidden words')
       }
 
       let imageUrl = null
