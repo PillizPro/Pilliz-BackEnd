@@ -92,7 +92,9 @@ export class PostController {
   }
 
   @Post('changePostOrCommentType')
-  async changePostOrCommentType(@Body() postOrCommentTypeDto: PostOrCommentTypeDto) {
+  async changePostOrCommentType(
+    @Body() postOrCommentTypeDto: PostOrCommentTypeDto
+  ) {
     return await this.postService.changePostOrCommentType(postOrCommentTypeDto)
   }
 
