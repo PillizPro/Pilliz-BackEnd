@@ -1,6 +1,6 @@
 import { Injectable, ConflictException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { ApplyToOfferDto, GetApplicantsByOffer } from './dto'
+import { ApplyToOfferDto } from './dto'
 import { ApplicantEntity } from './entity/applicant.entity'
 
 @Injectable()
@@ -27,13 +27,17 @@ export class ApplicantService {
     return new ApplicantEntity(newApplicant)
   }
 
-  async getApplicantsByOffer({ offerId }: GetApplicantsByOffer) {
+  async getApplicantsByOffer(offerId: string) {
     try {
       const applicants = await this.prismaService.applicants.findMany({
         where: {
           offerId,
         },
       })
+
+      if (applicants.length === 0) {
+        return []
+      }
 
       const foundUsers = await this.prismaService.users.findMany({
         where: {
@@ -42,9 +46,16 @@ export class ApplicantService {
           },
         },
       })
+
       return applicants.map((applicant) => {
-        const user = foundUsers.find((user) => user.id === applicant.userId)
-        return new ApplicantEntity({ ...applicant, users: user })
+        const user = foundUsers.find((u) => u.id === applicant.userId)
+
+        return {
+          userId: user?.id,
+          offerId: offerId,
+          createdAt: applicant.createdAt,
+          users: user,
+        }
       })
     } catch (error) {
       console.error(error)
