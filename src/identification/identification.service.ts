@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { IdentifyUsersDto } from './dto/identify-users.dto'
+import { contains } from 'class-validator'
 
 // Services
 
 @Injectable()
 export class IdentificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getAllUserTagWithPattern(pattern: string) {
     const users = await this.prisma.users.findMany({
@@ -18,6 +19,21 @@ export class IdentificationService {
     })
 
     return users
+  }
+
+  async formatUserTag(userTag: string) {
+    const users = await this.prisma.users.findMany({
+      where: {
+        userTag: {
+          startsWith: userTag,
+        },
+      },
+    })
+
+    if (users.length == 0)
+      return ""
+    else
+      return users.length.toString()
   }
 
   async isUserTagExist(userTag: string) {

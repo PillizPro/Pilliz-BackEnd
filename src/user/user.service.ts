@@ -11,14 +11,27 @@ import { BanningStatus } from '@prisma/client'
 export class UserService {
   private readonly _logger = new Logger(UserService.name)
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async createUser(createUserDto: CreateUserDto) {
     try {
+      const nbUserTag = await this.prismaService.users.findMany({
+        where: {
+          userTag: {
+            startsWith: createUserDto.userTag,
+          }
+        }
+      })
+
+      var realUserTag = createUserDto.userTag;
+      if (nbUserTag.length != 0)
+        realUserTag += nbUserTag.length.toString()
+
       const user = await this.prismaService.users.create({
         data: {
           nameLowercase: createUserDto.name.toLowerCase(),
           ...createUserDto,
+          userTag: realUserTag,
         },
       })
       return new UserEntity(user)

@@ -8,6 +8,7 @@ import { DocumentUploadService } from 'src/document/upload-document.service'
 import { IdentificationService } from 'src/identification/identification.service'
 import { LikeService } from 'src/like/like.service'
 import { RepostService } from 'src/repost/repost.service'
+import { DeletedFilesDto } from './dto/delete-files.dto'
 
 // DTO
 import { UploadFilesDto } from './dto/upload-files.dto'
@@ -24,7 +25,7 @@ export class ProfilService {
     private readonly identificationService: IdentificationService,
     private readonly likeService: LikeService,
     private readonly repostService: RepostService
-  ) {}
+  ) { }
 
   async changeBio(changeBioDto: ChangeBioDto, userId: string) {
     await this.prisma.users.update({
@@ -113,6 +114,11 @@ export class ProfilService {
     }
 
     return this.docService.uploadUserDocument(userId, docName, docUrl)
+  }
+
+  async deleteUserDocument(deletedFilesDto: DeletedFilesDto, userId: string) {
+    const { docName } = deletedFilesDto;
+    await this.docService.DeleteUserDocuments(userId, docName);
   }
 
   async getUserDocuments(userId: string) {

@@ -23,7 +23,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
-  ) {}
+  ) { }
 
   async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashData(registerDto.password)
