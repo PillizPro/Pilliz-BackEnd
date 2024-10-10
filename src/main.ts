@@ -17,10 +17,7 @@ import * as express from 'express'
 
 const ENV = process.env.NODE_ENV
 
-declare const module: any;
-
 async function bootstrap() {
-  
   const logLevels: LogLevel[] =
     ENV === 'production'
       ? ['fatal', 'error', 'warn', 'log']
@@ -28,10 +25,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: logLevels,
   })
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
 
   app.setGlobalPrefix('api')
   app.enableVersioning({

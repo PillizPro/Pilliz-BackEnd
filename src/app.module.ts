@@ -29,12 +29,12 @@ import { BlockingModule } from './blocking/blocking.module'
 import { AchievementsModule } from './achievements/achievements.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/guards'
-import { MailerService } from './mailer/mailer.service';
+// import { MailerService } from './mailer/mailer.service'
 import { TicketModule } from './ticket/ticket.module'
 import { SignalementModule } from './signalement/signalement.module'
 import { MailerModule } from './mailer/mailer.module'
-import { AnnouncementController } from './announcement/announcement.controller';
-import { AnnouncementService } from './announcement/announcement.service';
+import { AnnouncementController } from './announcement/announcement.controller'
+import { AnnouncementService } from './announcement/announcement.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -83,7 +83,7 @@ const ENV = process.env.NODE_ENV
     AchievementsModule,
     TicketModule,
     SignalementModule,
-    MailerModule
+    MailerModule,
   ],
   controllers: [AppController, AnnouncementController],
   providers: [
