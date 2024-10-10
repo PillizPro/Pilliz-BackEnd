@@ -537,10 +537,7 @@ export class PostService {
     }
   }
 
-  async changePostOrCommentType(
-    postOrCommentType: PostOrCommentTypeDto,
-    userId: string
-  ) {
+  async changePostOrCommentType(postOrCommentType: PostOrCommentTypeDto) {
     try {
       const post = await this.prismaService.post.findUnique({
         where: { id: postOrCommentType.postId },
@@ -587,10 +584,7 @@ export class PostService {
     }
   }
 
-  async interractViewPost(
-    viewInterractPostDto: ViewInterractPostDto,
-    userId: string
-  ) {
+  async interractViewPost(viewInterractPostDto: ViewInterractPostDto) {
     try {
       await this.prismaService.post.update({
         where: { id: viewInterractPostDto.postId },
