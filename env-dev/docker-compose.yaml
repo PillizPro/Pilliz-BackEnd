@@ -20,6 +20,7 @@ services:
       timeout: 20s
     depends_on:
       - pilliz-db-dev
+      - redis
     tty: true
 
   pilliz-backend-test:
@@ -47,13 +48,20 @@ services:
   dbadmin:
     image: dpage/pgadmin4
     container_name: env-dev_dbadmin
-    restart: always
+    restart: unless-stopped
     ports:
       - '8081:80'
     env_file:
       - ./.dbadmin.cred
     volumes:
       - dbadmin-data:/var/lib/pgadmin
+
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379'
+    restart: unless-stopped
+
 volumes:
   pilliz-db-dev-data:
     name: pilliz-db-dev-data
