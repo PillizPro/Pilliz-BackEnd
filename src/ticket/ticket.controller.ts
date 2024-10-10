@@ -17,10 +17,13 @@ export class TicketController {
 
   @ApiBearerAuth()
   @Post('createTicket')
-  async createTicket(@CurrentUserId() userId: string, @Body() createTicket: TicketDto) {
+  async createTicket(
+    @CurrentUserId() userId: string,
+    @Body() createTicket: TicketDto
+  ) {
     return await this.ticketService.createTicket(createTicket, userId)
   }
-  
+
   @ApiBearerAuth()
   @Post('changeTicketStatus')
   async changeTicketStatus(@Param('ticketId') ticketId: string) {
@@ -29,7 +32,10 @@ export class TicketController {
 
   @ApiBearerAuth()
   @Post('addResponse')
-  async addResponse(@CurrentUserId() userId: string, @Body() ticketResponse: TicketResponseDto) {
+  async addResponse(
+    @CurrentUserId() userId: string,
+    @Body() ticketResponse: TicketResponseDto
+  ) {
     return await this.ticketService.addResponse(ticketResponse, userId)
   }
 
