@@ -32,7 +32,7 @@ export class MailerService {
 
     const mailOptions = mailOptionsMaker(mail, typeMail)
 
-    transporter.sendMail(mailOptions, (err : Error) => {
+    transporter.sendMail(mailOptions, (err: Error) => {
       if (err) {
         throw new Error('An error occured when sending the email')
       } else {

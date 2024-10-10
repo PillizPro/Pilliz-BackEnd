@@ -15,7 +15,6 @@ import { ITokenPayload } from './strategies/jwt.strategy'
 import { ConfigService } from '@nestjs/config'
 import { Tokens } from './auth.controller'
 
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -81,16 +80,16 @@ export class AuthService {
   async makeUserAdmin(userId: string): Promise<void> {
     const user = await this.prismaService.users.findUnique({
       where: { id: userId },
-    });
-  
+    })
+
     if (!user) {
-      throw new UnauthorizedException("This user doesn't exist.");
+      throw new UnauthorizedException("This user doesn't exist.")
     }
-  
+
     await this.prismaService.users.update({
       where: { id: userId },
-      data: { role : 'admin' },
-    });
+      data: { role: 'admin' },
+    })
   }
 
   async getUserAuthInfo(userId: string) {

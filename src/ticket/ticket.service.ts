@@ -18,13 +18,13 @@ export class TicketService {
 
   async createTicket(ticket: TicketDto, userId: string) {
     try {
-        await this.prismaService.ticket.create({
-          data: { 
-            userId: userId,
-            category: ticket.category,
-            description: ticket.description,
-          },
-        })
+      await this.prismaService.ticket.create({
+        data: {
+          userId: userId,
+          category: ticket.category,
+          description: ticket.description,
+        },
+      })
     } catch (error) {
       throw new Error('An error occurred when creating the ticket.')
     }

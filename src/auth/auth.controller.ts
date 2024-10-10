@@ -67,7 +67,6 @@ export class AuthController {
     return await this.authService.resetPassword(resetPasswordDto)
   }
 
-
   // get user id from token
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
