@@ -35,17 +35,17 @@ export class PostController {
     return await this.postService.findAllPosts()
   }
 
-  @Get('find20LastsPosts')
-  async find20LastsPosts(@CurrentUserId() userId: string) {
-    return await this.postService.find20LastsPosts(userId)
-  }
-
   @Post('findPostInfo')
   async findPostById(
     @Body() recoverDetailsPostDto: RecoverDetailsPostDto,
     @CurrentUserId() userId: string
   ) {
     return await this.postService.findPostById(recoverDetailsPostDto, userId)
+  }
+
+  @Get('find20LastsPosts')
+  async find20LastsPosts(@CurrentUserId() userId: string) {
+    return await this.postService.find20LastsPosts(userId)
   }
 
   @Post('find20RecentsPosts')
@@ -62,6 +62,33 @@ export class PostController {
     @CurrentUserId() userId: string
   ) {
     return await this.postService.find20OlderPosts(recoverDatePostDto, userId)
+  }
+
+  @Get('find20LastsPostsFollowed')
+  async find20LastsPostsFollowed(@CurrentUserId() userId: string) {
+    return await this.postService.find20LastsPostsFollowed(userId)
+  }
+
+  @Post('find20RecentsPostsFollowed')
+  async find20RecentsPostsFollowed(
+    @Body() recoverDatePostDto: RecoverDatePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.find20RecentsPostsFollowed(
+      recoverDatePostDto,
+      userId
+    )
+  }
+
+  @Post('find20OlderPostsFollowed')
+  async find20OlderPostsFollowed(
+    @Body() recoverDatePostDto: RecoverDatePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.find20OlderPostsFollowed(
+      recoverDatePostDto,
+      userId
+    )
   }
 
   @Post('changePostOrCommentType')
