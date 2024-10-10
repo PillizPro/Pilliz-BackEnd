@@ -67,6 +67,8 @@ model Users {
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
   Achievements           Achievements[]
+  Ticket                 Ticket[]
+  signalement            Signalement[]
   Applicants             Applicants[]
 }
 
@@ -306,4 +308,69 @@ enum UserRoles {
 enum BanningStatus {
   banned
   notBanned
+}
+
+model TicketResponse {
+  id        String   @id @default(uuid())
+  ticketId  String
+  response  String
+  createdAt DateTime @default(now())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
+
+enum TicketCategory {
+  confidentialite
+  acces
+  assistance
+  securite
+  donnees
+  compte
+}
+
+model Ticket {
+  id          String           @id @default(uuid())
+  userId      String
+  category    TicketCategory
+  description String
+  createdAt   DateTime         @default(now())
+  solved      Boolean          @default(false)
+  solvedAt    DateTime?
+  Users       Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  response    TicketResponse[]
+}
+
+enum SignalementCategory {
+  confidentialite
+  acces
+  assistance
+  securite
+  donnees
+  compte
+}
+
+model Signalement {
+  id          String              @id @default(uuid())
+  userId      String
+  category    SignalementCategory
+  description String
+  createdAt   DateTime            @default(now())
+  solved      Boolean             @default(false)
+  solvedAt    DateTime?
+  user        Users               @relation(fields: [userId], references: [id])
+}
+
+enum AnnouncementCategory {
+  alerte
+  bonPlan
+  info
+}
+
+model Announcement {
+  id        String               @id @default(uuid())
+  category  AnnouncementCategory
+  title     String
+  content   String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  dayslong  Int                  @default(1)
 }
