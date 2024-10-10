@@ -1,14 +1,16 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { ResponseCommentDto } from './dto/response-comment.dto'
-import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
-import { FetchCommentDto } from './dto/fetch-comment.dto'
-import { FetchResponsesDto } from './dto/fetch-responses.dto'
-
+import {
+  CreateCommentDto,
+  ResponseCommentDto,
+  DeleteCommentResponseDto,
+  FetchCommentDto,
+  FetchResponsesDto,
+} from './dto'
 import { CommentService } from './comment.service'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
 
+@ApiBearerAuth()
 @ApiTags('Commenting')
 @Controller('comment')
 export class CommentController {

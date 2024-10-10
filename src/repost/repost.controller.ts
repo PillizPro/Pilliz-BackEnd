@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { RepostDto } from './dto/repost.dto'
+import { RepostDto } from './dto'
 import { RepostService } from './repost.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'

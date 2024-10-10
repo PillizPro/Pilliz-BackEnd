@@ -4,9 +4,8 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { LoginDto } from './dto/login.dto'
-import { CreateUserDto, CreateProUserDto } from 'src/user/dto/create-user.dto'
-import { ResetPasswordDto } from './dto/reset-password.dto'
+import { LoginDto, ResetPasswordDto } from './dto'
+import { CreateUserDto, CreateProUserDto } from 'src/user/dto'
 import { UserService } from 'src/user/user.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
@@ -32,7 +31,7 @@ export class AuthService {
       password: hashedPassword,
     }
     const newUser = await this.userService.createUser(userDtoWithHashedPassword)
-    if (!newUser) throw new ConflictException('User already exists')
+    if (!newUser) throw new ConflictException('User already exists.')
     return newUser
   }
 
@@ -46,7 +45,7 @@ export class AuthService {
       userDtoWithHashedPassword
     )
     if (!newProUser)
-      throw new ConflictException('Professional User already exists')
+      throw new ConflictException('Professional User already exists.')
     return newProUser
   }
 

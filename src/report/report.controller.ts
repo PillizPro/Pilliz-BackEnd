@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { ReportingPostCommentDto } from './dto/reporting-post-comment.dto'
+import { ReportingPostCommentDto } from './dto'
 import { ReportService } from './report.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'

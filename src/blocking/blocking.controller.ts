@@ -1,8 +1,5 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
-import { BlockUserDto } from './dto/block-user.dto'
-import { UnblockUserDto } from './dto/unblock-user.dto'
-import { HideUserDto } from './dto/hide-user.dto'
-import { UnhideUserDto } from './dto/unhide-user.dto'
+import { BlockUserDto, UnblockUserDto, HideUserDto, UnhideUserDto } from './dto'
 import { BlockingService } from './blocking.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
@@ -45,13 +42,16 @@ export class BlockingController {
   }
 
   @Get('hideWord/:wordToHide')
-  async hideWord(@Param() wordToHide: string, @CurrentUserId() userId: string) {
+  async hideWord(
+    @Param('wordToHide') wordToHide: string,
+    @CurrentUserId() userId: string
+  ) {
     return await this.blockingService.hideWord(wordToHide, userId)
   }
 
   @Get('unhideWord/:wordToUnhide')
   async unhideWord(
-    @Param() wordToUnhide: string,
+    @Param('wordToUnhide') wordToUnhide: string,
     @CurrentUserId() userId: string
   ) {
     return await this.blockingService.unhideWord(wordToUnhide, userId)

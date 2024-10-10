@@ -8,7 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common'
-import { CreateCompanyOfferDto } from './dto/create-offer.dto'
+import { CreateCompanyOfferDto } from './dto'
 import { OfferService } from './offer.service'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
@@ -35,13 +35,13 @@ export class CompanyOfferController {
   }
 
   @Get('find20RecentUserOffers')
-  async findUserOffers(@Headers('userId') userId: string) {
+  async findUserOffers(@CurrentUserId() userId: string) {
     return await this.offerService.find20RecentUserOffers(userId)
   }
 
   @Get('find20MoreRecentOffers')
   async find20MoreRecentOffers(
-    @Headers('userId') userId: string,
+    @CurrentUserId() userId: string,
     @Headers('dateString') dateString: string
   ) {
     return await this.offerService.find20MoreRecentOffers(userId, dateString)

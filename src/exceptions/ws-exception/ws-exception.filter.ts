@@ -61,6 +61,12 @@ export class WsExceptionFilter implements ExceptionFilter {
             statusCode: PRISMA_CODE.CONFLICT.returnStatusCode,
           })
           break
+        case PRISMA_CODE.BAD_REQUEST.prismaCode.includes(exception.code):
+          wsException = new WsPrismaException({
+            message,
+            statusCode: PRISMA_CODE.BAD_REQUEST.returnStatusCode,
+          })
+          break
         default:
           // default 500 error code
           wsException = new WsPrismaException({

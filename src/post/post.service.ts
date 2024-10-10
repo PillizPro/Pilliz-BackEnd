@@ -1,11 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreatePostDto } from './dto/create-post.dto'
-import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
-import { RecoverDatePostDto } from './dto/recover-date-post.dto'
+import {
+  CreatePostDto,
+  DeletePostDto,
+  RecoverDetailsPostDto,
+  RecoverDatePostDto,
+  ViewInterractPostDto,
+} from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
+import { containsForbiddenWord } from 'src/post/miscellanous/forbidenWords'
 
 @Injectable()
 export class PostService {
@@ -17,6 +25,10 @@ export class PostService {
   async postByUser(createPostDto: CreatePostDto, userId: string) {
     try {
       const { content, imageBase64, tagsList } = createPostDto
+
+      if (containsForbiddenWord(content)) {
+        throw new BadRequestException('Content contains forbidden words')
+      }
 
       let imageUrl = null
       if (imageBase64) {
@@ -40,9 +52,8 @@ export class PostService {
           )
         )
 
-        if (tags.includes(null)) {
-          throw new Error('One or more tags do not exist')
-        }
+        if (tags.includes(null))
+          throw new NotFoundException('One or more tags do not exist.')
 
         await this.prismaService.post.update({
           where: { id: newPost.id },
@@ -59,7 +70,7 @@ export class PostService {
       return new PostEntity(newPost)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a post')
+      throw new BadRequestException('An error occurred when creating a post.')
     }
   }
 
@@ -105,7 +116,7 @@ export class PostService {
       return { message: 'Post successfully deleted.' }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when deleting the post.')
+      throw new BadRequestException('An error occurred when deleting the post.')
     }
   }
 
@@ -135,7 +146,7 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting posts')
+      throw new BadRequestException('An error occured when getting posts.')
     }
   }
 
@@ -153,9 +164,7 @@ export class PostService {
         },
       })
 
-      if (!post) {
-        throw new Error('Post introuvable')
-      }
+      if (!post) throw new NotFoundException('Post introuvable.')
 
       const followeds = await this.prismaService.follows.findMany({
         where: {
@@ -184,6 +193,7 @@ export class PostService {
         likes: post.likesCount,
         reposts: post.repostsCount,
         comments: post.commentsCount,
+        interractions: post.totalInteractions,
         createdAt: post.createdAt,
         tags: post.Tags.map((tag) => tag.name),
         isRepost: reposters ? true : false,
@@ -192,7 +202,7 @@ export class PostService {
       }
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting the post')
+      throw new BadRequestException('An error occurred when getting the post.')
     }
   }
 
@@ -281,6 +291,7 @@ export class PostService {
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
+        interractions: post.totalInteractions,
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
         isRepost: post.isRepost, // Est ce que c'est un repost ?
@@ -291,7 +302,7 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting posts')
+      throw new BadRequestException('An error occurred when getting posts.')
     }
   }
 
@@ -386,6 +397,7 @@ export class PostService {
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
         comments: post.commentsCount, // Nombre de commentaires
+        interractions: post.totalInteractions,
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
         isRepost: post.isRepost, // Est ce que c'est un repost ?
@@ -396,7 +408,9 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting recents posts')
+      throw new BadRequestException(
+        'An error occurred when getting recents posts.'
+      )
     }
   }
 
@@ -491,6 +505,7 @@ export class PostService {
         imageUrl: post.imageUrl, // Image? du post
         likes: post.likesCount, // Nombre de likes
         reposts: post.repostsCount, // Nombre de reposts
+        interractions: post.totalInteractions,
         comments: post.commentsCount, // Nombre de commentaires
         createdAt: post.createdAt, // Date de création
         tags: post.Tags?.map((tag) => tag.name), // Liste des tags associés
@@ -502,7 +517,27 @@ export class PostService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting more posts')
+      throw new BadRequestException(
+        'An error occurred when getting more posts.'
+      )
+    }
+  }
+
+  async interractViewPost(
+    viewInterractPostDto: ViewInterractPostDto,
+    userId: string
+  ) {
+    void userId
+    try {
+      await this.prismaService.post.update({
+        where: { id: viewInterractPostDto.postId },
+        data: { totalInteractions: { increment: 1 } },
+      })
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when interracting with the post'
+      )
     }
   }
 }

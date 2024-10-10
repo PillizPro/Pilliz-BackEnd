@@ -14,7 +14,6 @@ env:
 jobs:
   build-and-push-docker-image:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,7 +36,7 @@ jobs:
             type=raw,value=latest
 
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: "Dockerfile.prod"
@@ -54,7 +53,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Execute Docker Container on Server
+      - name: Update Environment Stack on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}

@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateCompanyOfferDto } from './dto/create-offer.dto'
+import { CreateCompanyOfferDto } from './dto'
 import { OfferEntity } from './entities/offer.entity'
 
 @Injectable()
@@ -30,9 +35,8 @@ export class OfferService {
           )
         )
 
-        if (tags.includes(null)) {
-          throw new Error('One or more tags do not exist')
-        }
+        if (tags.includes(null))
+          throw new NotFoundException('One or more tags do not exist.')
 
         await this.prismaService.companyOffer.update({
           where: { id: newOffer.id },
@@ -49,7 +53,7 @@ export class OfferService {
       return new OfferEntity(newOffer)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a offer')
+      throw new BadRequestException('An error occurred when creating an offer.')
     }
   }
 
@@ -80,7 +84,7 @@ export class OfferService {
       return transformedOffers
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when getting offers')
+      throw new BadRequestException('An error occured when getting offers.')
     }
   }
 
@@ -117,7 +121,9 @@ export class OfferService {
       return transformedOffers
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting user offers')
+      throw new BadRequestException(
+        "An error occurred when getting user's offers."
+      )
     }
   }
 
@@ -157,7 +163,9 @@ export class OfferService {
       return transformedOffers
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting more offers')
+      throw new BadRequestException(
+        'An error occurred when getting more offers.'
+      )
     }
   }
 
@@ -168,12 +176,11 @@ export class OfferService {
           id: offerId,
         },
       })
-      console.log('offerId', offerId)
-      console.log('userId', userId)
-      console.log('offer userId', offer?.userId)
 
       if (!offer || offer.userId !== userId) {
-        throw new Error('You are not allowed to delete this offer')
+        throw new UnauthorizedException(
+          'You are not allowed to delete this offer.'
+        )
       }
 
       await this.prismaService.companyOffer.delete({
@@ -185,7 +192,9 @@ export class OfferService {
       return 'Post deleted successfully'
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when deleting the offer')
+      throw new BadRequestException(
+        'An error occurred when deleting the offer.'
+      )
     }
   }
 }

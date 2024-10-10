@@ -1,8 +1,11 @@
 import { Body, Controller, Post, Get } from '@nestjs/common'
-import { CreatePostDto } from './dto/create-post.dto'
-import { DeletePostDto } from './dto/delete-post.dto'
-import { RecoverDetailsPostDto } from './dto/recover-details-post.dto'
-import { RecoverDatePostDto } from './dto/recover-date-post.dto'
+import {
+  CreatePostDto,
+  DeletePostDto,
+  RecoverDetailsPostDto,
+  RecoverDatePostDto,
+  ViewInterractPostDto,
+} from './dto'
 import { PostService } from './post.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CurrentUserId } from 'src/common/decorators'
@@ -58,5 +61,16 @@ export class PostController {
     @CurrentUserId() userId: string
   ) {
     return await this.postService.find20OlderPosts(recoverDatePostDto, userId)
+  }
+
+  @Post('interractViewPost')
+  async interractViewPost(
+    @Body() viewInterractPostDto: ViewInterractPostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.interractViewPost(
+      viewInterractPostDto,
+      userId
+    )
   }
 }

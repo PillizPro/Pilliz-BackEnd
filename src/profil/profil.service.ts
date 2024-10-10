@@ -1,5 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
+
+import {
+  UploadFilesDto,
+  ChangeProfilImgDto,
+  ChangeBioDto,
+  OtherUserProfilIdDto,
+} from './dto'
 
 // Services
 import { FollowService } from 'src/follow/follow.service'
@@ -9,11 +16,6 @@ import { IdentificationService } from 'src/identification/identification.service
 import { LikeService } from 'src/like/like.service'
 import { RepostService } from 'src/repost/repost.service'
 import { DeletedFilesDto } from './dto/delete-files.dto'
-
-// DTO
-import { UploadFilesDto } from './dto/upload-files.dto'
-import { ChangeProfilImgDto } from './dto/change-profil-img.dto'
-import { ChangeBioDto } from './dto/change-bio.dto'
 
 @Injectable()
 export class ProfilService {
@@ -75,14 +77,16 @@ export class ProfilService {
         name: userInfos[0]!.name,
         bio: userBio,
         nbPosts: userNbPosts,
-        nbFollowers: userNbFollowers,
-        nbFollowings: userNbFollowings,
+        nbFollowers: userNbFollowings,
+        nbFollowings: userNbFollowers,
       }
 
       return informations
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting user infos')
+      throw new BadRequestException(
+        'An error occurred when getting user infos.'
+      )
     }
   }
 
@@ -140,8 +144,14 @@ export class ProfilService {
     return await this.identificationService.getIdentifyingPosts(userId)
   }
 
-  async getPostOnProfil(userId: string) {
+  async getPostOnProfil(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
     try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
       const posts = await this.prisma.post.findMany({
         take: 20,
         orderBy: { createdAt: 'desc' },
@@ -158,6 +168,7 @@ export class ProfilService {
         userId: post.userId,
         postId: post.id,
         username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -168,12 +179,20 @@ export class ProfilService {
       return transformedPosts
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting posts')
+      throw new BadRequestException(
+        'An error occurred when getting posts on the profil.'
+      )
     }
   }
 
-  async getCommentOnProfile(userId: string) {
+  async getCommentOnProfile(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
     try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
       const comments = await this.prisma.comment.findMany({
         where: {
           userId: userId,
@@ -207,6 +226,8 @@ export class ProfilService {
             userId: comment.userId,
             postId: comment.postId,
             commentId: comment.id, // ID of the comment
+            userImgUrl: comment.Users?.profilPicture,
+
             username: comment.Users.name, // User's name
             content: comment.content, // Content of the comment
             likes: comment.likesCount, // Number of likes
@@ -220,12 +241,20 @@ export class ProfilService {
       return transformedComments
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on te profil.')
+      throw new BadRequestException(
+        'An error occurred when getting comments on the profil.'
+      )
     }
   }
 
-  async getLikeOnProfile(userId: string) {
+  async getLikeOnProfile(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
     try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
       const likedCommentsIds =
         await this.likeService.getLikedCommentsByUser(userId)
       const likedPostsIds = await this.likeService.getLikedPostsByUser(userId)
@@ -247,6 +276,7 @@ export class ProfilService {
         userId: post.userId,
         postId: post.id,
         username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -291,6 +321,8 @@ export class ProfilService {
             userId: comment.userId,
             postId: comment.postId,
             commentId: comment.id,
+            userImgUrl: comment.Users?.profilPicture,
+
             username: comment.Users.name,
             content: comment.content,
             likes: comment.likesCount,
@@ -312,12 +344,20 @@ export class ProfilService {
       return combinedContent
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting like on the profil.')
+      throw new BadRequestException(
+        'An error occurred when getting like on the profil.'
+      )
     }
   }
 
-  async getRepostOnProfile(userId: string) {
+  async getRepostOnProfile(
+    otherUserProfilIdDto: OtherUserProfilIdDto,
+    userId: string
+  ) {
     try {
+      if (otherUserProfilIdDto.userId) {
+        userId = otherUserProfilIdDto.userId
+      }
       const repostedCommentsIds =
         await this.repostService.getRepostedCommentsByUser(userId)
       const repostedPostsIds =
@@ -340,6 +380,8 @@ export class ProfilService {
         userId: post.userId,
         postId: post.id,
         username: post.Users.name,
+        userImgUrl: post.Users?.profilPicture,
+
         content: post.content,
         imageUrl: post.imageUrl,
         likes: post.likesCount,
@@ -384,6 +426,8 @@ export class ProfilService {
             userId: comment.userId,
             postId: comment.postId,
             commentId: comment.id,
+            userImgUrl: comment.Users?.profilPicture,
+
             username: comment.Users.name,
             content: comment.content,
             likes: comment.likesCount,
@@ -405,7 +449,31 @@ export class ProfilService {
       return combinedContent
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting like on the profil.')
+      throw new BadRequestException(
+        'An error occurred when getting repost on the profil.'
+      )
+    }
+  }
+
+  async changeAccountType(userId: string) {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+
+    if (user?.accountType === 'public') {
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { accountType: 'private' },
+      })
+      return 'private'
+    } else {
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { accountType: 'public' },
+      })
+      return 'public'
     }
   }
 }

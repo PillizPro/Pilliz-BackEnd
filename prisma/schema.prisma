@@ -12,6 +12,7 @@ model Users {
   email                  String                   @unique @db.VarChar(255)
   name                   String                   @db.VarChar(255)
   userTag                String?                  @unique
+  accountType            String                   @default("public")
   nameLowercase          String                   @db.VarChar(255)
   password               String                   @db.VarChar(255)
   hashedRefreshToken     String?
@@ -65,6 +66,7 @@ model Users {
   blockedUsers           String[]                 @default([])
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
+  Applicants             Applicants[]
 }
 
 model Follows {
@@ -84,35 +86,46 @@ model Document {
 }
 
 model Post {
-  id            String    @id @default(uuid())
-  userId        String
-  content       String    @db.VarChar(1000)
-  imageUrl      String?   @db.VarChar(1000)
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  commentsCount Int       @default(0)
-  Like          Like[]
-  Repost        Repost[]
-  Comment       Comment[]
-  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Tags          Tags[]
-  Reports       Reports[]
+  id                String    @id @default(uuid())
+  userId            String
+  content           String    @db.VarChar(1000)
+  imageUrl          String?   @db.VarChar(1000)
+  createdAt         DateTime  @default(now())
+  likesCount        Int       @default(0)
+  repostsCount      Int       @default(0)
+  commentsCount     Int       @default(0)
+  totalInteractions Int       @default(0)
+  Like              Like[]
+  Repost            Repost[]
+  Comment           Comment[]
+  Users             Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tags              Tags[]
+  Reports           Reports[]
 }
 
 model CompanyOffer {
-  id                           String   @id @default(uuid())
+  id                           String       @id @default(uuid())
   userId                       String
-  content                      String   @db.VarChar(1000)
-  createdAt                    DateTime @default(now())
-  Users                        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content                      String       @db.VarChar(1000)
+  createdAt                    DateTime     @default(now())
+  Users                        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Tags                         Tags[]
-  companyOfferTitle            String   @default("")
-  companyOfferDiploma          String   @default("")
-  companyOfferSkills           String   @default("")
-  companyOfferContractType     String   @default("")
-  companyOfferContractDuration String   @default("")
-  companyOfferSalary           String   @default("")
+  companyOfferTitle            String       @default("")
+  companyOfferDiploma          String       @default("")
+  companyOfferSkills           String       @default("")
+  companyOfferContractType     String       @default("")
+  companyOfferContractDuration String       @default("")
+  companyOfferSalary           String       @default("")
+  Applicants                   Applicants[]
+}
+
+model Applicants {
+  id           String       @id @default(uuid())
+  userId       String
+  offerId      String
+  Users        Users        @relation(fields: [userId], references: [id])
+  CompanyOffer CompanyOffer @relation(fields: [offerId], references: [id])
+  createdAt    DateTime     @default(now())
 }
 
 model Tags {

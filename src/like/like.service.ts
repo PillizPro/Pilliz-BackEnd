@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { LikePostDto } from './dto/like-post.dto'
+import { LikePostDto } from './dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
@@ -28,7 +28,10 @@ export class LikeService {
       if (likeDto.postId) {
         const post = await this.prisma.post.update({
           where: { id: likeDto.postId },
-          data: { likesCount: { increment: 1 } },
+          data: {
+            likesCount: { increment: 1 },
+            totalInteractions: { increment: 1 },
+          },
           include: { Users: true },
         })
         this.eventEmitter.emit(
@@ -51,6 +54,16 @@ export class LikeService {
           comment.content,
           comment.userId
         )
+
+        const findOriginalPost = await this.prisma.comment.findFirst({
+          where: { id: likeDto.commentId },
+          select: { postId: true },
+        })
+
+        await this.prisma.post.update({
+          where: { id: findOriginalPost?.postId },
+          data: { totalInteractions: { increment: 1 } },
+        })
       }
     }
   }

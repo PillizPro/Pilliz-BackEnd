@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { DeleteCommentResponseDto } from './dto/delete-comment-response.dto'
-import { ResponseCommentDto } from './dto/response-comment.dto'
-import { FetchCommentDto } from './dto/fetch-comment.dto'
-import { FetchResponsesDto } from './dto/fetch-responses.dto'
+import {
+  CreateCommentDto,
+  ResponseCommentDto,
+  DeleteCommentResponseDto,
+  FetchCommentDto,
+  FetchResponsesDto,
+} from './dto'
 import { CommentEntity } from './entities/comment.entity'
+import { containsForbiddenWord } from 'src/post/miscellanous/forbidenWords'
 
 @Injectable()
 export class CommentService {
@@ -14,6 +21,11 @@ export class CommentService {
   async commentOnPost(createCommentDto: CreateCommentDto, userId: string) {
     try {
       const { postId, content } = createCommentDto
+
+      if (containsForbiddenWord(content)) {
+        throw new BadRequestException('Content contains forbidden words')
+      }
+
       const newComment = await this.prismaService.comment.create({
         data: {
           postId,
@@ -28,10 +40,15 @@ export class CommentService {
         data: { commentsCount: { increment: 1 } },
       })
 
+      await this.prismaService.post.update({
+        where: { id: postId },
+        data: { totalInteractions: { increment: 1 } },
+      })
+
       return new CommentEntity(newComment)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occured when creating a comment')
+      throw new BadRequestException('An error occured when creating a comment.')
     }
   }
 
@@ -110,7 +127,9 @@ export class CommentService {
       return transformedComments
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on this post')
+      throw new BadRequestException(
+        'An error occurred when getting comments on this post.'
+      )
     }
   }
 
@@ -121,6 +140,10 @@ export class CommentService {
     try {
       const { postId, content, parentId } = responseCommentDto
       let rootCommentId = parentId
+
+      if (containsForbiddenWord(content)) {
+        throw new BadRequestException('Content contains forbidden words')
+      }
 
       // Si c'est une réponse à une autre réponse, on trouve le commentaire racine.
       if (parentId) {
@@ -144,10 +167,17 @@ export class CommentService {
         },
       })
 
+      await this.prismaService.post.update({
+        where: { id: postId },
+        data: { totalInteractions: { increment: 1 } },
+      })
+
       return new CommentEntity(newComment)
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when creating a response')
+      throw new BadRequestException(
+        'An error occurred when creating a response.'
+      )
     }
   }
 
@@ -230,6 +260,7 @@ export class CommentService {
             userId: response.userId,
             commentId: response.id, // ID of the comment
             username: response.Users.name, // Name of the user
+            userImgUrl: response.Users.profilPicture, // User Profil Picture
             respondedToThisUser: originalUsername,
             content: response.content, // Content of the comment
             likes: response.likesCount, // Number of likes
@@ -245,7 +276,9 @@ export class CommentService {
       return transformedResponses
     } catch (error) {
       console.error(error)
-      throw new Error('An error occurred when getting comments on this post')
+      throw new BadRequestException(
+        'An error occurred when getting comments on this post.'
+      )
     }
   }
 
@@ -259,7 +292,7 @@ export class CommentService {
         where: { id: commentId },
       })
 
-      if (!comment) throw new Error('Comment not found')
+      if (!comment) throw new NotFoundException('Comment not found.')
 
       const responses = await this.prismaService.comment.findMany({
         where: {
@@ -316,7 +349,7 @@ export class CommentService {
       return { message: 'Comment and its responses successfully deleted.' }
     } catch (error) {
       console.error(error)
-      throw new Error(
+      throw new BadRequestException(
         'An error occurred when deleting the comment and its responses.'
       )
     }
