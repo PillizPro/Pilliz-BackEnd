@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { LikePostDto } from './dto/like-post.dto'
+import { LikePostDto } from './dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class LikeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
-  async like(likeDto: LikePostDto) {
+  async like(likeDto: LikePostDto, userId: string) {
     // Vérifier si c'est un like de post ou de commentaire
     const whereClause = likeDto.postId
-      ? { userId: likeDto.userId, postId: likeDto.postId }
-      : { userId: likeDto.userId, commentId: likeDto.commentId }
+      ? { userId: userId, postId: likeDto.postId }
+      : { userId: userId, commentId: likeDto.commentId }
 
     const existingLike = await this.prisma.like.findFirst({
       where: whereClause,
@@ -18,28 +22,57 @@ export class LikeService {
 
     if (!existingLike) {
       // Créer un nouveau like
-      await this.prisma.like.create({ data: { ...likeDto } })
+      await this.prisma.like.create({ data: { ...likeDto, userId } })
 
       // Mise à jour du compteur de likes
       if (likeDto.postId) {
-        await this.prisma.post.update({
+        const post = await this.prisma.post.update({
           where: { id: likeDto.postId },
-          data: { likesCount: { increment: 1 } },
+          data: {
+            likesCount: { increment: 1 },
+            totalInteractions: { increment: 1 },
+          },
+          include: { Users: true },
         })
+        this.eventEmitter.emit(
+          'notifyUser',
+          1,
+          userId,
+          post.content,
+          post.userId
+        )
       } else if (likeDto.commentId) {
-        await this.prisma.comment.update({
+        const comment = await this.prisma.comment.update({
           where: { id: likeDto.commentId },
           data: { likesCount: { increment: 1 } },
+          include: { Users: true },
+        })
+        this.eventEmitter.emit(
+          'notifyUser',
+          2,
+          userId,
+          comment.content,
+          comment.userId
+        )
+
+        const findOriginalPost = await this.prisma.comment.findFirst({
+          where: { id: likeDto.commentId },
+          select: { postId: true },
+        })
+
+        await this.prisma.post.update({
+          where: { id: findOriginalPost?.postId },
+          data: { totalInteractions: { increment: 1 } },
         })
       }
     }
   }
 
-  async unlike(likeDto: LikePostDto) {
+  async unlike(likeDto: LikePostDto, userId: string) {
     // Vérifier si c'est un unlike de post ou de commentaire
     const whereClause = likeDto.postId
-      ? { userId: likeDto.userId, postId: likeDto.postId }
-      : { userId: likeDto.userId, commentId: likeDto.commentId }
+      ? { userId: userId, postId: likeDto.postId }
+      : { userId: userId, commentId: likeDto.commentId }
 
     const existingLike = await this.prisma.like.findFirst({
       where: whereClause,
