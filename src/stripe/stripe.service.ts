@@ -5,12 +5,12 @@ import Stripe from 'stripe'
 
 @Injectable()
 export class StripeService {
-  private _stripe: Stripe
+  private _stripe: Stripe | undefined
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService
   ) {
-    this._stripe = new Stripe(
+    this._stripe = process.env.NODE_ENV === 'gha' ? undefined : new Stripe(
       this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
       {}
     )
@@ -18,7 +18,7 @@ export class StripeService {
 
   async createProduct(productData: any) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const product = await this._stripe.products.create({
+    const product = await this._stripe?.products.create({
       name: productData.name,
       default_price_data: {
         currency: 'eur',
