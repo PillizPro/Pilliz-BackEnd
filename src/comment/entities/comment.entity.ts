@@ -15,6 +15,7 @@ export class CommentEntity implements Comment {
   likesCount: number
   repostsCount: number
   commentsCount: number
+  confidentiality: string
   user: UserEntity
   parent?: CommentEntity
   children?: CommentEntity[]

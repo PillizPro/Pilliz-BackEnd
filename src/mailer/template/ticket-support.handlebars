@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800,900&display=swap" rel="stylesheet">
+    <style>
+        
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Nunito, sans-serif;
+  display:flex;
+    justify-content: center;
+
+}
+
+img{
+    width: 60%;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    height: 80%;
+}
+
+p {
+    margin: 15px;
+}
+
+button {
+    margin: 25px;
+}
+
+.code{
+    padding:10px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 1px;
+    font-size: 40px;
+    letter-spacing: 10px;
+}
+.response {
+  padding:10px;
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 1px;
+}
+    </style>
+  </head>
+  <body>
+  <div class="main">
+    <img src="https://i.ibb.co/wLRG8xX/Pilliz-logo.png" alt="Logo Pilliz"/>
+    <p>
+      Bonjour,
+    </p>
+    <p>
+      Nous avons le plaisir de vous informer que nous avons répondu à votre demande. Vous trouverez ci-dessous les détails de notre réponse.
+    </p>
+    <p class="response"> {{response}} </p> 
+    <p class="content"> Si vous avez des questions ou besoin de plus amples informations, n'hésitez pas à nous contacter. Nous sommes là pour vous aider. </p> 
+    <p class="content"> Cordialement, </p> 
+    <p>Pilliz</p>
+  </div>
+</body>
+</html>
