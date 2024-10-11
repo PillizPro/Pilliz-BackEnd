@@ -66,6 +66,10 @@ model Users {
   blockedUsers           String[]                 @default([])
   hiddenUsers            String[]                 @default([])
   hiddenWords            String[]                 @default([])
+  Achievements           Achievements[]
+  Ticket                 Ticket[]
+  signalement            Signalement[]
+  Applicants             Applicants[]
 }
 
 model Follows {
@@ -94,6 +98,7 @@ model Post {
   repostsCount      Int       @default(0)
   commentsCount     Int       @default(0)
   totalInteractions Int       @default(0)
+  confidentiality   String    @default("public")
   Like              Like[]
   Repost            Repost[]
   Comment           Comment[]
@@ -103,18 +108,28 @@ model Post {
 }
 
 model CompanyOffer {
-  id                           String   @id @default(uuid())
+  id                           String       @id @default(uuid())
   userId                       String
-  content                      String   @db.VarChar(1000)
-  createdAt                    DateTime @default(now())
-  Users                        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content                      String       @db.VarChar(1000)
+  createdAt                    DateTime     @default(now())
+  Users                        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Tags                         Tags[]
-  companyOfferTitle            String   @default("")
-  companyOfferDiploma          String   @default("")
-  companyOfferSkills           String   @default("")
-  companyOfferContractType     String   @default("")
-  companyOfferContractDuration String   @default("")
-  companyOfferSalary           String   @default("")
+  companyOfferTitle            String       @default("")
+  companyOfferDiploma          String       @default("")
+  companyOfferSkills           String       @default("")
+  companyOfferContractType     String       @default("")
+  companyOfferContractDuration String       @default("")
+  companyOfferSalary           String       @default("")
+  Applicants                   Applicants[]
+}
+
+model Applicants {
+  id           String       @id @default(uuid())
+  userId       String
+  offerId      String
+  Users        Users        @relation(fields: [userId], references: [id])
+  CompanyOffer CompanyOffer @relation(fields: [offerId], references: [id])
+  createdAt    DateTime     @default(now())
 }
 
 model Tags {
@@ -148,22 +163,23 @@ model Repost {
 }
 
 model Comment {
-  id            String    @id @default(uuid())
-  content       String    @db.VarChar(1000)
-  userId        String
-  postId        String
-  createdAt     DateTime  @default(now())
-  likesCount    Int       @default(0)
-  repostsCount  Int       @default(0)
-  parentId      String?   @db.VarChar(36)
-  rootCommentId String?   @db.VarChar(36)
-  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
-  children      Comment[] @relation("ChildComments")
-  Post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  Users         Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Like          Like[]
-  Repost        Repost[]
-  Reports       Reports[]
+  id              String    @id @default(uuid())
+  content         String    @db.VarChar(1000)
+  userId          String
+  postId          String
+  createdAt       DateTime  @default(now())
+  likesCount      Int       @default(0)
+  repostsCount    Int       @default(0)
+  parentId        String?   @db.VarChar(36)
+  rootCommentId   String?   @db.VarChar(36)
+  confidentiality String    @default("public")
+  parent          Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children        Comment[] @relation("ChildComments")
+  Post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  Users           Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like            Like[]
+  Repost          Repost[]
+  Reports         Reports[]
 }
 
 model Conversation {
@@ -276,6 +292,14 @@ model Reports {
   Comment     Comment? @relation(fields: [commentId], references: [id])
 }
 
+model Achievements {
+  id           String   @id @default(uuid())
+  userId       String
+  achievements String
+  achievedAt   DateTime @default(now())
+  Users        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum UserRoles {
   admin
   user
@@ -284,4 +308,69 @@ enum UserRoles {
 enum BanningStatus {
   banned
   notBanned
+}
+
+model TicketResponse {
+  id        String   @id @default(uuid())
+  ticketId  String
+  response  String
+  createdAt DateTime @default(now())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
+
+enum TicketCategory {
+  confidentialite
+  acces
+  assistance
+  securite
+  donnees
+  compte
+}
+
+model Ticket {
+  id          String           @id @default(uuid())
+  userId      String
+  category    TicketCategory
+  description String
+  createdAt   DateTime         @default(now())
+  solved      Boolean          @default(false)
+  solvedAt    DateTime?
+  Users       Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  response    TicketResponse[]
+}
+
+enum SignalementCategory {
+  confidentialite
+  acces
+  assistance
+  securite
+  donnees
+  compte
+}
+
+model Signalement {
+  id          String              @id @default(uuid())
+  userId      String
+  category    SignalementCategory
+  description String
+  createdAt   DateTime            @default(now())
+  solved      Boolean             @default(false)
+  solvedAt    DateTime?
+  user        Users               @relation(fields: [userId], references: [id])
+}
+
+enum AnnouncementCategory {
+  alerte
+  bonPlan
+  info
+}
+
+model Announcement {
+  id        String               @id @default(uuid())
+  category  AnnouncementCategory
+  title     String
+  content   String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  dayslong  Int                  @default(1)
 }

@@ -25,9 +25,18 @@ import { MetricModule } from './metric/metric.module'
 import { IdentificationModule } from './identification/identification.module'
 import { CronModule } from './cron/cron.module'
 import { OfferModule } from './company-offer/offer.module'
+import { ApplicantModule } from './applicants/applicant.module'
 import { BlockingModule } from './blocking/blocking.module'
+import { AchievementsModule } from './achievements/achievements.module'
+import { StripeModule } from './stripe/stripe.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/guards'
+// import { MailerService } from './mailer/mailer.service'
+import { TicketModule } from './ticket/ticket.module'
+import { SignalementModule } from './signalement/signalement.module'
+import { MailerModule } from './mailer/mailer.module'
+import { AnnouncementController } from './announcement/announcement.controller'
+import { AnnouncementService } from './announcement/announcement.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -72,15 +81,22 @@ const ENV = process.env.NODE_ENV
     IdentificationModule,
     CronModule,
     OfferModule,
+    ApplicantModule,
     BlockingModule,
+    AchievementsModule,
+    TicketModule,
+    SignalementModule,
+    MailerModule,
+    StripeModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AnnouncementController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    AnnouncementService,
   ],
 })
 export class AppModule {}
