@@ -34,7 +34,7 @@ services:
     tty: true
 
   pilliz-db-dev:
-    image: postgres
+    image: postgres:16.4
     container_name: env-dev_pilliz-db
     restart: always
     ports:
