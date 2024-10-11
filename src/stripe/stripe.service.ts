@@ -10,10 +10,13 @@ export class StripeService {
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService
   ) {
-    this._stripe = process.env.NODE_ENV === 'gha' ? undefined : new Stripe(
-      this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
-      {}
-    )
+    this._stripe =
+      process.env.NODE_ENV === 'gha'
+        ? undefined
+        : new Stripe(
+            this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
+            {}
+          )
   }
 
   async createProduct(productData: any) {
