@@ -28,6 +28,7 @@ import { OfferModule } from './company-offer/offer.module'
 import { ApplicantModule } from './applicants/applicant.module'
 import { BlockingModule } from './blocking/blocking.module'
 import { AchievementsModule } from './achievements/achievements.module'
+import { StripeModule } from './stripe/stripe.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtAuthGuard } from './common/guards'
 // import { MailerService } from './mailer/mailer.service'
@@ -86,6 +87,7 @@ const ENV = process.env.NODE_ENV
     TicketModule,
     SignalementModule,
     MailerModule,
+    StripeModule,
   ],
   controllers: [AppController, AnnouncementController],
   providers: [
