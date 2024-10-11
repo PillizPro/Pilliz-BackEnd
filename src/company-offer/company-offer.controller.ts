@@ -35,13 +35,13 @@ export class CompanyOfferController {
   }
 
   @Get('find20RecentUserOffers')
-  async findUserOffers(@Headers('userId') userId: string) {
+  async findUserOffers(@CurrentUserId() userId: string) {
     return await this.offerService.find20RecentUserOffers(userId)
   }
 
   @Get('find20MoreRecentOffers')
   async find20MoreRecentOffers(
-    @Headers('userId') userId: string,
+    @CurrentUserId() userId: string,
     @Headers('dateString') dateString: string
   ) {
     return await this.offerService.find20MoreRecentOffers(userId, dateString)

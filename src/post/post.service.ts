@@ -10,6 +10,7 @@ import {
   RecoverDetailsPostDto,
   RecoverDatePostDto,
   ViewInterractPostDto,
+  PostOrCommentTypeDto,
 } from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
@@ -81,6 +82,7 @@ export class PostService {
         where: { postId: deletePostDto.postId },
         select: { id: true },
       })
+
       const commentIds = comments.map((comment) => comment.id)
 
       // Supprimer les likes des commentaires
@@ -241,7 +243,10 @@ export class PostService {
           userId: { in: followeds.map((followed) => followed.followerId) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -258,6 +263,7 @@ export class PostService {
         orderBy: { createdAt: 'desc' },
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -346,7 +352,10 @@ export class PostService {
           createdAt: { gt: new Date(dateString) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -364,6 +373,7 @@ export class PostService {
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
           createdAt: { gt: new Date(dateString) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -454,7 +464,10 @@ export class PostService {
           createdAt: { lt: new Date(dateString) },
         },
         include: {
-          Post: { include: { Users: true, Tags: true } },
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
           Users: true,
         },
       })
@@ -472,6 +485,7 @@ export class PostService {
         where: {
           userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
           createdAt: { lt: new Date(dateString) },
+          confidentiality: 'public',
         },
         include: {
           Users: true,
@@ -523,11 +537,387 @@ export class PostService {
     }
   }
 
-  async interractViewPost(
-    viewInterractPostDto: ViewInterractPostDto,
+  async changePostOrCommentType(postOrCommentType: PostOrCommentTypeDto) {
+    try {
+      const post = await this.prismaService.post.findUnique({
+        where: { id: postOrCommentType.postId },
+        select: { confidentiality: true },
+      })
+
+      if (post !== null) {
+        const newConfidentiality =
+          post?.confidentiality === 'public' ? 'private' : 'public'
+
+        await this.prismaService.post.update({
+          where: { id: postOrCommentType.postId },
+          data: { confidentiality: newConfidentiality },
+        })
+
+        return {
+          message: 'Post type successfully updated.',
+          type: newConfidentiality,
+        }
+      } else {
+        const comment = await this.prismaService.comment.findUnique({
+          where: { id: postOrCommentType.postId },
+          select: { confidentiality: true },
+        })
+
+        const newConfidentiality =
+          comment?.confidentiality === 'public' ? 'private' : 'public'
+
+        await this.prismaService.comment.update({
+          where: { id: postOrCommentType.postId },
+          data: { confidentiality: newConfidentiality },
+        })
+
+        return {
+          message: 'Comment type successfully updated.',
+          type: newConfidentiality,
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when updating the post or comment type.'
+      )
+    }
+  }
+
+  async find20LastsPostsFollowed(userId: string) {
+    try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
+      const followeds = await this.prismaService.follows.findMany({
+        where: {
+          followingId: userId,
+          followerId: {
+            notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+          },
+        },
+        select: {
+          followerId: true,
+        },
+      })
+
+      const followedIds = followeds.map((followed) => followed.followerId)
+
+      const reposts = await this.prismaService.repost.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { in: followedIds },
+        },
+        include: {
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
+          Users: true,
+        },
+      })
+
+      const repostsPosts = reposts.map((repost) => ({
+        ...repost.Post,
+        isRepost: true,
+        reposterId: repost.userId,
+        reposterUsername: repost.Users.name,
+      }))
+
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { in: followedIds },
+          confidentiality: 'public',
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const postsTransformed = posts.map((post) => ({
+        ...post,
+        isRepost: false,
+        reposterUsername: null,
+        reposterId: null,
+      }))
+
+      const combinedPosts = [...repostsPosts, ...postsTransformed]
+
+      const filteredPosts = combinedPosts.filter((post) => {
+        return !hiddenWords.some((word) => post.content?.includes(word))
+      })
+
+      const transformedPosts = filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        comments: post.commentsCount,
+        interractions: post.totalInteractions,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterId: post.reposterId,
+      }))
+
+      return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException('An error occurred when getting posts.')
+    }
+  }
+
+  async find20RecentsPostsFollowed(
+    recoverDatePostDto: RecoverDatePostDto,
     userId: string
   ) {
-    void userId
+    const { dateString } = recoverDatePostDto
+    try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const blockerIds = (
+        await this.prismaService.users.findMany({
+          where: {
+            blockedUsers: {
+              has: userId,
+            },
+          },
+          select: { id: true },
+        })
+      ).map((user) => user.id)
+
+      const followedIds = (
+        await this.prismaService.follows.findMany({
+          where: {
+            followingId: userId,
+            followerId: {
+              notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+            },
+          },
+          select: { followerId: true },
+        })
+      ).map((followed) => followed.followerId)
+
+      const reposts = await this.prismaService.repost.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { in: followedIds },
+          createdAt: { gt: new Date(dateString) },
+        },
+        include: {
+          Post: {
+            where: { confidentiality: 'public' },
+            include: { Users: true, Tags: true },
+          },
+          Users: true,
+        },
+      })
+
+      const repostsPosts = reposts.map((repost) => ({
+        ...repost.Post,
+        isRepost: true,
+        reposterId: repost.userId,
+        reposterUsername: repost.Users.name,
+      }))
+
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          createdAt: { gt: new Date(dateString) },
+          confidentiality: 'public',
+        },
+        include: { Users: true, Tags: true },
+      })
+
+      const postsTransformed = posts.map((post) => ({
+        ...post,
+        isRepost: false,
+        reposterUsername: null,
+        reposterId: null,
+      }))
+
+      const uniquePosts = [...repostsPosts, ...postsTransformed].filter(
+        (post, index, self) => self.findIndex((p) => p.id === post.id) === index
+      )
+
+      const filteredPosts = uniquePosts.filter((post) =>
+        hiddenWords.every((word) => !post.content?.includes(word))
+      )
+
+      return filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        interractions: post.totalInteractions,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterId: post.reposterId,
+      }))
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting recents posts.'
+      )
+    }
+  }
+
+  async find20OlderPostsFollowed(
+    recoverDatePostDto: RecoverDatePostDto,
+    userId: string
+  ) {
+    const { dateString } = recoverDatePostDto
+    try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      const allUsers = await this.prismaService.users.findMany({
+        select: { id: true, blockedUsers: true },
+      })
+
+      const blockerIds = allUsers
+        .filter((user) => user.blockedUsers.includes(userId))
+        .map((user) => user.id)
+
+      const followeds = await this.prismaService.follows.findMany({
+        where: {
+          followingId: userId,
+          followerId: {
+            notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds],
+          },
+        },
+      })
+
+      const followedIds = followeds.map((followed) => followed.followerId)
+
+      const reposts = await this.prismaService.repost.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { in: followedIds },
+          createdAt: { lt: new Date(dateString) },
+        },
+        include: {
+          Post: {
+            include: { Users: true, Tags: true },
+            where: { confidentiality: 'public' },
+          },
+          Users: true,
+        },
+      })
+
+      const repostsPosts = reposts.map((repost) => ({
+        ...repost.Post,
+        isRepost: true,
+        reposterId: repost.userId,
+        reposterUsername: repost.Users.name,
+      }))
+
+      const posts = await this.prismaService.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          userId: { in: followedIds },
+          createdAt: { lt: new Date(dateString) },
+          confidentiality: 'public',
+        },
+        include: {
+          Users: true,
+          Tags: true,
+        },
+      })
+
+      const postsTransformed = posts.map((post) => ({
+        ...post,
+        isRepost: false,
+        reposterUsername: null,
+        reposterId: null,
+      }))
+
+      const combinedPosts = [...repostsPosts, ...postsTransformed]
+
+      const uniquePosts = combinedPosts.filter(
+        (post, index, self) => self.findIndex((p) => p.id === post.id) === index
+      )
+
+      const filteredPosts = uniquePosts.filter((post) => {
+        return !hiddenWords.some((word) => post.content?.includes(word))
+      })
+
+      const transformedPosts = filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        interractions: post.totalInteractions,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: post.isRepost,
+        reposterUsername: post.reposterUsername,
+        reposterId: post.reposterId,
+      }))
+
+      return transformedPosts
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting more posts.'
+      )
+    }
+  }
+
+  async interractViewPost(viewInterractPostDto: ViewInterractPostDto) {
     try {
       await this.prismaService.post.update({
         where: { id: viewInterractPostDto.postId },
