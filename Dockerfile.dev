@@ -18,6 +18,7 @@ FROM base AS dev
 USER node
 ENV NODE_ENV=development
 ENV DB_HOST=pilliz-db-dev
+ENV REDIS_URL=redis://redis-dev:6379
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .

@@ -1,5 +1,9 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Inject } from '@nestjs/common'
+import { Cache } from 'cache-manager'
 import {
   WebSocketGateway,
+  WebSocketServer,
   SubscribeMessage,
   MessageBody,
   OnGatewayConnection,
@@ -34,9 +38,11 @@ import { WsExceptionFilter } from 'src/exceptions/ws-exception/ws-exception.filt
 export class WSGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
-  private _connectedUsers: Map<string, Socket> = new Map()
+  @WebSocketServer()
+  server: Server
 
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly chatService: ChatService,
     private readonly userService: UserService
   ) {}
@@ -57,29 +63,70 @@ export class WSGateway
     // })
   }
 
-  handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`)
-    client.on('authWS', (payload: { userId: string }) => {
+  async handleConnection(client: Socket) {
+    client.on('authWS', async (payload: { userId: string }) => {
       try {
         this.userService.updateConnectedStatus(payload.userId, true)
-        this._connectedUsers.set(payload.userId, client)
-        console.log(this._connectedUsers)
+        await this.addWSSocketId(payload.userId, client.id)
+        console.log(`User: ${payload.userId} | Client connected: ${client.id}`)
       } catch (err) {
         client.disconnect()
-        console.error(err)
+        console.error('handleConnection:', err)
       }
     })
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`)
-    for (const [userId, socket] of this._connectedUsers.entries()) {
-      if (socket === client) {
-        this._connectedUsers.delete(userId)
-        this.userService.updateConnectedStatus(userId, false)
-        break
+  async handleDisconnect(client: Socket) {
+    const userId = await this.removeWSUserId(client.id)
+    try {
+      if (userId) this.userService.updateConnectedStatus(userId, false)
+    } catch (err) {
+      console.error('handleDisconnect:', err)
+    }
+    console.log(`User: ${userId} | Client disconnected: ${client.id}`)
+  }
+
+  // add socketId with userId in cache
+  async addWSSocketId(userId: string, socketId: string): Promise<void> {
+    const socketIds = await this.getWSSocketId(userId)
+
+    if (socketIds && Array.isArray(socketIds) && socketIds.length) {
+      socketIds.push(socketId)
+      await this.cacheManager.set(`WSuserId:${userId}`, [...new Set(socketIds)])
+    } else {
+      await this.cacheManager.set(`WSuserId:${userId}`, [socketId])
+    }
+    await this.cacheManager.set(`WSsocketId:${socketId}`, userId)
+  }
+
+  // get socketId using userId
+  async getWSSocketId(userId: string): Promise<string[] | null | undefined> {
+    return this.cacheManager.get(`WSuserId:${userId}`)
+  }
+
+  // get userId using socketId
+  async getWSUserId(socketId: string): Promise<string | null | undefined> {
+    return this.cacheManager.get(`WSsocketId:${socketId}`)
+  }
+
+  // Remove socketId from user array OR
+  // No active connection then remove userId from cache
+  async removeWSUserId(socketId: string): Promise<string | null | undefined> {
+    const userId = await this.getWSUserId(socketId)
+    const socketIds = userId ? await this.getWSSocketId(userId) : null
+
+    if (socketIds) {
+      const updatedSocketIds = socketIds.filter((id) => id !== socketId)
+
+      if (updatedSocketIds.length > 0) {
+        await this.cacheManager.set(`WSuserId:${userId}`, updatedSocketIds)
+      } else {
+        await this.cacheManager.del(`WSuserId:${userId}`)
       }
     }
+    await this.cacheManager.del(`WSsocketId:${socketId}`)
+
+    return userId
   }
 
   @SubscribeMessage('createChat')
@@ -88,14 +135,18 @@ export class WSGateway
     @ConnectedSocket() client: Socket
   ) {
     const newChatEntity = await this.chatService.createChat(createChatDto)
-    const receiverSocket = this._connectedUsers.get(newChatEntity.receiverId)
+    const receiverSocketId = await this.getWSSocketId(newChatEntity.receiverId)
     client.emit('newChat', newChatEntity.chat)
-    if (receiverSocket) {
-      receiverSocket.emit('newChat', newChatEntity.chat)
+    if (receiverSocketId) {
+      receiverSocketId.forEach((id) => {
+        this.server.to(id).emit('newChat', newChatEntity.chat)
+      })
       const conversations = await this.chatService.getConversations({
         userId: newChatEntity.receiverId,
       })
-      receiverSocket.emit('getConversations', conversations)
+      receiverSocketId.forEach((id) => {
+        this.server.to(id).emit('getConversations', conversations)
+      })
     } else {
       this.chatService.emitEventCreateChat(
         createChatDto,
@@ -112,9 +163,12 @@ export class WSGateway
     @ConnectedSocket() client: Socket
   ) {
     const newReaction = await this.chatService.createReaction(createReactionDto)
-    const receiverSocket = this._connectedUsers.get(newReaction.receiverId)
+    const receiverSocketId = await this.getWSSocketId(newReaction.receiverId)
     client.emit('newReaction', newReaction.chat)
-    if (receiverSocket) receiverSocket.emit('newReaction', newReaction.chat)
+    if (receiverSocketId)
+      receiverSocketId.forEach((id) => {
+        this.server.to(id).emit('newReaction', newReaction.chat)
+      })
     return newReaction.chat
   }
 
@@ -156,14 +210,18 @@ export class WSGateway
     @ConnectedSocket() client: Socket
   ) {
     const deleteChat = await this.chatService.deleteChat(deleteChatDto)
-    const receiverSocket = this._connectedUsers.get(deleteChat.receiverId)
+    const receiverSocketId = await this.getWSSocketId(deleteChat.receiverId)
     client.emit('deleteChat', deleteChat.chat)
-    if (receiverSocket) {
-      receiverSocket.emit('deleteChat', deleteChat.chat)
+    if (receiverSocketId) {
+      receiverSocketId.forEach((id) => {
+        this.server.to(id).emit('deleteChat', deleteChat.chat)
+      })
       const conversations = await this.chatService.getConversations({
         userId: deleteChat.receiverId,
       })
-      receiverSocket.emit('getConversations', conversations)
+      receiverSocketId.forEach((id) => {
+        this.server.to(id).emit('getConversations', conversations)
+      })
     }
     return deleteChat.chat
   }

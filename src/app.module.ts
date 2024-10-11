@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common'
+import { CacheModule, CacheModuleAsyncOptions } from '@nestjs/cache-manager'
+import { redisStore } from 'cache-manager-redis-store'
+import { WSModule } from './websocket/websocket.module'
 import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -16,7 +19,6 @@ import { ReportModule } from './report/report.module'
 import { CommentModule } from './comment/comment.module'
 import { ImageUploadModule } from './image/image-upload.module'
 import { ProductModule } from './product/product.module'
-import { WSModule } from './websocket/websocket.module'
 import { PushNotificationModule } from './push-notification/push-notification.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TagsModule } from './tags/tags.module'
@@ -32,8 +34,23 @@ import { JwtAuthGuard } from './common/guards'
 
 const ENV = process.env.NODE_ENV
 
+export const REDIS_OPTIONS: CacheModuleAsyncOptions = {
+  isGlobal: true,
+  useFactory: async () => {
+    const store = await redisStore({
+      url: process.env.REDIS_URL,
+    })
+    return {
+      store: () => store,
+      ttl: 86400000, // 1 day (remove this if you dont want to clear cache automatically)
+    }
+  },
+}
+
 @Module({
   imports: [
+    CacheModule.registerAsync(REDIS_OPTIONS),
+    WSModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
@@ -65,7 +82,6 @@ const ENV = process.env.NODE_ENV
     CommentModule,
     ImageUploadModule,
     ProductModule,
-    WSModule,
     PushNotificationModule,
     TagsModule,
     TutorialsModule,

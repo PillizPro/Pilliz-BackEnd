@@ -20,7 +20,7 @@ services:
       timeout: 20s
     depends_on:
       - pilliz-db-dev
-      - redis
+      - redis-dev
     tty: true
 
   pilliz-backend-test:
@@ -32,7 +32,7 @@ services:
     container_name: env-dev_pilliz-backend-test
     depends_on:
       - pilliz-db-dev
-      - redis
+      - redis-dev
     tty: true
 
   pilliz-db-dev:
@@ -57,7 +57,7 @@ services:
     volumes:
       - dbadmin-data:/var/lib/pgadmin
 
-  redis:
+  redis-dev:
     image: 'redis:latest'
     container_name: env-dev_redis
     restart: unless-stopped

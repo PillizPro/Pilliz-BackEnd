@@ -22,7 +22,7 @@
     "docker:clean:img": "docker image prune -f && docker compose -f env-dev/docker-compose.yaml down -v --rmi all",
     "docker:db": "docker compose -f env-dev/docker-compose.yaml up --build -d pilliz-db-dev dbadmin",
     "docker:db:reset": "docker compose -f env-dev/docker-compose.yaml rm -s -v -f pilliz-db-dev && docker volume rm pilliz-db-dev-data",
-    "docker:redis": "docker compose -f env-dev/docker-compose.yaml up --build -d redis",
+    "docker:redis": "docker compose -f env-dev/docker-compose.yaml up --build -d redis-dev",
     "docker:dev": "docker image prune -f && pnpm docker:db && pnpm docker:redis && docker compose -f env-dev/docker-compose.yaml up --build pilliz-backend-dev",
     "docker:lint": "docker compose -f env-dev/docker-compose.yaml exec pilliz-backend-dev pnpm lint",
     "docker:test": "docker image prune -f && docker compose -f env-dev/docker-compose.yaml up --build pilliz-backend-test",

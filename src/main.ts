@@ -14,6 +14,7 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger'
 import * as express from 'express'
+import { RedisIoAdapter } from './websocket/redis.adapter'
 
 const ENV = process.env.NODE_ENV
 
@@ -25,6 +26,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: logLevels,
   })
+
+  const redisIoAdapter = new RedisIoAdapter(app)
+  await redisIoAdapter.connectToRedis()
+  app.useWebSocketAdapter(redisIoAdapter)
 
   app.setGlobalPrefix('api')
   app.enableVersioning({
