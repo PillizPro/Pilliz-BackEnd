@@ -18,7 +18,7 @@ export class IdentificationService {
       },
     })
 
-    return users
+    return users.map((str) => str.userTag)
   }
 
   async formatUserTag(userTag: string) {
