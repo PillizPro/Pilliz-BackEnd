@@ -1,11 +1,11 @@
 import { ProductEntity } from './entities/product.entity'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto } from './dto/create-product.dto'
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAllProducts() {
     try {
@@ -70,7 +70,6 @@ export class ProductService {
     return transformedProductTags
   }
 
-
   async createProduct(createProductDto: CreateProductDto) {
     try {
       const product = await this.prismaService.product.create({
@@ -81,23 +80,29 @@ export class ProductService {
           isFavourite: createProductDto.isFavourite || false,
           isPopular: createProductDto.isPopular || false,
           isAddedToCart: createProductDto.isAddedToCart || false,
-          images: ["https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png"],
+          images: [
+            'https://res.cloudinary.com/defykajh0/image/upload/v1712584661/pilliz_logo_bg_e5nx1k.png',
+          ],
           // Connecter les tags si fournis
-          ProductTags: createProductDto.ProductTags
+          ProductTags: createProductDto.productTags
             ? {
-              connectOrCreate: createProductDto.ProductTags.map((tagName) => ({
-                where: { name: tagName },
-                create: { name: tagName },
-              })),
-            }
+                connectOrCreate: createProductDto.productTags.map(
+                  (tagName) => ({
+                    where: { name: tagName },
+                    create: { name: tagName },
+                  })
+                ),
+              }
             : undefined,
         },
-      });
+      })
 
-      return new ProductEntity(product);
+      return new ProductEntity(product)
     } catch (error) {
-      console.error(error);
-      throw new BadRequestException('An error occurred when creating the product.');
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when creating the product.'
+      )
     }
   }
 }

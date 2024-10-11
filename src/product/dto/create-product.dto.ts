@@ -1,41 +1,48 @@
-import { IsNotEmpty, IsNumber, IsString, IsBoolean, IsArray, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsBoolean,
+  IsArray,
+  IsOptional,
+} from 'class-validator'
 
 export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
-  title: string;
+  title: string
 
   @IsNotEmpty()
   @IsNumber()
-  price: number;
+  price: number
 
   @IsNotEmpty()
   @IsString()
-  description: string;
+  description: string
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  images?: string[];
+  images?: string[]
 
   @IsOptional()
   @IsNumber()
-  rating?: number;
+  rating?: number
 
   @IsOptional()
   @IsBoolean()
-  isFavourite?: boolean;
+  isFavourite?: boolean
 
   @IsOptional()
   @IsBoolean()
-  isPopular?: boolean;
+  isPopular?: boolean
 
   @IsOptional()
   @IsBoolean()
-  isAddedToCart?: boolean;
+  isAddedToCart?: boolean
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  ProductTags?: string[]; // Liste optionnelle des tags pour le produit
+  productTags?: string[] // Liste optionnelle des tags pour le produit
 }

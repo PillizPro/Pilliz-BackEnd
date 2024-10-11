@@ -1,25 +1,31 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
-import Stripe from 'stripe';
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { PrismaService } from 'src/prisma/prisma.service'
+import Stripe from 'stripe'
 
 @Injectable()
 export class StripeService {
-  private stripe: Stripe;
+  private _stripe: Stripe
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService
   ) {
-    this.stripe = new Stripe(this.configService.get('STRIPE_PRIVATE_API_KEY') as string, {
-    });
+    this._stripe = new Stripe(
+      this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
+      {}
+    )
   }
 
   async createProduct(productData: any) {
-    const product = await this.stripe.products.create({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const product = await this._stripe.products.create({
       name: productData.name,
-      default_price_data: { currency: "eur", unit_amount_decimal: productData.default_price },
+      default_price_data: {
+        currency: 'eur',
+        unit_amount_decimal: productData.default_price,
+      },
       description: productData.description,
-    });
+    })
   }
 
   // async createPaymentIntent(paymentData: any) {
@@ -34,4 +40,3 @@ export class StripeService {
   //   }
   // }
 }
-
