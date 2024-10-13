@@ -21,6 +21,7 @@ ENV DB_HOST=pilliz-db-dev
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch --frozen-lockfile
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
+COPY src/post/miscellanous/forbidenWords.json /app/
 RUN pnpm prisma:generate
 CMD [ "pnpm", "start:dev" ]
 
