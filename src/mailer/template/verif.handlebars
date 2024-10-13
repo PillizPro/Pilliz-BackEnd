@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800,900&display=swap" rel="stylesheet">
+    <style>
+        
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Nunito, sans-serif;
+  display:flex;
+    justify-content: center;
+
+}
+
+img{
+    width: 60%;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    height: 80%;
+}
+
+p {
+    margin: 15px;
+}
+
+button {
+    margin: 25px;
+}
+
+.code{
+    padding:10px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 1px;
+    font-size: 40px;
+    letter-spacing: 10px;
+}
+    </style>
+  </head>
+  <body>
+  <div class="main">
+    <img src="https://i.ibb.co/wLRG8xX/Pilliz-logo.png" alt="Logo Pilliz"/>
+    <p>
+      Bonjour, <span id="name">{{name}}</span>
+    </p>
+    <p class="content">
+      Merci de vous être inscrit sur Pilliz. Pour activer votre compte Pilliz, veuillez vérifier votre adresse e-mail en entrant le code fourni ci-dessous.
+    </p>
+    <p>
+      Code de vérification :
+    </p>
+    <p class="code">
+      {{code}}
+    </p>
+    <p class="content">
+      Si vous rencontrez des difficultés avec ce processus, n'hésitez pas à nous le faire savoir et nous serons heureux de vous aider davantage.
+    <p class="content">
+      Cordialement,
+    <p>Pilliz</p>
+  </div>
+</body>
+</html>

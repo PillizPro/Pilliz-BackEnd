@@ -14,6 +14,7 @@ export class PostEntity implements Post {
   repostsCount: number
   commentsCount: number
   totalInteractions: number
+  confidentiality: string
   user: UserEntity
   isCompanyOffer: boolean
   companyOfferTitle: string

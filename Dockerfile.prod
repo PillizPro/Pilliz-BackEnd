@@ -31,6 +31,7 @@ RUN pnpm prisma:generate
 FROM base AS gha
 USER node
 COPY --from=prod-build /app/dist /app/dist
+COPY --from=prod-build /app/src/post/miscellanous/forbidenWords.json /app/
 COPY --from=prod-dependencies /app/node_modules /app/node_modules
 ENV NODE_ENV=gha
 CMD [ "pnpm", "start:prod" ]
@@ -38,6 +39,7 @@ CMD [ "pnpm", "start:prod" ]
 FROM base AS staging
 USER node
 COPY --from=prod-build /app/dist /app/dist
+COPY --from=prod-build /app/src/post/miscellanous/forbidenWords.json /app/
 COPY --from=prod-dependencies /app/node_modules /app/node_modules
 ENV NODE_ENV=staging
 CMD [ "pnpm", "start:prod" ]
@@ -45,6 +47,7 @@ CMD [ "pnpm", "start:prod" ]
 FROM base AS prod
 USER node
 COPY --from=prod-build /app/dist /app/dist
+COPY --from=prod-build /app/src/post/miscellanous/forbidenWords.json /app/
 COPY --from=prod-dependencies /app/node_modules /app/node_modules
 ENV NODE_ENV=production
 CMD [ "pnpm", "start:prod" ]

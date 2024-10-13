@@ -78,6 +78,7 @@ export class CommentService {
       const comments = await this.prismaService.comment.findMany({
         where: {
           postId: postId,
+          confidentiality: 'public',
           parentId: null,
           userId: { notIn: excludedUserIds },
           AND: [
@@ -88,6 +89,11 @@ export class CommentService {
                 },
               },
             },
+            {
+              Post: {
+                confidentiality: 'public',
+              },
+            },
           ],
         },
         orderBy: {
@@ -95,6 +101,7 @@ export class CommentService {
         },
         include: {
           Users: true,
+          Post: true,
         },
       })
 
@@ -209,6 +216,7 @@ export class CommentService {
 
       const responses = await this.prismaService.comment.findMany({
         where: {
+          confidentiality: 'public',
           rootCommentId: commentId,
           userId: { notIn: excludedUserIds },
           AND: [
@@ -219,6 +227,11 @@ export class CommentService {
                 },
               },
             },
+            {
+              Post: {
+                confidentiality: 'public',
+              },
+            },
           ],
         },
         orderBy: {
@@ -226,6 +239,7 @@ export class CommentService {
         },
         include: {
           Users: true,
+          Post: true,
         },
       })
 

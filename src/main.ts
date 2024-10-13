@@ -65,6 +65,12 @@ async function bootstrap() {
   app.use(express.json({ limit: '50mb' })) // Augmentez selon vos besoins
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  })
+
   await app.listen(3000)
 }
 bootstrap()
