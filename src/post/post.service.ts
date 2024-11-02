@@ -11,6 +11,7 @@ import {
   RecoverDatePostDto,
   ViewInterractPostDto,
   PostOrCommentTypeDto,
+  FavoritePostDto,
 } from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
@@ -287,6 +288,13 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
@@ -303,6 +311,7 @@ export class PostService {
         isRepost: post.isRepost, // Est ce que c'est un repost ?
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
 
       return transformedPosts
@@ -397,6 +406,13 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
@@ -413,6 +429,7 @@ export class PostService {
         isRepost: post.isRepost, // Est ce que c'est un repost ?
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
 
       return transformedPosts
@@ -510,6 +527,13 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId, // ID du user
         postId: post.id, // ID du post
@@ -526,6 +550,7 @@ export class PostService {
         isRepost: post.isRepost, // Est ce que c'est un repost ?
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
 
       return transformedPosts
@@ -665,6 +690,13 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId,
         postId: post.id,
@@ -681,6 +713,7 @@ export class PostService {
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
 
       return transformedPosts
@@ -777,6 +810,13 @@ export class PostService {
         hiddenWords.every((word) => !post.content?.includes(word))
       )
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       return filteredPosts.map((post) => ({
         userId: post.userId,
         postId: post.id,
@@ -793,6 +833,7 @@ export class PostService {
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
     } catch (error) {
       console.error(error)
@@ -890,6 +931,13 @@ export class PostService {
         return !hiddenWords.some((word) => post.content?.includes(word))
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       const transformedPosts = filteredPosts.map((post) => ({
         userId: post.userId,
         postId: post.id,
@@ -906,6 +954,7 @@ export class PostService {
         isRepost: post.isRepost,
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
       }))
 
       return transformedPosts
@@ -913,6 +962,117 @@ export class PostService {
       console.error(error)
       throw new BadRequestException(
         'An error occurred when getting more posts.'
+      )
+    }
+  }
+
+  async findFavoritePosts(userId: string) {
+    try {
+      // Récupère les utilisateurs bloqués, cachés, et mots cachés de l'utilisateur actuel
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+      })
+
+      const blockedUsers = currentUser?.blockedUsers ?? []
+      const hiddenUsers = currentUser?.hiddenUsers ?? []
+      const hiddenWords = currentUser?.hiddenWords ?? []
+
+      // Identifie les utilisateurs qui ont bloqué l'utilisateur actuel
+      const blockerIds = (
+        await this.prismaService.users.findMany({
+          where: {
+            blockedUsers: {
+              has: userId,
+            },
+          },
+          select: { id: true },
+        })
+      ).map((user) => user.id)
+
+      // Récupère les posts favoris de l'utilisateur, en excluant les posts bloqués ou cachés
+      const favoritePosts = await this.prismaService.post.findMany({
+        take: 20,
+        orderBy: { createdAt: 'desc' },
+        where: {
+          favoritedBy: { some: { id: userId } },
+          userId: { notIn: [...blockedUsers, ...hiddenUsers, ...blockerIds] },
+          confidentiality: 'public',
+        },
+        include: { Users: true, Tags: true },
+      })
+
+      const filteredPosts = favoritePosts.filter((post) =>
+        hiddenWords.every((word) => !post.content?.includes(word))
+      )
+
+      return filteredPosts.map((post) => ({
+        userId: post.userId,
+        postId: post.id,
+        username: post.Users?.name,
+        userImgUrl: post.Users?.profilPicture,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likes: post.likesCount,
+        reposts: post.repostsCount,
+        interractions: post.totalInteractions,
+        comments: post.commentsCount,
+        createdAt: post.createdAt,
+        tags: post.Tags?.map((tag) => tag.name),
+        isRepost: false,
+        reposterUsername: null,
+        reposterId: null,
+        isFavorited: true,
+      }))
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting favorite posts.'
+      )
+    }
+  }
+
+  async addPostToFavorites(favoritePostDto: FavoritePostDto, userId: string) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId },
+        data: {
+          FavoritePost: {
+            connect: { id: favoritePostDto.postId },
+          },
+        },
+      })
+
+      return { message: 'Post added to favorites successfully.' }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred while adding to favorites.'
+      )
+    }
+  }
+
+  async removePostFromFavorites(
+    favoritePostDto: FavoritePostDto,
+    userId: string
+  ) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId },
+        data: {
+          FavoritePost: {
+            disconnect: { id: favoritePostDto.postId },
+          },
+        },
+      })
+
+      console.log('Post removed')
+
+      return { message: 'Post removed from favorites successfully.' }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred while removing from favorites.'
       )
     }
   }

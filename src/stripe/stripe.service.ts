@@ -6,18 +6,18 @@ import Stripe from 'stripe'
 @Injectable()
 export class StripeService {
   private _stripe: Stripe | undefined
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService
-  ) {
-    this._stripe =
-      process.env.NODE_ENV === 'gha'
-        ? undefined
-        : new Stripe(
-            this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
-            {}
-          )
-  }
+  // constructor(
+  //   private readonly prismaService: PrismaService,
+  //   private readonly configService: ConfigService
+  // ) {
+  //   this._stripe =
+  //     process.env.NODE_ENV === 'gha'
+  //       ? undefined
+  //       : new Stripe(
+  //           this.configService.get('STRIPE_PRIVATE_API_KEY') as string,
+  //           {}
+  //         )
+  // }
 
   async createProduct(productData: any) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

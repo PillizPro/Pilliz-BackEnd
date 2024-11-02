@@ -6,6 +6,7 @@ import {
   RecoverDatePostDto,
   PostOrCommentTypeDto,
   ViewInterractPostDto,
+  FavoritePostDto,
 } from './dto'
 import { PostService } from './post.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -87,6 +88,30 @@ export class PostController {
   ) {
     return await this.postService.find20OlderPostsFollowed(
       recoverDatePostDto,
+      userId
+    )
+  }
+
+  @Get('findFavoritePosts')
+  async findFavoritePosts(@CurrentUserId() userId: string) {
+    return await this.postService.findFavoritePosts(userId)
+  }
+
+  @Post('addPostToFavorites')
+  async addPostToFavorites(
+    @Body() favoritePostDto: FavoritePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.addPostToFavorites(favoritePostDto, userId)
+  }
+
+  @Post('removePostFromFavorites')
+  async removePostFromFavorites(
+    @Body() favoritePostDto: FavoritePostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.removePostFromFavorites(
+      favoritePostDto,
       userId
     )
   }
