@@ -9,4 +9,14 @@ export class CronController {
   create() {
     return this.cronService.cron()
   }
+
+  @Get('getLastFourWeeks')
+  MetricsLastFourWeeks() {
+    return this.cronService.MetricsLastFourWeeks()
+  }
+
+  @Get('getAllMetrics')
+  getAllMetrics() {
+    return this.cronService.getAllMetrics()
+  }
 }
