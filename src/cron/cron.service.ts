@@ -27,7 +27,7 @@ export class CronService {
   async getLastFourWeeks() {
     const lastFourWeeks = await this.prismaService.metrics.findMany({
       orderBy: {
-        createdAt: 'desc',
+        Date: 'desc',
       },
       take: 4*7,
     })
