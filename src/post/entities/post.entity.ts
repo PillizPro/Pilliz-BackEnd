@@ -17,4 +17,5 @@ export class PostEntity implements Post {
   confidentiality: string
   user: UserEntity
   isFavorited: boolean
+  isPinned: boolean
 }
