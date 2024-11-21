@@ -11,7 +11,7 @@ export class CronController {
   }
 
   @Get('getLastFourWeeks')
-  MetricsLastFourWeeks() {
+  metricsLastFourWeeks() {
     return this.cronService.getLastFourWeeks()
   }
 
