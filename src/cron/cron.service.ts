@@ -21,7 +21,7 @@ export class CronService {
   // const oneMonth = 30 * this.oneDay
 
   async getAllMetrics() {
-    return this.prismaService.metrics.findMany();
+    return this.prismaService.metrics.findMany()
   }
 
   async getLastFourWeeks() {
@@ -29,7 +29,7 @@ export class CronService {
       orderBy: {
         Date: 'desc',
       },
-      take: 4*7,
+      take: 4 * 7,
     })
     return lastFourWeeks
   }
