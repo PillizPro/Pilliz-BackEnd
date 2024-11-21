@@ -14,6 +14,10 @@ import { JwtService } from '@nestjs/jwt'
 import { ITokenPayload } from './strategies/jwt.strategy'
 import { ConfigService } from '@nestjs/config'
 import { Tokens } from './auth.controller'
+import { Verifier } from 'academic-email-verifier';
+import { ValidationEmail } from 'src/mailer/dto/mailer.dto';
+import { MailerService } from 'src/mailer/mailer.service';
+import { VerifyDto } from './dto/verify.dto'
 
 @Injectable()
 export class AuthService {
@@ -21,17 +25,34 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly mailerService: MailerService
   ) {}
 
   async register(registerDto: CreateUserDto) {
     const hashedPassword = await this._hashData(registerDto.password)
+
+    const min = 100000;
+    const max = 999999;
+    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+
     const userDtoWithHashedPassword = {
       ...registerDto,
       password: hashedPassword,
     }
-    const newUser = await this.userService.createUser(userDtoWithHashedPassword)
+    const mail = userDtoWithHashedPassword.email;
+    const isAcademic = await Verifier.isAcademic(mail);
+    // if (!isAcademic) throw new ConflictException('Email is not academic.')
+
+    const newUser = await this.userService.createUser(userDtoWithHashedPassword, randomNumber.toString())
     if (!newUser) throw new ConflictException('User already exists.')
+
+    const emailObject = new ValidationEmail();
+    emailObject.name = newUser.name;
+    emailObject.code = randomNumber;
+    await this.mailerService.sendMail(mail, emailObject)
+
     return newUser
   }
 
@@ -70,8 +91,24 @@ export class AuthService {
     }
   }
 
+  async verificationCode(verifyDto: VerifyDto) {
+    const email = verifyDto.email;
+    const code = verifyDto.code;
+
+    const user = await this.userService.findByEmail({ email })
+    if (!user) throw new UnauthorizedException('User not found.')
+    if (user.codeVerification  !== code) throw new UnauthorizedException('Invalid code.')
+    await this.userService.updateVerificationStatus(user.id)
+    return { status: 'verified' }
+  }
+
   async login(user: any): Promise<Tokens | undefined> {
     if (!user) return
+    const email = user.email;
+    const userInfo = await this.userService.findByEmail({ email })
+    if (userInfo && userInfo.isVerified === false) {
+      throw new ForbiddenException('Email not verified.')
+    }
     const tokens = await this._generateTokens(user.id, user.email)
     await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
     return tokens

@@ -29,11 +29,12 @@ export class MailerService {
         extName: '.handlebars',
       })
     )
-
+    
     const mailOptions = mailOptionsMaker(mail, typeMail)
 
     transporter.sendMail(mailOptions, (err: Error) => {
       if (err) {
+        console.error('Error sending email:', err);
         throw new Error('An error occured when sending the email')
       } else {
         return { message: 'Email successfully sent.' }

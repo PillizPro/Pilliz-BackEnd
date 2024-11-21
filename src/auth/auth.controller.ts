@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateUserDto, CreateProUserDto } from 'src/user/dto'
+import { VerifyDto } from './dto/verify.dto'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { ResetPasswordDto } from './dto'
 import { Request } from 'express'
@@ -82,6 +83,12 @@ export class AuthController {
     return await this.authService.makeUserAdmin(userId)
   }
 
+  @Public()
+  @Post('verifyEmail')
+  async verifyEmail(@Body() verifyDto: VerifyDto) {
+    return await this.authService.verificationCode(verifyDto)
+  }
+
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Public()
@@ -93,4 +100,6 @@ export class AuthController {
   ): Promise<Tokens> {
     return await this.authService.refreshTokens(userId, refreshToken)
   }
+
+
 }

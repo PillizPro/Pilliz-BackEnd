@@ -42,7 +42,7 @@ export class SupportTicketEmail implements MailerDto {
 
 export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {
   const mailOptions = {
-    from: 'pillizpro@gmail.com',
+    from: 'tiktoktest531@gmail.com',
     to: mail,
     template: typeMail.template,
     subject: typeMail.subject,
@@ -61,5 +61,6 @@ export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {
       response: typeMail.response,
     }
   }
+
   return mailOptions
 }

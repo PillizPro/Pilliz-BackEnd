@@ -16,12 +16,13 @@ export class UserService {
 
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto, codeVerification: string) {
     try {
       const user = await this.prismaService.users.create({
         data: {
           nameLowercase: createUserDto.name.toLowerCase(),
           ...createUserDto,
+          codeVerification: codeVerification,
         },
       })
       return new UserEntity(user)
@@ -34,6 +35,8 @@ export class UserService {
     try {
       const user = await this.prismaService.users.create({
         data: {
+          codeVerification: '0',
+          isVerified: true,
           nameLowercase: createUserDto.name.toLowerCase(),
           ...createUserDto,
         },
@@ -106,6 +109,24 @@ export class UserService {
       throw new BadRequestException(
         `An error occured when changing connected user status:
          ${userId} to: ${connectedStatus}`
+      )
+    }
+  }
+
+  async updateVerificationStatus(userId: string) {
+    try {
+      const user = await this.prismaService.users.update({
+        where: { id: userId },
+        data: { isVerified: true, codeVerification: '0' },
+      })
+      this._logger.debug(
+        `Update verification status of user: ${userId} [${user.name}] to: true`
+      )
+    } catch (err) {
+      console.error(err)
+      throw new BadRequestException(
+        `An error occured when changing verification user status:
+         ${userId} to: true`
       )
     }
   }
