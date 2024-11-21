@@ -86,6 +86,7 @@ export class ProfilService {
         select: {
           email: true,
           name: true,
+          profilPicture: true,
         },
       })
 
@@ -99,6 +100,7 @@ export class ProfilService {
         email: userInfos[0]!.email,
         name: userInfos[0]!.name,
         bio: userBio,
+        profilImg: userInfos[0]!.profilPicture,
         nbPosts: userNbPosts,
         nbFollowers: userNbFollowings,
         nbFollowings: userNbFollowers,
