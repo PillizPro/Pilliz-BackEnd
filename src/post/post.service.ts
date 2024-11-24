@@ -12,6 +12,8 @@ import {
   ViewInterractPostDto,
   PostOrCommentTypeDto,
   FavoritePostDto,
+  PinnedPostDto,
+  PinnedPostUserDto,
 } from './dto'
 import { PostEntity } from './entities/post.entity'
 import { ImageUploadService } from 'src/image/image-upload.service'
@@ -159,6 +161,14 @@ export class PostService {
   ) {
     const { postId } = recoverDetailsPostDto
     try {
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: {
+          pinnedPostId: true,
+        },
+      })
+
+      const pinnedPostId = currentUser?.pinnedPostId
       const post = await this.prismaService.post.findUnique({
         where: { id: postId },
         include: {
@@ -186,6 +196,13 @@ export class PostService {
         }, // Inclure les détails du post
       })
 
+      const favoritePostIds = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
       return {
         userId: post.userId,
         postId: post.id,
@@ -202,6 +219,8 @@ export class PostService {
         isRepost: reposters ? true : false,
         reposterUsername: reposters ? reposters.Users.name : null,
         reposterId: reposters ? reposters.userId : null,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }
     } catch (error) {
       console.error(error)
@@ -213,12 +232,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const allUsers = await this.prismaService.users.findMany({
         select: { id: true, blockedUsers: true },
@@ -312,6 +337,7 @@ export class PostService {
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       return transformedPosts
@@ -329,12 +355,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const allUsers = await this.prismaService.users.findMany({
         select: { id: true, blockedUsers: true },
@@ -430,6 +462,7 @@ export class PostService {
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       return transformedPosts
@@ -449,12 +482,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const allUsers = await this.prismaService.users.findMany({
         select: { id: true, blockedUsers: true },
@@ -551,6 +590,7 @@ export class PostService {
         reposterUsername: post.reposterUsername, // Nom du reposter
         reposterId: post.reposterId, // ID du reposter
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       return transformedPosts
@@ -613,12 +653,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const allUsers = await this.prismaService.users.findMany({
         select: { id: true, blockedUsers: true },
@@ -714,6 +760,7 @@ export class PostService {
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       return transformedPosts
@@ -731,12 +778,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const blockerIds = (
         await this.prismaService.users.findMany({
@@ -834,6 +887,7 @@ export class PostService {
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
     } catch (error) {
       console.error(error)
@@ -851,12 +905,18 @@ export class PostService {
     try {
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       const allUsers = await this.prismaService.users.findMany({
         select: { id: true, blockedUsers: true },
@@ -955,6 +1015,7 @@ export class PostService {
         reposterUsername: post.reposterUsername,
         reposterId: post.reposterId,
         isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       return transformedPosts
@@ -971,12 +1032,18 @@ export class PostService {
       // Récupère les utilisateurs bloqués, cachés, et mots cachés de l'utilisateur actuel
       const currentUser = await this.prismaService.users.findUnique({
         where: { id: userId },
-        select: { blockedUsers: true, hiddenUsers: true, hiddenWords: true },
+        select: {
+          blockedUsers: true,
+          hiddenUsers: true,
+          hiddenWords: true,
+          pinnedPostId: true,
+        },
       })
 
       const blockedUsers = currentUser?.blockedUsers ?? []
       const hiddenUsers = currentUser?.hiddenUsers ?? []
       const hiddenWords = currentUser?.hiddenWords ?? []
+      const pinnedPostId = currentUser?.pinnedPostId
 
       // Identifie les utilisateurs qui ont bloqué l'utilisateur actuel
       const blockerIds = (
@@ -1023,6 +1090,7 @@ export class PostService {
         reposterUsername: null,
         reposterId: null,
         isFavorited: true,
+        isPinned: post.id === pinnedPostId,
       }))
     } catch (error) {
       console.error(error)
@@ -1066,8 +1134,6 @@ export class PostService {
         },
       })
 
-      console.log('Post removed')
-
       return { message: 'Post removed from favorites successfully.' }
     } catch (error) {
       console.error(error)
@@ -1087,6 +1153,99 @@ export class PostService {
       console.error(error)
       throw new BadRequestException(
         'An error occurred when interracting with the post'
+      )
+    }
+  }
+
+  async findPinnedPost(pinnedPostUserDto: PinnedPostUserDto, userId: string) {
+    try {
+      if (pinnedPostUserDto.userId) {
+        userId = pinnedPostUserDto.userId
+      }
+      const currentUser = await this.prismaService.users.findUnique({
+        where: { id: userId },
+        select: { pinnedPostId: true },
+      })
+
+      const pinnedPostId = currentUser?.pinnedPostId
+
+      if (!pinnedPostId) {
+        return null
+      }
+
+      const pinnedPost = await this.prismaService.post.findUnique({
+        where: { id: pinnedPostId },
+        include: { Users: true, Tags: true },
+      })
+
+      if (!pinnedPost) {
+        return null
+      }
+
+      const isFavorited = await this.prismaService.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.some((post) => post.id === pinnedPostId))
+
+      return {
+        userId: pinnedPost.userId,
+        postId: pinnedPost.id,
+        username: pinnedPost.Users?.name,
+        userImgUrl: pinnedPost.Users?.profilPicture,
+        content: pinnedPost.content,
+        imageUrl: pinnedPost.imageUrl,
+        likes: pinnedPost.likesCount,
+        reposts: pinnedPost.repostsCount,
+        interractions: pinnedPost.totalInteractions,
+        comments: pinnedPost.commentsCount,
+        createdAt: pinnedPost.createdAt,
+        tags: pinnedPost.Tags?.map((tag) => tag.name),
+        isPinned: true,
+        isRepost: false,
+        reposterUsername: null,
+        reposterId: null,
+        isFavorited: isFavorited,
+      }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred when getting the pinned post.'
+      )
+    }
+  }
+
+  async addPostToPinned(pinnedPostDto: PinnedPostDto, userId: string) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId },
+        data: {
+          pinnedPostId: pinnedPostDto.postId,
+        },
+      })
+
+      return { message: 'Post added to pinned successfully.' }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException('An error occurred while adding to pinned.')
+    }
+  }
+
+  async removePostFromPinned(pinnedPostDto: PinnedPostDto, userId: string) {
+    try {
+      await this.prismaService.users.update({
+        where: { id: userId, pinnedPostId: pinnedPostDto.postId },
+        data: {
+          pinnedPostId: null,
+        },
+      })
+
+      return { message: 'Post removed from pinned successfully.' }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException(
+        'An error occurred while removing from pinned.'
       )
     }
   }
