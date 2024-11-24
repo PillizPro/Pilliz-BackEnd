@@ -3,7 +3,8 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 
 function loadForbiddenWords(): string[] {
-  const filePath = join('src/post/miscellanous', 'forbidenWords.json')
+  // The forbiddenWords.json file is copied in /app in the Dockerfile
+  const filePath = join('/app', 'forbidenWords.json')
   const data = readFileSync(filePath, 'utf-8')
   const json = JSON.parse(data)
   return json.forbiddenWords

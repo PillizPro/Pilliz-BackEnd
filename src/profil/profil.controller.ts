@@ -42,6 +42,11 @@ export class ProfilController {
     return await this.profilService.getNbPost(userId)
   }
 
+  @Get('userNbInterractions')
+  async getUserNbInterractions(@CurrentUserId() userId: string) {
+    return await this.profilService.getNbInterractions(userId)
+  }
+
   @Get('otherUsersInfos/:userId')
   async fetchUserInfos(@Param('userId', new ParseUUIDPipe()) userId: string) {
     return await this.profilService.fetchUserInfos(userId)
@@ -130,6 +135,28 @@ export class ProfilController {
     @CurrentUserId() userId: string
   ) {
     return await this.profilService.getRepostOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getPostMediaOnProfil')
+  async getPostMediaOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPostMediaOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getPrivateOnProfil')
+  async getPrivateOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPrivateOnProfil(
       otherUserProfilIdDto,
       userId
     )
