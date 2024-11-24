@@ -4,13 +4,13 @@ import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class DocumentUploadService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async uploadUserDocument(userId: string, docName: string, docUrl: string) {
     try {
       const doc = await this.prismaService.document.findFirst({
         where: {
-          docName: docName
+          docName: docName,
         },
       })
 
