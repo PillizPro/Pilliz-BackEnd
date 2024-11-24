@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { contains } from 'class-validator'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { IdentifyUsersDto } from './dto'
 
 // Services
 
 @Injectable()
 export class IdentificationService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) { }
 
   async getAllUserTagWithPattern(pattern: string) {
     const users = await this.prisma.users.findMany({
@@ -47,7 +51,7 @@ export class IdentificationService {
   }
 
   async identifyUsers(identifyUsersDto: IdentifyUsersDto) {
-    const { usersTag } = identifyUsersDto
+    const { userId, content, usersTag } = identifyUsersDto
 
     if (!(usersTag instanceof Array)) {
       // Prevents DoS. (CodeQL)
@@ -61,14 +65,25 @@ export class IdentificationService {
     for (let idx = 0; idx < usersTag.length; idx++) {
       const element = usersTag[idx]
       if ((await this.isUserTagExist(element!)) === false) continue
-
       // Emit Socket afin d'envoyer une notification (j'imagine^^)
+      var receiver = await this.prisma.users.findUnique({
+        where: { userTag: element },
+      })
+
+      this.eventEmitter.emit(
+        'notifyUser',
+        6,
+        userId,
+        content,
+        receiver!.id,
+      )
 
       await this.prisma.users.update({
         where: { userTag: element },
         data: { totalIdentifyTime: { increment: 1 } },
       })
     }
+
   }
 
   async getIdentifyingPosts(userId: string) {

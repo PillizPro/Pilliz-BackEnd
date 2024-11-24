@@ -9,7 +9,7 @@ export class PushNotificationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService
-  ) {}
+  ) { }
 
   async getAllNotifications(userId: string) {
     const notifications = await this.prismaService.notificatifion.findMany({
@@ -43,6 +43,7 @@ export class PushNotificationService {
   //  3: a user has been followed
   //  4: a user has repost a post
   //  5: a user has repost a comment
+  //  6: a user has been identify
   @OnEvent('notifyUser')
   async notifyOnCreateChat(
     notifType: number,

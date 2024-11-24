@@ -16,6 +16,7 @@ import { IdentificationService } from 'src/identification/identification.service
 import { LikeService } from 'src/like/like.service'
 import { RepostService } from 'src/repost/repost.service'
 import { DeletedFilesDto } from './dto/delete-files.dto'
+import { userInfo } from 'os'
 
 @Injectable()
 export class ProfilService {
@@ -64,6 +65,7 @@ export class ProfilService {
         select: {
           email: true,
           name: true,
+          profilPicture: true,
         },
       })
 
@@ -75,6 +77,7 @@ export class ProfilService {
       const informations = {
         email: userInfos[0]!.email,
         name: userInfos[0]!.name,
+        profilImg: userInfos[0]!.profilPicture,
         bio: userBio,
         nbPosts: userNbPosts,
         nbFollowers: userNbFollowings,
