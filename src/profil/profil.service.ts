@@ -170,8 +170,24 @@ export class ProfilService {
     userId: string
   ) {
     try {
+      const favoritePostIds = await this.prisma.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
+      let pinnedPostId = null
       if (otherUserProfilIdDto.userId) {
         userId = otherUserProfilIdDto.userId
+      } else {
+        const currentUser = await this.prisma.users.findUnique({
+          where: { id: userId },
+          select: {
+            pinnedPostId: true,
+          },
+        })
+        pinnedPostId = currentUser?.pinnedPostId
       }
       const posts = await this.prisma.post.findMany({
         take: 20,
@@ -197,6 +213,8 @@ export class ProfilService {
         reposts: post.repostsCount,
         comments: post.commentsCount,
         createdAt: post.createdAt,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
       return transformedPosts
     } catch (error) {
@@ -283,9 +301,26 @@ export class ProfilService {
     userId: string
   ) {
     try {
+      const favoritePostIds = await this.prisma.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
+      let pinnedPostId = null
       if (otherUserProfilIdDto.userId) {
         userId = otherUserProfilIdDto.userId
+      } else {
+        const currentUser = await this.prisma.users.findUnique({
+          where: { id: userId },
+          select: {
+            pinnedPostId: true,
+          },
+        })
+        pinnedPostId = currentUser?.pinnedPostId
       }
+
       const likedCommentsIds =
         await this.likeService.getLikedCommentsByUser(userId)
       const likedPostsIds = await this.likeService.getLikedPostsByUser(userId)
@@ -317,6 +352,8 @@ export class ProfilService {
         createdAt: post.createdAt,
         tags: post.Tags.map((tag) => tag.name),
         isComment: false,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       const likedComments = await this.prisma.comment.findMany({
@@ -395,9 +432,25 @@ export class ProfilService {
     userId: string
   ) {
     try {
+      const favoritePostIds = await this.prisma.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+      let pinnedPostId = null
       if (otherUserProfilIdDto.userId) {
         userId = otherUserProfilIdDto.userId
+      } else {
+        const currentUser = await this.prisma.users.findUnique({
+          where: { id: userId },
+          select: {
+            pinnedPostId: true,
+          },
+        })
+        pinnedPostId = currentUser?.pinnedPostId
       }
+
       const repostedCommentsIds =
         await this.repostService.getRepostedCommentsByUser(userId)
       const repostedPostsIds =
@@ -431,6 +484,8 @@ export class ProfilService {
         createdAt: post.createdAt,
         tags: post.Tags.map((tag) => tag.name),
         isComment: false,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       const repostedComments = await this.prisma.comment.findMany({
@@ -509,8 +564,24 @@ export class ProfilService {
     userId: string
   ) {
     try {
+      const favoritePostIds = await this.prisma.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+
+      let pinnedPostId = null
       if (otherUserProfilIdDto.userId) {
         userId = otherUserProfilIdDto.userId
+      } else {
+        const currentUser = await this.prisma.users.findUnique({
+          where: { id: userId },
+          select: {
+            pinnedPostId: true,
+          },
+        })
+        pinnedPostId = currentUser?.pinnedPostId
       }
       const posts = await this.prisma.post.findMany({
         take: 20,
@@ -539,6 +610,8 @@ export class ProfilService {
         reposts: post.repostsCount,
         comments: post.commentsCount,
         createdAt: post.createdAt,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
       return transformedPosts
     } catch (error) {
@@ -554,8 +627,23 @@ export class ProfilService {
     userId: string
   ) {
     try {
+      const favoritePostIds = await this.prisma.post
+        .findMany({
+          where: { favoritedBy: { some: { id: userId } } },
+          select: { id: true },
+        })
+        .then((posts) => posts.map((post) => post.id))
+      let pinnedPostId = null
       if (otherUserProfilIdDto.userId) {
         userId = otherUserProfilIdDto.userId
+      } else {
+        const currentUser = await this.prisma.users.findUnique({
+          where: { id: userId },
+          select: {
+            pinnedPostId: true,
+          },
+        })
+        pinnedPostId = currentUser?.pinnedPostId
       }
 
       const privatePosts = await this.prisma.post.findMany({
@@ -586,6 +674,8 @@ export class ProfilService {
         createdAt: post.createdAt,
         tags: post.Tags.map((tag) => tag.name),
         isComment: false,
+        isFavorited: post.id ? favoritePostIds.includes(post.id) : false,
+        isPinned: post.id === pinnedPostId,
       }))
 
       const privateComments = await this.prisma.comment.findMany({

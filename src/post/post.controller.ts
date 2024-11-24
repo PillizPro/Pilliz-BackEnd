@@ -7,6 +7,8 @@ import {
   PostOrCommentTypeDto,
   ViewInterractPostDto,
   FavoritePostDto,
+  PinnedPostDto,
+  PinnedPostUserDto,
 } from './dto'
 import { PostService } from './post.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -126,5 +128,29 @@ export class PostController {
   @Post('interractViewPost')
   async interractViewPost(@Body() viewInterractPostDto: ViewInterractPostDto) {
     return await this.postService.interractViewPost(viewInterractPostDto)
+  }
+
+  @Post('findPinnedPost')
+  async findPinnedPost(
+    @Body() pinnedPostUserDto: PinnedPostUserDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.findPinnedPost(pinnedPostUserDto, userId)
+  }
+
+  @Post('addPostToPinned')
+  async addPostToPinned(
+    @Body() pinnedPostDto: PinnedPostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.addPostToPinned(pinnedPostDto, userId)
+  }
+
+  @Post('removePostFromPinned')
+  async removePostToPinned(
+    @Body() pinnedPostDto: PinnedPostDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.postService.removePostFromPinned(pinnedPostDto, userId)
   }
 }
