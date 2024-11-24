@@ -4,18 +4,18 @@ import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class DocumentUploadService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async uploadUserDocument(userId: string, docName: string, docUrl: string) {
     try {
       const doc = await this.prismaService.document.findFirst({
         where: {
-          userId: userId,
+          docName: docName
         },
       })
 
       // existe déjà, on le met à jour
-      if (docName === doc?.docName) {
+      if (doc && docName === doc?.docName) {
         await this.prismaService.document.update({
           where: {
             docName: docName,

@@ -5,7 +5,7 @@ import { StripeService } from './stripe.service'
 
 @Module({
   imports: [ImageUploadModule], // Ajoutez ImageUploadModule aux imports
-  controllers: [StripeController],
-  providers: [StripeService],
+  // controllers: [StripeController],
+  // providers: [StripeService],
 })
-export class StripeModule {}
+export class StripeModule { }
