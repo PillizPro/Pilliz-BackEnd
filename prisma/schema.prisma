@@ -26,6 +26,8 @@ model Users {
   banned                 BanningStatus            @default(notBanned)
   Post                   Post[]
   FavoritePost           Post[]                   @relation("UserFavorites")
+  pinnedPostId           String?                  @unique
+  PinnedPost             Post?                    @relation("UserPinned", fields: [pinnedPostId], references: [id])
   Like                   Like[]
   Repost                 Repost[]
   Comment                Comment[]
@@ -107,6 +109,7 @@ model Post {
   Tags              Tags[]
   Reports           Reports[]
   favoritedBy       Users[]   @relation("UserFavorites")
+  pinnedBy          Users?    @relation("UserPinned")
 }
 
 model CompanyOffer {
