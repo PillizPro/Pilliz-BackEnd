@@ -25,6 +25,11 @@ export class MailerDto {
   readonly response?: string
 }
 
+export class MailerResend {
+  @IsDefined()
+  readonly email!: string
+}
+
 export class ValidationEmail implements MailerDto {
   type = MailerType.VALIDATION
   subject = 'Pilliz - Email Verification'

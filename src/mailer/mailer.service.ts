@@ -2,9 +2,27 @@ import { Injectable } from '@nestjs/common'
 import * as nodemailer from 'nodemailer'
 import * as hbs from 'nodemailer-express-handlebars'
 import { MailerDto, mailOptionsMaker } from './dto/mailer.dto'
+import { UserService } from 'src/user/user.service'
+import { ValidationEmail } from 'src/mailer/dto/mailer.dto';
 
 @Injectable()
 export class MailerService {
+  constructor(private readonly userService: UserService) {}
+
+  async sendVerificationMail(mail: string) {
+    const user = await this.userService.findByEmail({ email: mail })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+    const code = user.codeVerification
+
+    const emailObject = new ValidationEmail();
+    emailObject.name = user.name;
+    emailObject.code = parseInt(code);
+    await this.sendMail(mail, emailObject)
+  }
+
   async sendMail(mail: string, typeMail: MailerDto) {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
