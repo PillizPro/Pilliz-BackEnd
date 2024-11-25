@@ -43,6 +43,7 @@ export class PushNotificationService {
   //  3: a user has been followed
   //  4: a user has repost a post
   //  5: a user has repost a comment
+  //  6: a user has been identify
   @OnEvent('notifyUser')
   async notifyOnCreateChat(
     notifType: number,

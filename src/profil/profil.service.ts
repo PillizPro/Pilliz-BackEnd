@@ -6,6 +6,7 @@ import {
   ChangeProfilImgDto,
   ChangeBioDto,
   OtherUserProfilIdDto,
+  DeletedFilesDto,
 } from './dto'
 
 // Services
@@ -99,8 +100,8 @@ export class ProfilService {
       const informations = {
         email: userInfos[0]!.email,
         name: userInfos[0]!.name,
-        bio: userBio,
         profilImg: userInfos[0]!.profilPicture,
+        bio: userBio,
         nbPosts: userNbPosts,
         nbFollowers: userNbFollowings,
         nbFollowings: userNbFollowers,
@@ -144,6 +145,11 @@ export class ProfilService {
     }
 
     return this.docService.uploadUserDocument(userId, docName, docUrl)
+  }
+
+  async deleteUserDocument(deletedFilesDto: DeletedFilesDto, userId: string) {
+    const { docName } = deletedFilesDto
+    await this.docService.deleteUserDocuments(userId, docName)
   }
 
   async getUserDocuments(userId: string) {

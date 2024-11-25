@@ -18,10 +18,22 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto) {
     try {
+      const nbUserTag = await this.prismaService.users.findMany({
+        where: {
+          userTag: {
+            startsWith: createUserDto.userTag,
+          },
+        },
+      })
+
+      let realUserTag = createUserDto.userTag
+      if (nbUserTag.length !== 0) realUserTag += nbUserTag.length.toString()
+
       const user = await this.prismaService.users.create({
         data: {
           nameLowercase: createUserDto.name.toLowerCase(),
           ...createUserDto,
+          userTag: realUserTag,
         },
       })
       return new UserEntity(user)
