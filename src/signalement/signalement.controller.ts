@@ -24,10 +24,13 @@ export class SignalementController {
   @ApiBearerAuth()
   @Post('createsignalement')
   async createsignalement(
-  @CurrentUserId() userId: string,
-  @Body() createsignalement: SignalementDto
+    @CurrentUserId() userId: string,
+    @Body() createsignalement: SignalementDto
   ) {
-    return await this.signalementService.createSignalement(createsignalement, userId)
+    return await this.signalementService.createSignalement(
+      createsignalement,
+      userId
+    )
   }
 
   @ApiBearerAuth()

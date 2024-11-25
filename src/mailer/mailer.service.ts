@@ -3,7 +3,7 @@ import * as nodemailer from 'nodemailer'
 import * as hbs from 'nodemailer-express-handlebars'
 import { MailerDto, mailOptionsMaker } from './dto/mailer.dto'
 import { UserService } from 'src/user/user.service'
-import { ValidationEmail } from 'src/mailer/dto/mailer.dto';
+import { ValidationEmail } from 'src/mailer/dto/mailer.dto'
 
 @Injectable()
 export class MailerService {
@@ -17,9 +17,9 @@ export class MailerService {
     }
     const code = user.codeVerification
 
-    const emailObject = new ValidationEmail();
-    emailObject.name = user.name;
-    emailObject.code = parseInt(code);
+    const emailObject = new ValidationEmail()
+    emailObject.name = user.name
+    emailObject.code = parseInt(code)
     await this.sendMail(mail, emailObject)
   }
 
@@ -47,12 +47,12 @@ export class MailerService {
         extName: '.handlebars',
       })
     )
-    
+
     const mailOptions = mailOptionsMaker(mail, typeMail)
 
     transporter.sendMail(mailOptions, (err: Error) => {
       if (err) {
-        console.error('Error sending email:', err);
+        console.error('Error sending email:', err)
         throw new Error('An error occured when sending the email')
       } else {
         return { message: 'Email successfully sent.' }

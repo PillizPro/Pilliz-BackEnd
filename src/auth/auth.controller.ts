@@ -100,6 +100,4 @@ export class AuthController {
   ): Promise<Tokens> {
     return await this.authService.refreshTokens(userId, refreshToken)
   }
-
-
 }
