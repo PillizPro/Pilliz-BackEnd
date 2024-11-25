@@ -22,7 +22,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 @ApiTags('Profil')
 @Controller('profil')
 export class ProfilController {
-  constructor(private readonly profilService: ProfilService) { }
+  constructor(private readonly profilService: ProfilService) {}
 
   @Post('changeBio')
   async changeBio(

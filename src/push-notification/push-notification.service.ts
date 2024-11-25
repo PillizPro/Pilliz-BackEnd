@@ -9,7 +9,7 @@ export class PushNotificationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService
-  ) { }
+  ) {}
 
   async getAllNotifications(userId: string) {
     const notifications = await this.prismaService.notificatifion.findMany({
