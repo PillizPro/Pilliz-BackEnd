@@ -1,22 +1,21 @@
 // image-upload.service.ts
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class DocumentUploadService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async uploadUserDocument(userId: string, docName: string, docUrl: string) {
     try {
       const nbDoc = await this.prismaService.document.findMany({
         where: {
           userId: userId,
-        }
+        },
       })
 
-      if (nbDoc.length == 10) {
-        return -1;
+      if (nbDoc.length === 10) {
+        return -1
       }
 
       const doc = await this.prismaService.document.findFirst({
@@ -78,16 +77,16 @@ export class DocumentUploadService {
     }
   }
 
-  async DeleteUserDocuments(_userId: string, _docName: string) {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  async deleteUserDocuments(_userId: string, _docName: string) {
     try {
       await this.prismaService.document.delete({
         where: {
           docName: _docName,
-        }
+        },
       })
       return { message: 'Document succesfully deleted' }
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error)
       throw new BadRequestException('An error occurred when deleting the post.')
     }

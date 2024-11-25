@@ -6,6 +6,7 @@ import {
   ChangeProfilImgDto,
   ChangeBioDto,
   OtherUserProfilIdDto,
+  DeletedFilesDto,
 } from './dto'
 
 // Services
@@ -15,8 +16,6 @@ import { DocumentUploadService } from 'src/document/upload-document.service'
 import { IdentificationService } from 'src/identification/identification.service'
 import { LikeService } from 'src/like/like.service'
 import { RepostService } from 'src/repost/repost.service'
-import { DeletedFilesDto } from './dto/delete-files.dto'
-import { userInfo } from 'os'
 
 @Injectable()
 export class ProfilService {
@@ -28,7 +27,7 @@ export class ProfilService {
     private readonly identificationService: IdentificationService,
     private readonly likeService: LikeService,
     private readonly repostService: RepostService
-  ) { }
+  ) {}
 
   async changeBio(changeBioDto: ChangeBioDto, userId: string) {
     await this.prisma.users.update({
@@ -103,7 +102,6 @@ export class ProfilService {
         name: userInfos[0]!.name,
         profilImg: userInfos[0]!.profilPicture,
         bio: userBio,
-        profilImg: userInfos[0]!.profilPicture,
         nbPosts: userNbPosts,
         nbFollowers: userNbFollowings,
         nbFollowings: userNbFollowers,
@@ -150,8 +148,8 @@ export class ProfilService {
   }
 
   async deleteUserDocument(deletedFilesDto: DeletedFilesDto, userId: string) {
-    const { docName } = deletedFilesDto;
-    await this.docService.DeleteUserDocuments(userId, docName);
+    const { docName } = deletedFilesDto
+    await this.docService.deleteUserDocuments(userId, docName)
   }
 
   async getUserDocuments(userId: string) {
