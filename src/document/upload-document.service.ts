@@ -8,6 +8,16 @@ export class DocumentUploadService {
 
   async uploadUserDocument(userId: string, docName: string, docUrl: string) {
     try {
+      const nbDoc = await this.prismaService.document.findMany({
+        where: {
+          userId: userId,
+        },
+      })
+
+      if (nbDoc.length === 10) {
+        return -1
+      }
+
       const doc = await this.prismaService.document.findFirst({
         where: {
           userId: userId,
@@ -64,6 +74,21 @@ export class DocumentUploadService {
       throw new BadRequestException(
         'An error occurred when getting user documents.'
       )
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  async deleteUserDocuments(_userId: string, _docName: string) {
+    try {
+      await this.prismaService.document.delete({
+        where: {
+          docName: _docName,
+        },
+      })
+      return { message: 'Document succesfully deleted' }
+    } catch (error) {
+      console.error(error)
+      throw new BadRequestException('An error occurred when deleting the post.')
     }
   }
 
