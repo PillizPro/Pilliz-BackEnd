@@ -16,10 +16,14 @@ export class SignalementService {
     })
   }
 
-  async createSignalement(signalement: SignalementDto) {
+  async createSignalement(signalement: SignalementDto, userId: string) {
     try {
       await this.prismaService.signalement.create({
-        data: signalement,
+        data: {
+          userId: userId,
+          category: signalement.category,
+          description: signalement.description,
+        },
       })
     } catch (error) {
       console.error(error)

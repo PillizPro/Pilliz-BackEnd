@@ -46,6 +46,9 @@ model Users {
   NotificationSend       Notificatifion[]         @relation("hasNotified")
   Reports                Reports[]
   Documents              Document[]
+  // verification email
+  isVerified             Boolean                  @default(false)
+  codeVerification       String
   // Pro
   isCompanyAccount       Boolean                  @default(false)
   companyAddress         String                   @default("")

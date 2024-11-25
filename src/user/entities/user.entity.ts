@@ -34,6 +34,9 @@ export class UserEntity implements Users {
   bio: string
   isConnected: boolean
   profilPicture: string
+  //verification email
+  isVerified: boolean
+  codeVerification: string
   // Métriques
   country: string
   totalIdentifyTime: number

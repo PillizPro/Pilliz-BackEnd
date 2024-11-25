@@ -25,6 +25,11 @@ export class MailerDto {
   readonly response?: string
 }
 
+export class MailerResend {
+  @IsDefined()
+  readonly email!: string
+}
+
 export class ValidationEmail implements MailerDto {
   type = MailerType.VALIDATION
   subject = 'Pilliz - Email Verification'
@@ -42,7 +47,7 @@ export class SupportTicketEmail implements MailerDto {
 
 export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {
   const mailOptions = {
-    from: 'pillizpro@gmail.com',
+    from: 'tiktoktest531@gmail.com',
     to: mail,
     template: typeMail.template,
     subject: typeMail.subject,
@@ -61,5 +66,6 @@ export function mailOptionsMaker(mail: string, typeMail: MailerDto): any {
       response: typeMail.response,
     }
   }
+
   return mailOptions
 }

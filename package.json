@@ -54,6 +54,7 @@
     "@nestjs/swagger": "^7.1.16",
     "@nestjs/websockets": "^10.3.0",
     "@prisma/client": "^5.19.1",
+    "academic-email-verifier": "^3.1.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
