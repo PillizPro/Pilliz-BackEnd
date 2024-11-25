@@ -43,7 +43,7 @@ export class AuthService {
     }
     const mail = userDtoWithHashedPassword.email;
     const isAcademic = await Verifier.isAcademic(mail);
-    // if (!isAcademic) throw new ConflictException('Email is not academic.')
+    if (!isAcademic) throw new ConflictException('Email is not academic.')
 
     const newUser = await this.userService.createUser(userDtoWithHashedPassword, randomNumber.toString())
     if (!newUser) throw new ConflictException('User already exists.')
