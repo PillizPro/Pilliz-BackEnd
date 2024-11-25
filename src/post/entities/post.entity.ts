@@ -16,4 +16,6 @@ export class PostEntity implements Post {
   totalInteractions: number
   confidentiality: string
   user: UserEntity
+  isFavorited: boolean
+  isPinned: boolean
 }

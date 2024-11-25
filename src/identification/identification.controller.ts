@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common'
 import { IdentificationService } from './identification.service'
+import { IdentifyUsersDto } from './dto/identify-users.dto'
 import { ApiTags } from '@nestjs/swagger'
-import { IdentifyUsersDto } from './dto'
 
 @ApiTags('Identification')
 @Controller('identification')
@@ -11,6 +11,11 @@ export class IdentificationController {
   @Get('getAllUserTagWithPattern/:pattern')
   async getAllUserTagWithPattern(@Param('pattern') pattern: string) {
     return await this.identificationService.getAllUserTagWithPattern(pattern)
+  }
+
+  @Get('formatUserTag/:userTag')
+  async formatUserTag(@Param('userTag') userTag: string) {
+    return await this.identificationService.formatUserTag(userTag)
   }
 
   @Post('IdentifyUsers')
