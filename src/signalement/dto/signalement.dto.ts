@@ -8,7 +8,4 @@ export class SignalementDto {
 
   @IsNotEmpty()
   readonly description: string
-
-  @IsNotEmpty()
-  readonly userId: string
 }
