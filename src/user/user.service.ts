@@ -119,9 +119,7 @@ export class UserService {
         where: { id: userId },
         data: { isVerified: true, codeVerification: '0' },
       })
-      this._logger.debug(
-        `Update verification status of user: ${userId} [${user.name}] to: true`
-      )
+      return new UserEntity(user)
     } catch (err) {
       console.error(err)
       throw new BadRequestException(
