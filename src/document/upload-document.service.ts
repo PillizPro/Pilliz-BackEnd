@@ -20,12 +20,12 @@ export class DocumentUploadService {
 
       const doc = await this.prismaService.document.findFirst({
         where: {
-          userId: userId,
+          docName: docName,
         },
       })
 
       // existe déjà, on le met à jour
-      if (docName === doc?.docName) {
+      if (doc && docName === doc?.docName) {
         await this.prismaService.document.update({
           where: {
             docName: docName,
