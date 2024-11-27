@@ -39,7 +39,6 @@ export class AuthService {
     const hashedPassword = await this._hashData(registerDto.password)
     const userDtoWithHashedPassword = {
       ...registerDto,
-      admin: true,
       password: hashedPassword,
     }
     const newProUser = await this.userService.createProUser(
@@ -75,21 +74,6 @@ export class AuthService {
     const tokens = await this._generateTokens(user.id, user.email)
     await this._updateRefreshTokenHash(user.id, tokens.refreshToken)
     return tokens
-  }
-
-  async makeUserAdmin(userId: string): Promise<void> {
-    const user = await this.prismaService.users.findUnique({
-      where: { id: userId },
-    })
-
-    if (!user) {
-      throw new UnauthorizedException("This user doesn't exist.")
-    }
-
-    await this.prismaService.users.update({
-      where: { id: userId },
-      data: { role: 'admin' },
-    })
   }
 
   async getUserAuthInfo(userId: string) {
