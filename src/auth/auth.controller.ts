@@ -77,13 +77,6 @@ export class AuthController {
 
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
-  @Post('toAdmin')
-  async toAdmin(@CurrentUserId() userId: string) {
-    return await this.authService.makeUserAdmin(userId)
-  }
-
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
   @Public()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refreshTokens')
