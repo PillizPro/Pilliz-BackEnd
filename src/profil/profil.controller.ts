@@ -10,8 +10,10 @@ import {
   ChangeBioDto,
   ChangeProfilImgDto,
   UploadFilesDto,
+  DeletedFilesDto,
   OtherUserProfilIdDto,
 } from './dto'
+
 import { CurrentUserId } from 'src/common/decorators'
 import { ProfilService } from './profil.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -38,6 +40,11 @@ export class ProfilController {
   @Get('userNbPost')
   async getUserNumbersOfPost(@CurrentUserId() userId: string) {
     return await this.profilService.getNbPost(userId)
+  }
+
+  @Get('userNbInterractions')
+  async getUserNbInterractions(@CurrentUserId() userId: string) {
+    return await this.profilService.getNbInterractions(userId)
   }
 
   @Get('otherUsersInfos/:userId')
@@ -67,6 +74,14 @@ export class ProfilController {
     @CurrentUserId() userId: string
   ) {
     return await this.profilService.uploadUserDocument(uploadFilesDto, userId)
+  }
+
+  @Post('deleteUserDocument')
+  async deleteUserDocument(
+    @Body() deletedFilesDto: DeletedFilesDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.deleteUserDocument(deletedFilesDto, userId)
   }
 
   @Get('getUserDocuments')
@@ -120,6 +135,28 @@ export class ProfilController {
     @CurrentUserId() userId: string
   ) {
     return await this.profilService.getRepostOnProfile(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getPostMediaOnProfil')
+  async getPostMediaOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPostMediaOnProfil(
+      otherUserProfilIdDto,
+      userId
+    )
+  }
+
+  @Post('getPrivateOnProfil')
+  async getPrivateOnProfil(
+    @Body() otherUserProfilIdDto: OtherUserProfilIdDto,
+    @CurrentUserId() userId: string
+  ) {
+    return await this.profilService.getPrivateOnProfil(
       otherUserProfilIdDto,
       userId
     )

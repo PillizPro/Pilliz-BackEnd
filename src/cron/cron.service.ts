@@ -20,6 +20,20 @@ export class CronService {
   // const oneWeek = 7 * this.oneDay
   // const oneMonth = 30 * this.oneDay
 
+  async getAllMetrics() {
+    return this.prismaService.metrics.findMany()
+  }
+
+  async getLastFourWeeks() {
+    const lastFourWeeks = await this.prismaService.metrics.findMany({
+      orderBy: {
+        Date: 'desc',
+      },
+      take: 4 * 7,
+    })
+    return lastFourWeeks
+  }
+
   async cron() {
     const nbUsers = await this.prismaService.users.count()
     const nbPosts = await this.prismaService.post.count()

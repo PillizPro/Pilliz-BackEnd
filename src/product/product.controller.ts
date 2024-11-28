@@ -1,6 +1,15 @@
 import { ApiTags } from '@nestjs/swagger'
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common'
 import { ProductService } from './product.service'
+import { CreateProductDto } from './dto/create-product.dto'
 
 @ApiTags('Product')
 @Controller('product')
@@ -34,5 +43,10 @@ export class ProductController {
   @Get('recoveringAllTags')
   async recoveringAllTags() {
     return await this.productService.recoveringAllProductTags()
+  }
+
+  @Post('createProduct')
+  async createProduct(@Body() createProductDto: CreateProductDto) {
+    return await this.productService.createProduct(createProductDto)
   }
 }
