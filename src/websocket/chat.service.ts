@@ -383,11 +383,13 @@ export class ChatService {
         const receiver = await this.prismaService.users.findUnique({
           where: { id: findChatDto.receiverId },
         })
-        if (receiver) isProConv = receiver.isCompanyAccount
         const user = await this.prismaService.users.findUnique({
           where: { id: findChatDto.userId },
         })
-        if (user) isProConv = user.isCompanyAccount
+        if (receiver && user) {
+          if (receiver.isCompanyAccount || user.isCompanyAccount)
+            isProConv = true
+        }
         if (!isReceiverFollowUser) {
           isInvitation = {
             Users: {
